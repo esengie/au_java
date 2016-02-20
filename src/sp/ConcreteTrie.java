@@ -2,11 +2,13 @@ package sp;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 public class ConcreteTrie implements Trie {
 
-    public ArrayList<ConcreteTrie> nodes = new ArrayList<>();
+    public List<ConcreteTrie> nodes = new ArrayList<>();
+
     int mSize = 0;
     Node mRoot;
 
@@ -22,14 +24,13 @@ public class ConcreteTrie implements Trie {
     public boolean add(String element) {
         if (element.length() == 0) {
             mRoot.isTerminal = true;
-            mRoot.number = mSize + 1;
             mSize++;
             return true;
         }
-        return addHelper(element, 0, mSize + 1);
+        return addHelper(element, 0);
     }
 
-    private boolean addHelper(String elem, int pos, int num) {
+    private boolean addHelper(String elem, int pos) {
         ConcreteTrie trie = trieOnLevel(elem.charAt(pos));
         boolean added;
         if (trie != null) {
@@ -37,13 +38,12 @@ public class ConcreteTrie implements Trie {
                 if (trie.mRoot.isTerminal) return false;
                 else {
                     trie.mRoot.isTerminal = true;
-                    trie.mRoot.number = num;
                     trie.mSize++;
                     mSize++;
                     return true;
                 }
             }
-            added = trie.addHelper(elem, pos + 1, num);
+            added = trie.addHelper(elem, pos + 1);
             if (added) mSize++;
         } else {
             trie = new ConcreteTrie(elem.charAt(pos));
@@ -52,11 +52,10 @@ public class ConcreteTrie implements Trie {
             mSize++;
             if (pos == elem.length() - 1) {
                 trie.mRoot.isTerminal = true;
-                trie.mRoot.number = num;
                 trie.mSize++;
                 return true;
             }
-            trie.addHelper(elem, pos + 1, num);
+            trie.addHelper(elem, pos + 1);
         }
         return added;
     }
@@ -67,17 +66,29 @@ public class ConcreteTrie implements Trie {
         return containsHelper(element, 0);
     }
 
-    public void printer() {
+    void print() {
         Queue<ConcreteTrie> q = new LinkedList<>();
+        Queue<Integer> l = new LinkedList<>();
         q.add(this);
+        l.add(0);
         ConcreteTrie t;
+        int lev;
         while (q.size() != 0) {
             t = q.poll();
-            System.out.print(String.format("%c%d ", t.mRoot.label, t.size()));
+            lev = l.poll();
+            System.out.print(String.format("%c%d ", t.mRoot.character, t.size()));
             for (ConcreteTrie f : t.nodes) {
                 q.add(f);
             }
+            if (l.size() == 0){
+                System.out.println();
+                lev++;
+                for (int i = 0; i < q.size(); ++i){
+                    l.add(lev);
+                }
+            }
         }
+        System.out.println();
     }
 
     private boolean containsHelper(String elem, int pos) {
@@ -91,7 +102,7 @@ public class ConcreteTrie implements Trie {
 
     private ConcreteTrie trieOnLevel(char element) {
         for (ConcreteTrie it : nodes) {
-            if (it.mRoot.label == element) {
+            if (it.mRoot.character == element) {
                 return it;
             }
         }
@@ -112,7 +123,33 @@ public class ConcreteTrie implements Trie {
     }
 
     private boolean removeHelper(String elem, int pos) {
-        return false;
+        ConcreteTrie it = trieOnLevel(elem.charAt(pos));
+        if (it == null) return false;
+
+        if (pos == elem.length() - 1) {
+            if (!it.mRoot.isTerminal) {
+                return false;
+            }
+            if (it.size() > 1) {
+                it.mSize--;
+                mSize--;
+                it.mRoot.isTerminal = false;
+                return true;
+            }
+            nodes.remove(it);
+            mSize--;
+            return true;
+        }
+        boolean deleted = it.removeHelper(elem, pos + 1);
+        if (!deleted) return false;
+
+        if (it.size() >= 1) {
+            mSize--;
+            return true;
+        }
+        nodes.remove(it);
+        mSize--;
+        return true;
     }
 
     @Override
@@ -137,17 +174,11 @@ public class ConcreteTrie implements Trie {
     }
 
     private class Node {
-        char label;
+        char character;
         boolean isTerminal = false;
-        int number = 0;
 
         public Node(char a) {
-            label = a;
-        }
-
-        public Node(int b) {
-            number = b;
-            isTerminal = true;
+            character = a;
         }
     }
 }
