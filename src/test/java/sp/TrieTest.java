@@ -60,7 +60,7 @@ public class TrieTest {
 
     public static Trie instance() {
         try {
-            return (Trie) Class.forName("sp.ConcreteTrie").newInstance();
+            return (Trie) Class.forName("sp.TrieImpl").newInstance();
         } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
             throw new IllegalStateException(e);
         }

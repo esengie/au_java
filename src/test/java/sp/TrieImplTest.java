@@ -2,17 +2,16 @@ package sp;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.LinkedList;
 
 import static org.junit.Assert.assertEquals;
 
-public class ConcreteTrieTest {
+public class TrieImplTest {
 
-    Trie trie;
+    private Trie trie;
 
     @org.junit.Before
     public void setUp() throws Exception {
-        trie = new ConcreteTrie();
+        trie = new TrieImpl();
     }
 
     @org.junit.Test
@@ -49,7 +48,7 @@ public class ConcreteTrieTest {
 
     @org.junit.Test
     public void testPrint() throws Exception {
-        ConcreteTrie testTree = new ConcreteTrie();
+        TrieImpl testTree = new TrieImpl();
         testTree.add("chicken");
         testTree.add("Sammich");
         testTree.add("Sammich");
@@ -81,6 +80,8 @@ public class ConcreteTrieTest {
         assertEquals(1, trie.size());
         trie.add("mon");
         assertEquals(2, trie.size());
+        trie.add("bevvie");
+        assertEquals(3, trie.size());
         trie.add("bevvie");
         assertEquals(3, trie.size());
     }

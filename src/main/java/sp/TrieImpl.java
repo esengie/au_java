@@ -1,31 +1,27 @@
 package sp;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-
 import java.io.*;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
-public class ConcreteTrie implements Trie, StreamSerializable {
+public class TrieImpl implements Trie, StreamSerializable {
 
-    public List<ConcreteTrie> nodes = new ArrayList<>();
+    private final List<TrieImpl> mNodes = new ArrayList<>();
 
-    int mSize = 0;
-    Node mRoot;
+    private int mSize = 0;
+    private final Node mRoot;
 
-    public ConcreteTrie() {
+    public TrieImpl() {
         mRoot = new Node('/');
     }
 
-    private ConcreteTrie(char a) {
+    private TrieImpl(char a) {
         mRoot = new Node(a);
     }
 
     @Override
     public boolean add(String element) {
-        if (element.length() == 0) {
+        if (element.isEmpty()) {
             mRoot.isTerminal = true;
             mSize++;
             return true;
@@ -34,7 +30,7 @@ public class ConcreteTrie implements Trie, StreamSerializable {
     }
 
     private boolean addHelper(String elem, int pos) {
-        ConcreteTrie trie = trieOnLevel(elem.charAt(pos));
+        TrieImpl trie = findChildren(elem.charAt(pos));
         boolean added;
         if (trie != null) {
             if (pos == elem.length() - 1) {
@@ -49,8 +45,8 @@ public class ConcreteTrie implements Trie, StreamSerializable {
             added = trie.addHelper(elem, pos + 1);
             if (added) mSize++;
         } else {
-            trie = new ConcreteTrie(elem.charAt(pos));
-            nodes.add(trie);
+            trie = new TrieImpl(elem.charAt(pos));
+            mNodes.add(trie);
             added = true;
             mSize++;
             if (pos == elem.length() - 1) {
@@ -65,7 +61,7 @@ public class ConcreteTrie implements Trie, StreamSerializable {
 
     @Override
     public boolean contains(String element) {
-        if (element.length() == 0) return mRoot.isTerminal;
+        if (element.isEmpty()) return mRoot.isTerminal;
         return containsHelper(element, 0);
     }
 
@@ -73,14 +69,14 @@ public class ConcreteTrie implements Trie, StreamSerializable {
         if (pos == elem.length()) {
             return mRoot.isTerminal;
         } else {
-            ConcreteTrie el = trieOnLevel(elem.charAt(pos));
+            TrieImpl el = findChildren(elem.charAt(pos));
             return el != null && el.containsHelper(elem, pos + 1);
         }
     }
 
-    private ConcreteTrie trieOnLevel(char element) {
-        for (ConcreteTrie it : nodes) {
-            if (it.mRoot.character == element) {
+    private TrieImpl findChildren(char element) {
+        for (TrieImpl it : mNodes) {
+            if (it.mRoot.mCharacter == element) {
                 return it;
             }
         }
@@ -89,7 +85,7 @@ public class ConcreteTrie implements Trie, StreamSerializable {
 
     @Override
     public boolean remove(String element) {
-        if (element.length() == 0) {
+        if (element.isEmpty()) {
             if (mRoot.isTerminal) {
                 mRoot.isTerminal = false;
                 mSize--;
@@ -101,7 +97,7 @@ public class ConcreteTrie implements Trie, StreamSerializable {
     }
 
     private boolean removeHelper(String elem, int pos) {
-        ConcreteTrie it = trieOnLevel(elem.charAt(pos));
+        TrieImpl it = findChildren(elem.charAt(pos));
         if (it == null) return false;
 
         if (pos == elem.length() - 1) {
@@ -114,7 +110,7 @@ public class ConcreteTrie implements Trie, StreamSerializable {
                 it.mRoot.isTerminal = false;
                 return true;
             }
-            nodes.remove(it);
+            mNodes.remove(it);
             mSize--;
             return true;
         }
@@ -125,7 +121,7 @@ public class ConcreteTrie implements Trie, StreamSerializable {
             mSize--;
             return true;
         }
-        nodes.remove(it);
+        mNodes.remove(it);
         mSize--;
         return true;
     }
@@ -137,12 +133,12 @@ public class ConcreteTrie implements Trie, StreamSerializable {
 
     @Override
     public int howManyStartsWithPrefix(String prefix) {
-        if (prefix.length() == 0) return size();
+        if (prefix.isEmpty()) return size();
         return prefixHelper(prefix, 0);
     }
 
     private int prefixHelper(String prefix, int pos) {
-        ConcreteTrie it = trieOnLevel(prefix.charAt(pos));
+        TrieImpl it = findChildren(prefix.charAt(pos));
         if (it == null) return 0;
         if (pos == prefix.length() - 1) {
             return it.size();
@@ -153,8 +149,8 @@ public class ConcreteTrie implements Trie, StreamSerializable {
 
     void print(StringBuilder os) {
         if (this == null) return;
-        os.append(String.format("%c%d%b", mRoot.character, size(), mRoot.isTerminal));
-        for (ConcreteTrie f : nodes) {
+        os.append(String.format("%c%d%b", mRoot.mCharacter, size(), mRoot.isTerminal));
+        for (TrieImpl f : mNodes) {
             f.print(os);
         }
         os.append('|');
@@ -170,10 +166,10 @@ public class ConcreteTrie implements Trie, StreamSerializable {
 
     private void flush(DataOutputStream out) throws IOException {
         if (this == null) return;
-        out.writeChar(mRoot.character);
+        out.writeChar(mRoot.mCharacter);
         out.writeInt(size());
         out.writeBoolean(mRoot.isTerminal);
-        for (ConcreteTrie f : nodes) {
+        for (TrieImpl f : mNodes) {
             f.flush(out);
         }
         out.writeChar('|');
@@ -181,9 +177,9 @@ public class ConcreteTrie implements Trie, StreamSerializable {
 
     @Override
     public void deserialize(InputStream in) throws IOException {
-        nodes.clear();
+        mNodes.clear();
         DataInputStream is = new DataInputStream(in);
-        mRoot.character = is.readChar();
+        mRoot.mCharacter = is.readChar();
         mSize = is.readInt();
         mRoot.isTerminal = is.readBoolean();
         while(is.available() != 0) {
@@ -196,22 +192,21 @@ public class ConcreteTrie implements Trie, StreamSerializable {
             char ch = is.readChar();
             if (ch == '|')
                 return;
-
-            ConcreteTrie trie = new ConcreteTrie();
+            TrieImpl trie = new TrieImpl();
             trie.mSize = is.readInt();
-            trie.mRoot.character = ch;
+            trie.mRoot.mCharacter = ch;
             trie.mRoot.isTerminal = is.readBoolean();
-            nodes.add(trie);
+            mNodes.add(trie);
             trie.restore(is);
         }
     }
 
-    private class Node {
-        char character;
-        boolean isTerminal = false;
+    private static class Node {
+        private char mCharacter;
+        private boolean isTerminal = false;
 
         public Node(char a) {
-            character = a;
+            mCharacter = a;
         }
     }
 }
