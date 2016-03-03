@@ -1,5 +1,9 @@
 package sp;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.util.LinkedList;
+
 import static org.junit.Assert.assertEquals;
 
 public class ConcreteTrieTest {
@@ -48,9 +52,27 @@ public class ConcreteTrieTest {
         ConcreteTrie testTree = new ConcreteTrie();
         testTree.add("chicken");
         testTree.add("Sammich");
+        testTree.add("Sammich");
         testTree.add("chick");
         testTree.add("lol");
-        testTree.print();
+        testTree.add("chickon");
+        testTree.remove("chick");
+
+        StringBuilder s = new StringBuilder();
+        testTree.print(s);
+
+        System.out.println(s.toString());
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        testTree.serialize(outputStream);
+
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+        testTree.deserialize(inputStream);
+
+        StringBuilder s2 = new StringBuilder();
+        testTree.print(s2);
+
+        System.out.println(s2.toString());
     }
 
     @org.junit.Test

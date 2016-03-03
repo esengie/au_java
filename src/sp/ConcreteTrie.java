@@ -1,11 +1,14 @@
 package sp;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-public class ConcreteTrie implements Trie {
+public class ConcreteTrie implements Trie, StreamSerializable {
 
     public List<ConcreteTrie> nodes = new ArrayList<>();
 
@@ -64,31 +67,6 @@ public class ConcreteTrie implements Trie {
     public boolean contains(String element) {
         if (element.length() == 0) return mRoot.isTerminal;
         return containsHelper(element, 0);
-    }
-
-    void print() {
-        Queue<ConcreteTrie> q = new LinkedList<>();
-        Queue<Integer> l = new LinkedList<>();
-        q.add(this);
-        l.add(0);
-        ConcreteTrie t;
-        int lev;
-        while (q.size() != 0) {
-            t = q.poll();
-            lev = l.poll();
-            System.out.print(String.format("%c%d ", t.mRoot.character, t.size()));
-            for (ConcreteTrie f : t.nodes) {
-                q.add(f);
-            }
-            if (l.size() == 0){
-                System.out.println();
-                lev++;
-                for (int i = 0; i < q.size(); ++i){
-                    l.add(lev);
-                }
-            }
-        }
-        System.out.println();
     }
 
     private boolean containsHelper(String elem, int pos) {
@@ -170,6 +148,61 @@ public class ConcreteTrie implements Trie {
             return it.size();
         } else {
             return it.prefixHelper(prefix, pos + 1);
+        }
+    }
+
+    void print(StringBuilder os) {
+        if (this == null) return;
+        os.append(String.format("%c%d%b", mRoot.character, size(), mRoot.isTerminal));
+        for (ConcreteTrie f : nodes) {
+            f.print(os);
+        }
+        os.append('|');
+    }
+
+
+    @Override
+    public void serialize(OutputStream out) throws IOException {
+        DataOutputStream os = new DataOutputStream(out);
+        flush(os);
+        os.flush();
+    }
+
+    private void flush(DataOutputStream out) throws IOException {
+        if (this == null) return;
+        out.writeChar(mRoot.character);
+        out.writeInt(size());
+        out.writeBoolean(mRoot.isTerminal);
+        for (ConcreteTrie f : nodes) {
+            f.flush(out);
+        }
+        out.writeChar('|');
+    }
+
+    @Override
+    public void deserialize(InputStream in) throws IOException {
+        nodes.clear();
+        DataInputStream is = new DataInputStream(in);
+        mRoot.character = is.readChar();
+        mSize = is.readInt();
+        mRoot.isTerminal = is.readBoolean();
+        while(is.available() != 0) {
+            restore(is);
+        }
+    }
+
+    private void restore(DataInputStream is) throws IOException {
+        while(is.available() != 0) {
+            char ch = is.readChar();
+            if (ch == '|')
+                return;
+
+            ConcreteTrie trie = new ConcreteTrie();
+            trie.mSize = is.readInt();
+            trie.mRoot.character = ch;
+            trie.mRoot.isTerminal = is.readBoolean();
+            nodes.add(trie);
+            trie.restore(is);
         }
     }
 
