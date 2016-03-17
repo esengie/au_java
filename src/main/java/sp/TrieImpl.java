@@ -148,7 +148,6 @@ public class TrieImpl implements Trie, StreamSerializable {
     }
 
     void print(StringBuilder os) {
-        if (this == null) return;
         os.append(String.format("%c%d%b", mRoot.mCharacter, size(), mRoot.isTerminal));
         for (TrieImpl f : mNodes) {
             f.print(os);
@@ -165,7 +164,6 @@ public class TrieImpl implements Trie, StreamSerializable {
     }
 
     private void flush(DataOutputStream out) throws IOException {
-        if (this == null) return;
         out.writeChar(mRoot.mCharacter);
         out.writeInt(size());
         out.writeBoolean(mRoot.isTerminal);
@@ -182,9 +180,7 @@ public class TrieImpl implements Trie, StreamSerializable {
         mRoot.mCharacter = is.readChar();
         mSize = is.readInt();
         mRoot.isTerminal = is.readBoolean();
-        while(is.available() != 0) {
-            restore(is);
-        }
+        restore(is);
     }
 
     private void restore(DataInputStream is) throws IOException {

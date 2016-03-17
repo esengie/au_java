@@ -4,6 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 public class TrieImplTest {
 
@@ -16,34 +18,34 @@ public class TrieImplTest {
 
     @org.junit.Test
     public void testAdd() throws Exception {
-        assertEquals(true, trie.add("money"));
-        assertEquals(false, trie.add("money"));
-        assertEquals(true, trie.add("mon"));
-        assertEquals(false, trie.add("mon"));
-        assertEquals(true, trie.add(""));
+        assertTrue(trie.add("money"));
+        assertFalse(trie.add("money"));
+        assertTrue(trie.add("mon"));
+        assertFalse(trie.add("mon"));
+        assertTrue(trie.add(""));
     }
 
     @org.junit.Test
     public void testContains() throws Exception {
         trie.add("money");
-        assertEquals(true, trie.contains("money"));
-        assertEquals(false, trie.contains("mon"));
+        assertTrue(trie.contains("money"));
+        assertFalse(trie.contains("mon"));
         trie.add("mon");
-        assertEquals(true, trie.contains("mon"));
+        assertTrue(trie.contains("mon"));
     }
 
     @org.junit.Test
     public void testRemove() throws Exception {
         trie.add("");
-        assertEquals(true, trie.remove(""));
-        assertEquals(false, trie.remove(""));
+        assertTrue(trie.remove(""));
+        assertFalse(trie.remove(""));
         trie.add("money");
         trie.add("mon");
-        assertEquals(true, trie.remove("money"));
-        assertEquals(true, trie.contains("mon"));
-        assertEquals(false, trie.contains("money"));
-        assertEquals(false, trie.remove("mono"));
-        assertEquals(true, trie.remove("mon"));
+        assertTrue(trie.remove("money"));
+        assertTrue(trie.contains("mon"));
+        assertFalse(trie.contains("money"));
+        assertFalse(trie.remove("mono"));
+        assertTrue(trie.remove("mon"));
     }
 
     @org.junit.Test

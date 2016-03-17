@@ -23,7 +23,7 @@ public class TrieTest {
     }
 
     @Test
-    public void testSimpleSerialization() throws IOException, ClassNotFoundException {
+    public void testSimpleSerialization() throws IOException {
         Trie trie = instance();
 
         assertTrue(trie.add("abc"));

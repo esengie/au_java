@@ -11,5 +11,5 @@ public interface StreamSerializable {
     /**
      * Replace current state with data from input stream
      */
-    void deserialize(InputStream in) throws IOException, ClassNotFoundException;
+    void deserialize(InputStream in) throws IOException;
 }
