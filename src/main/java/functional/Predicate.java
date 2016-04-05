@@ -1,8 +1,8 @@
 package functional;
 
 public interface Predicate<A> extends Function1<A, Boolean> {
-    static final Predicate<Object> ALWAYS_TRUE = (arg -> true);
-    static final Predicate<Object> ALWAYS_FALSE = (arg -> false);
+    Predicate<Object> ALWAYS_TRUE = arg -> true;
+    Predicate<Object> ALWAYS_FALSE = arg -> false;
 
     default Predicate<A> or(Predicate<? super A> other) {
         return arg -> apply(arg) || other.apply(arg);

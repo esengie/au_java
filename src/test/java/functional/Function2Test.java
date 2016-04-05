@@ -12,6 +12,9 @@ public class Function2Test {
 
         assertEquals(36, mul.compose(square).apply(2.0, 3.0).intValue());
         assertEquals(0, mul.compose(square).apply(0.0, 100.0).intValue());
+
+        Function1<Object, String> toString = Object::toString;
+        assertEquals(Double.toString(4.0), mul.compose(toString).apply(2.0, 2.0));
     }
 
     @Test

@@ -12,5 +12,9 @@ public class Function1Test {
 
         assertEquals(2, square.compose(sqrt).apply(2.).intValue());
         assertEquals(1, sqrt.compose(sqrt).apply(2.).intValue());
+
+        Function1<Object, Boolean> notNull = x -> x != null;
+        Function1<Integer, Integer> toNull = x -> null;
+        assertFalse(toNull.compose(notNull).apply(10));
     }
 }
