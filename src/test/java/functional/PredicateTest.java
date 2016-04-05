@@ -24,6 +24,11 @@ public class PredicateTest {
         Predicate<String> equals10 = "10"::equals;
         Predicate<Object> equals12 = "12"::equals;
         assertTrue(equals10.or(equals12).apply("12"));
+
+        Predicate<Function1<Integer, Integer>> check_not_null = f -> f.apply(1) == 1;
+        Predicate<Function1<Integer, Integer>> check_null = f -> f.apply(0) == 1;
+        Function1<Integer, Integer> unsafe = a -> 1/a;
+        assertTrue(check_not_null.or(check_null).apply(unsafe));
     }
 
     @Test
@@ -40,6 +45,11 @@ public class PredicateTest {
         Predicate<String> equals10 = "10"::equals;
         Predicate<Object> equals12 = "12"::equals;
         assertFalse(equals10.and(equals12).apply("12"));
+
+        Predicate<Function1<Integer, Integer>> check_not_null = f -> f.apply(1) != 1;
+        Predicate<Function1<Integer, Integer>> check_null = f -> f.apply(0) == 1;
+        Function1<Integer, Integer> unsafe = a -> 1/a;
+        assertFalse(check_not_null.and(check_null).apply(unsafe));
     }
 
     @Test
