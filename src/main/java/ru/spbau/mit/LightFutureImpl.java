@@ -14,6 +14,7 @@ public class LightFutureImpl<T> implements LightFuture<T> {
                 wait();
             }
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             throw new LightExecutionException();
         }
         if (excepted) {
@@ -22,7 +23,7 @@ public class LightFutureImpl<T> implements LightFuture<T> {
         return value;
     }
 
-    void setRes(T val) {
+    synchronized void setRes(T val) {
         value = val;
         notify();
     }

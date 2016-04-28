@@ -1,13 +1,11 @@
 package ru.spbau.mit;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.function.Supplier;
 
 class Worker extends Thread {
-    Worker(Queue<Runnable> queue) {
+    Worker(SynchQueue<Runnable> queue) {
         tasks = queue;
     }
 
@@ -15,26 +13,20 @@ class Worker extends Thread {
     public void run() {
         try {
             while (!isInterrupted()) {
-                Runnable task;
-                while (tasks.isEmpty()) {
-                    tasks.wait();
-                }
-                synchronized (tasks) {
-                    if (tasks.isEmpty()) continue;
-                    task = tasks.peek();
-                    tasks.remove();
-                }
+                Runnable task = tasks.take();
                 task.run();
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
     }
-    private final Queue<Runnable> tasks;
+
+    private final SynchQueue<Runnable> tasks;
 }
 
 public class ThreadPoolImpl implements ThreadPool {
     public ThreadPoolImpl(int size) {
+        tasks = new SynchQueue<>(size * 2);
         for (int i = 0; i < size; i++) {
             Worker w = new Worker(tasks);
             workers.add(w);
@@ -43,24 +35,32 @@ public class ThreadPoolImpl implements ThreadPool {
     }
 
     @Override
-    public synchronized <T> LightFuture<T> add(Supplier<T> task) {
+    public <T> LightFuture<T> add(Supplier<T> task) {
         LightFutureImpl<T> future = new LightFutureImpl<>(this);
-        tasks.add(() -> {
-            try {
-                future.setRes(task.get());
-            } catch (Exception e) {
-                future.excepted();
-            }
-        });
-        tasks.notifyAll();
+        try {
+            tasks.put(() -> {
+                try {
+                    future.setRes(task.get());
+                } catch (Exception e) {
+                    future.excepted();
+                }
+            });
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         return future;
     }
 
     @Override
     public void shutdown() {
         try {
-            for (Worker w : workers) {
+            for (Worker w: workers) {
                 w.interrupt();
+                tasks.put(()->Thread.currentThread().interrupt()); // Help, doesn't work without this,
+                // probably because only one thread is inside synchronised in queue,
+                // so interrupt works only for that one(?)
+            }
+            for (Worker w: workers) {
                 w.join();
             }
         } catch (InterruptedException e) {
@@ -68,6 +68,6 @@ public class ThreadPoolImpl implements ThreadPool {
         }
     }
 
-    private final Queue<Runnable> tasks = new LinkedList<>();
+    private final SynchQueue<Runnable> tasks;
     private final List<Worker> workers = new ArrayList<>();
 }
