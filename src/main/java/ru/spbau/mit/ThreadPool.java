@@ -6,5 +6,6 @@ public interface ThreadPool {
 
     <T> LightFuture<T> add(Supplier<T> task);
 
+    void put(Runnable task);
     void shutdown();
 }

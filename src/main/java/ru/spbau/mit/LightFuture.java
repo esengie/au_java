@@ -3,7 +3,7 @@ package ru.spbau.mit;
 import java.util.function.Function;
 
 public interface LightFuture<T> {
-    T get() throws LightExecutionException;
+    T get() throws LightExecutionException, InterruptedException;
 
     boolean isReady();
 

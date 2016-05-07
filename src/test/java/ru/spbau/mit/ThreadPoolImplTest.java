@@ -2,10 +2,8 @@ package ru.spbau.mit;
 
 import org.junit.Test;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.lang.reflect.Array;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -38,16 +36,30 @@ public class ThreadPoolImplTest {
 
     @Test
     public void testAfter() throws Exception {
-        ThreadPool th = new ThreadPoolImpl(5);
+        ThreadPool th = new ThreadPoolImpl(2);
         LightFuture<String> res = th.add(ThreadPoolImplTest::helperTestDiff);
-        LightFuture<String> res2 = res.thenApply(s -> s.concat("After"));
-        th.add(() -> "Else");
-        th.add(() -> "Else");
-        th.add(() -> "Else");
-        th.add(() -> "Else");
+        Queue<String> results = new LinkedList<>();
+        LightFuture<String> res2 = res.thenApply(s -> {
+            results.add("slow"); return s.concat("After");
+        });
+        res2.thenApply(s -> {
+            results.add("slower"); return s.concat("After");
+        });
+        th.add(() -> {
+            results.add("fast"); return "Else";
+        });
+        th.add(() -> {
+            results.add("fast"); return "Else";
+        });
+        th.add(() -> {
+            results.add("fast"); return "Else";
+        });
+        th.add(() -> {
+            results.add("fast"); return "Else";
+        });
         assertEquals("BeforeAfter", res2.get());
+        assertArrayEquals(new String[] {"fast", "fast", "fast", "fast", "slow", "slower"}, results.toArray());
     }
-
 
 
     private static Thread helperTestN(){

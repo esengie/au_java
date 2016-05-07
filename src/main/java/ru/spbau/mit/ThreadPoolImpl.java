@@ -26,7 +26,7 @@ class Worker extends Thread {
 
 public class ThreadPoolImpl implements ThreadPool {
     public ThreadPoolImpl(int size) {
-        tasks = new SynchQueue<>(size * 2);
+        tasks = new SynchQueue<>(size * 10);
         for (int i = 0; i < size; i++) {
             Worker w = new Worker(tasks);
             workers.add(w);
@@ -37,18 +37,23 @@ public class ThreadPoolImpl implements ThreadPool {
     @Override
     public <T> LightFuture<T> add(Supplier<T> task) {
         LightFutureImpl<T> future = new LightFutureImpl<>(this);
+        put(() -> {
+            try {
+                future.setRes(task.get());
+            } catch (Exception e) {
+                future.excepted();
+            }
+        });
+        return future;
+    }
+
+    @Override
+    public void put(Runnable task){
         try {
-            tasks.put(() -> {
-                try {
-                    future.setRes(task.get());
-                } catch (Exception e) {
-                    future.excepted();
-                }
-            });
+            tasks.put(task);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        return future;
     }
 
     @Override
@@ -56,7 +61,7 @@ public class ThreadPoolImpl implements ThreadPool {
         try {
             for (Worker w: workers) {
                 w.interrupt();
-                tasks.put(()->Thread.currentThread().interrupt()); // Help, doesn't work without this,
+                tasks.put(()->Thread.currentThread().interrupt()); // doesn't work without this,
                 // probably because only one thread is inside synchronised in queue,
                 // so interrupt works only for that one(?)
             }

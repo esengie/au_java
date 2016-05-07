@@ -1,5 +1,9 @@
 package ru.spbau.mit;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.RunnableFuture;
 import java.util.function.Function;
 
 public class LightFutureImpl<T> implements LightFuture<T> {
@@ -8,14 +12,9 @@ public class LightFutureImpl<T> implements LightFuture<T> {
     }
 
     @Override
-    public synchronized T get() throws LightExecutionException {
-        try {
-            while (value == null) {
-                wait();
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new LightExecutionException();
+    public synchronized T get() throws LightExecutionException, InterruptedException {
+        while (value == null) {
+            wait();
         }
         if (excepted) {
             throw new LightExecutionException();
@@ -26,29 +25,40 @@ public class LightFutureImpl<T> implements LightFuture<T> {
     synchronized void setRes(T val) {
         value = val;
         notify();
+        int i = 0;
+        for (Runnable tsk : toDo) {
+            threadPool.put(tsk);
+        }
     }
 
-    void excepted() {
+    synchronized void excepted() {
         excepted = true;
     }
 
     @Override
     public synchronized boolean isReady() {
-        return value != null;
+        return value != null && !excepted;
     }
 
     @Override
     public synchronized <R> LightFuture<R> thenApply(Function<? super T, ? extends R> function) {
-        return threadPool.add(() -> {         // to make sure this is called only after the initial one has finished
-            try {
-                return function.apply(this.get());
-            } catch (LightExecutionException e) {
-                throw new RuntimeException();
-            }
-        });
+        if (isReady()) {
+            return threadPool.add(() -> function.apply(value));
+        } else {
+            LightFutureImpl<R> future = new LightFutureImpl<>(threadPool);
+            toDo.add(() -> {
+                try {
+                    future.setRes(function.apply(this.get()));
+                } catch (Exception e) {
+                    future.excepted();
+                }
+            });
+            return future;
+        }
     }
 
     private T value = null;
     private Boolean excepted = false;
     private final ThreadPool threadPool;
+    private List<Runnable> toDo = new LinkedList<>();
 }
