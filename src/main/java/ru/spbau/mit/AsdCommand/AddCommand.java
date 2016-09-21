@@ -6,7 +6,7 @@ import java.util.List;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 
-@Parameters(commandDescription = "AddCommand files to the index")
+@Parameters(commandDescription = "Add files to the index")
 public class AddCommand extends AsdCommand {
     @Parameter(description = "File patterns to add to the index")
     private List<String> patterns;

@@ -17,8 +17,9 @@ public class AsdCommandFactory {
         COMMANDS.put("branch", BranchCommand.class);
         COMMANDS.put("checkout", CheckoutCommand.class);
         COMMANDS.put("commit", CommitCommand.class);
-        COMMANDS.put("log", LogRefactor.class);
-        COMMANDS.put("merge", MergeRefactor.class);
+        COMMANDS.put("log", LogCommand.class);
+        COMMANDS.put("merge", MergeCommand.class);
+        COMMANDS.put("init", InitCommand.class);
     }
 
     public static List<String> getCommandNames(){

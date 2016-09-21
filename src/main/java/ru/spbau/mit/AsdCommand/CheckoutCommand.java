@@ -6,11 +6,11 @@ import com.beust.jcommander.Parameters;
 import java.io.IOException;
 import java.util.List;
 
-@Parameters(commandDescription = "CheckoutCommand branches")
+@Parameters(commandDescription = "Checkout a branch or a commit")
 public class CheckoutCommand extends AsdCommand {
 
-    @Parameter(description = "BranchCommand name")
-    private List<String> branches;
+    @Parameter(description = "Branch name or revision")
+    private List<String> branch;
 
     protected CheckoutCommand(){super();}
 

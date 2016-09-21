@@ -14,7 +14,11 @@ public interface RevisionTree {
     @NotNull
     Set<AsdBranch> getBranches();
 
-    void branch(AsdBranch a_branch);
+    int getRevisionNumber();
+
+    void branchCreate(AsdBranch a_branch);
+    void branchRemove(AsdBranch a_branch);
+
     void commit(CommitNode a_node);
 
     void merge(AsdBranch a_branch, CommitNode merged) throws BranchDoesntExistException;

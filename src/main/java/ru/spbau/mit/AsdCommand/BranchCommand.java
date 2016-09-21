@@ -6,13 +6,13 @@ import com.beust.jcommander.Parameters;
 import java.io.IOException;
 import java.util.List;
 
-@Parameters(commandDescription = "AddCommand file contents to the index")
+@Parameters(commandDescription = "Branch managements")
 public class BranchCommand extends AsdCommand {
 
-    @Parameter(description = "The branch names")
+    @Parameter(description = "The branch name")
     private List<String> branchName;
 
-    @Parameter(names = "-d")
+    @Parameter(names = "-d", description = "delete branch")
     private boolean deleteMode = false;
 
     protected BranchCommand(){super();}

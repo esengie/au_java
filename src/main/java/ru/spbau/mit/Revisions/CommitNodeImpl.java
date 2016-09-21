@@ -1,26 +1,24 @@
 package ru.spbau.mit.Revisions;
 
-import java.util.*;
-
 public class CommitNodeImpl implements CommitNode {
-    private String m_author;
-    private String m_hashCode;
+    private String m_message;
+    private int m_revisionNumber;
     private AsdBranch m_branch;
 
-    public CommitNodeImpl(String a_author, String a_hashCode, AsdBranch a_branch) {
-        m_author = a_author;
-        m_hashCode = a_hashCode;
+    public CommitNodeImpl(String a_message, int a_revisionNumber, AsdBranch a_branch) {
+        m_message = a_message;
+        m_revisionNumber = a_revisionNumber;
         m_branch = a_branch;
     }
 
     @Override
-    public String getAuthor() {
-        return m_author;
+    public String getMessage() {
+        return m_message;
     }
 
     @Override
-    public String getHashCode() {
-        return m_hashCode;
+    public int getRevisionNumber() {
+        return m_revisionNumber;
     }
 
     @Override

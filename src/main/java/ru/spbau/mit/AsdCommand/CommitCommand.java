@@ -13,8 +13,8 @@ public class CommitCommand extends AsdCommand {
 
     protected CommitCommand(){super();}
 
-    @Parameter(names = "--author")
-    private String author = "";
+    @Parameter(names = "-m", description = "Commit message", required = true)
+    private String message = "";
 
     @Override
     public void run() throws IOException {

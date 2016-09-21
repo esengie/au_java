@@ -6,12 +6,12 @@ import com.beust.jcommander.Parameters;
 import java.io.IOException;
 import java.util.List;
 
-@Parameters(commandDescription = "MergeRefactor a branch to this one")
-public class MergeRefactor extends AsdCommand {
-    @Parameter(description = "The branch names")
+@Parameters(commandDescription = "Merge a branch to this one")
+public class MergeCommand extends AsdCommand {
+    @Parameter(description = "The branch name")
     private List<String> branchName;
 
-    protected MergeRefactor(){super();}
+    protected MergeCommand(){super();}
 
     @Override
     public void run() throws IOException {

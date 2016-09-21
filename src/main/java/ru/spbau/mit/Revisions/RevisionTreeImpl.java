@@ -5,6 +5,7 @@ import org.jgrapht.graph.DefaultEdge;
 import ru.spbau.mit.Revisions.Exceptions.BranchDoesntExistException;
 import ru.spbau.mit.Revisions.Exceptions.DagContainsCyclesRuntimeException;
 import ru.spbau.mit.Revisions.Exceptions.RevisionTreeAncestorsRuntimeError;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.*;
 
@@ -12,7 +13,7 @@ public class RevisionTreeImpl implements RevisionTree {
     private DirectedAcyclicGraph<CommitNode, DefaultEdge> m_graph
             = new DirectedAcyclicGraph<>(DefaultEdge.class);
 
-    private AsdBranch m_currentBranch = new AsdBranchImpl("");
+    private AsdBranch m_currentBranch = new AsdBranchImpl("master");
 
     private Map<AsdBranch, CommitNode> m_branchToHeadCommitMap = new HashMap<>();
 
@@ -49,7 +50,6 @@ public class RevisionTreeImpl implements RevisionTree {
         return path;
     }
 
-
     @Override
     public AsdBranch getCurrentBranch() {
         return m_currentBranch;
@@ -61,8 +61,18 @@ public class RevisionTreeImpl implements RevisionTree {
     }
 
     @Override
-    public void branch(AsdBranch a_branch) {
+    public int getRevisionNumber() {
+        return m_graph.vertexSet().size();
+    }
 
+    @Override
+    public void branchCreate(AsdBranch a_branch) {
+        setHeadCommitForBranch(a_branch, getHeadCommitForBranch(m_currentBranch));
+    }
+
+    @Override
+    public void branchRemove(AsdBranch a_branch) {
+        throw new NotImplementedException();
     }
 
     @Override
@@ -84,21 +94,21 @@ public class RevisionTreeImpl implements RevisionTree {
     /**
      * Performs a three-way merge, always
      *
-     * @param a_branch a branch to merge into the current one
+     * @param a_branch a branchCreate to merge into the current one
      */
     @Override
-    public void merge(AsdBranch a_branch, CommitNode merged) throws BranchDoesntExistException {
+    public void merge(AsdBranch a_branch, CommitNode a_merged) throws BranchDoesntExistException {
         if (!branchExists(a_branch))
-            throw new BranchDoesntExistException("No such branch: " + a_branch.getName());
+            throw new BranchDoesntExistException("No such branchCreate: " + a_branch.getName());
 
         CommitNode mergee = getHeadCommitForBranch(a_branch);
         CommitNode current = getHeadCommitForBranch(m_currentBranch);
 
-        addDagEdge(mergee, merged);
-        addDagEdge(current, merged);
+        addDagEdge(mergee, a_merged);
+        addDagEdge(current, a_merged);
 
-        setHeadCommitForBranch(a_branch, merged);
-        setHeadCommitForBranch(m_currentBranch, merged);
+        setHeadCommitForBranch(a_branch, a_merged);
+        setHeadCommitForBranch(m_currentBranch, a_merged);
     }
 
     private CommitNode getHeadCommitForBranch(AsdBranch a_branch){
