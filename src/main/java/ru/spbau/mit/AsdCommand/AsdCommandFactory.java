@@ -1,35 +1,37 @@
 package ru.spbau.mit.AsdCommand;
 
-import ru.spbau.mit.Exceptions.CommandCreationException;
+import ru.spbau.mit.AsdCommand.Exceptions.CommandCreationError;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class AsdCommandFactory {
     private static final Map<String, Class<? extends AsdCommand>> COMMANDS = new ConcurrentHashMap<>();
 
     static {
-        COMMANDS.put("add", Add.class);
-        COMMANDS.put("branch", Branch.class);
-        COMMANDS.put("checkout", Checkout.class);
-        COMMANDS.put("commit", Commit.class);
-        COMMANDS.put("log", Log.class);
-        COMMANDS.put("merge", Merge.class);
+        COMMANDS.put("add", AddCommand.class);
+        COMMANDS.put("branch", BranchCommand.class);
+        COMMANDS.put("checkout", CheckoutCommand.class);
+        COMMANDS.put("commit", CommitCommand.class);
+        COMMANDS.put("log", LogRefactor.class);
+        COMMANDS.put("merge", MergeRefactor.class);
     }
 
-    public static AsdCommand createCommand(String a_commandName, String... a_commandArguments) throws CommandCreationException {
-        List<String> args = Arrays.asList(a_commandArguments);
+    public static List<String> getCommandNames(){
+        return COMMANDS.keySet().stream().collect(Collectors.toList());
+    }
 
+    public static AsdCommand createCommand(String a_commandName) {
         Class<? extends AsdCommand> commandClass = COMMANDS.get(a_commandName);
         try {
-            Constructor<? extends AsdCommand> constructor = commandClass.getDeclaredConstructor(List.class);
-            return constructor.newInstance(args);
+            Constructor<? extends AsdCommand> constructor = commandClass.getDeclaredConstructor();
+            return constructor.newInstance();
         } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
-            throw new CommandCreationException(a_commandName, e);
+            throw new CommandCreationError(a_commandName, e);
         }
     }
 }
