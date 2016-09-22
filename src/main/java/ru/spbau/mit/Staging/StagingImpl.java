@@ -1,22 +1,24 @@
 package ru.spbau.mit.Staging;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.NotFileFilter;
+import org.apache.commons.io.filefilter.WildcardFileFilter;
 import ru.spbau.mit.App.SaveDirLocation;
 import ru.spbau.mit.Revisions.CommitNodes.CommitNode;
 import ru.spbau.mit.Staging.Exceptions.FileShouldExistError;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class StagingImpl implements Staging {
     private final Path m_root;
     private final String m_saveDirectoryName = SaveDirLocation.getFolderName();
     private final String m_stagingArea = m_saveDirectoryName + "/staging";
 
-    public StagingImpl(){
-        m_root = Paths.get("").toAbsolutePath();
+    public StagingImpl(Path a_root) {
+        m_root = a_root;
         boolean res = new File(m_root + "/" + m_stagingArea).mkdirs();
     }
 
@@ -53,6 +55,28 @@ public class StagingImpl implements Staging {
         FileUtils.copyDirectory(
                 new File(m_root.toString() + "/" + m_stagingArea),
                 commitDirectory);
+        emptyStagingArea();
+    }
+
+    @Override
+    public void checkout(CommitNode a_node) throws IOException {
+        Integer number = a_node.getRevisionNumber();
+        String path = m_root.toString() + "/" + m_saveDirectoryName + "/" + number.toString();
+        File commitDirectory = new File(path);
+
+        for (File f : m_root.toFile().listFiles((FileFilter)
+                new NotFileFilter(
+                        new WildcardFileFilter(m_saveDirectoryName))
+        )) {
+            if (f.isDirectory())
+                FileUtils.deleteDirectory(f);
+            else
+                FileUtils.deleteQuietly(f);
+        }
+
+        FileUtils.copyDirectory(
+                commitDirectory,
+                m_root.toFile());
         emptyStagingArea();
     }
 

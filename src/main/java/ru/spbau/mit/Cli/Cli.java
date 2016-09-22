@@ -33,16 +33,10 @@ public class Cli {
     public static void main(String[] args) throws Exception {
         AsdCommand cmd = parseAndDispatch("add one two three".split("\\s"));
         cmd.run();
-        cmd = parseAndDispatch("add four five six".split("\\s"));
+        cmd = parseAndDispatch("checkout 1".split("\\s"));
         cmd.run();
 
-//        Scanner scanner = new Scanner(System.in);
-//        while (scanner.hasNextLine()) {
-//            String line = scanner.nextLine();
-//            if (line == null) continue;
-//            AsdCommand cmd = parseAndDispatch(line.split("\\s"));
-//            cmd.run();
-//        }
+
     }
 
 }

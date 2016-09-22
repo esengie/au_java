@@ -10,6 +10,7 @@ import ru.spbau.mit.Staging.StagingImpl;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 
 @Parameters(commandDescription = "Initialise the repo (if uninitialised)")
 public class InitCommand extends AsdCommand {
@@ -24,7 +25,7 @@ public class InitCommand extends AsdCommand {
         if (f.getAbsoluteFile().exists()) {
             throw new AlreadyAnAsdFolderException();
         }
-        Staging staging = new StagingImpl();
+        Staging staging = new StagingImpl(Paths.get(""));
         RevisionTree revTree = new RevisionTreeImpl();
     }
 }
