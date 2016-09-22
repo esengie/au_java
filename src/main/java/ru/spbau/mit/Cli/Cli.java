@@ -30,13 +30,4 @@ public class Cli {
         return (AsdCommand) parsedJCommander.getObjects().get(0);
     }
 
-    public static void main(String[] args) throws Exception {
-        AsdCommand cmd = parseAndDispatch("add one two three".split("\\s"));
-        cmd.run();
-        cmd = parseAndDispatch("checkout 1".split("\\s"));
-        cmd.run();
-
-
-    }
-
 }

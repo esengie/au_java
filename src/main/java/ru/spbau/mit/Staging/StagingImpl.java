@@ -3,7 +3,7 @@ package ru.spbau.mit.Staging;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.NotFileFilter;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
-import ru.spbau.mit.App.SaveDirLocation;
+import ru.spbau.mit.Paths.SaveDirLocation;
 import ru.spbau.mit.Revisions.CommitNodes.CommitNode;
 import ru.spbau.mit.Staging.Exceptions.FileShouldExistError;
 

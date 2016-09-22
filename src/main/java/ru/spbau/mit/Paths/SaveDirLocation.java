@@ -1,4 +1,4 @@
-package ru.spbau.mit.App;
+package ru.spbau.mit.Paths;
 
 public class SaveDirLocation {
     private SaveDirLocation(){}

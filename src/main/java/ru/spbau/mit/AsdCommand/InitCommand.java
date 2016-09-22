@@ -2,15 +2,17 @@ package ru.spbau.mit.AsdCommand;
 
 import com.beust.jcommander.Parameters;
 import ru.spbau.mit.AsdCommand.Exceptions.AlreadyAnAsdFolderException;
+import ru.spbau.mit.Paths.AsdFolderOperations;
 import ru.spbau.mit.Revisions.RevisionTree.RevisionTree;
 import ru.spbau.mit.Revisions.RevisionTree.RevisionTreeImpl;
-import ru.spbau.mit.App.SaveDirLocation;
+import ru.spbau.mit.Paths.SaveDirLocation;
 import ru.spbau.mit.Staging.Staging;
 import ru.spbau.mit.Staging.StagingImpl;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+
+import static ru.spbau.mit.Paths.AsdFolderOperations.isAnAsdFolder;
 
 @Parameters(commandDescription = "Initialise the repo (if uninitialised)")
 public class InitCommand extends AsdCommand {
@@ -20,12 +22,11 @@ public class InitCommand extends AsdCommand {
     }
 
     @Override
-    public void run() throws IOException, AlreadyAnAsdFolderException {
-        File f = new File(SaveDirLocation.getFolderName());
-        if (f.getAbsoluteFile().exists()) {
+    public void run(RevisionTree a_tree, Staging a_staging) throws IOException, AlreadyAnAsdFolderException {
+        if (isAnAsdFolder()) {
             throw new AlreadyAnAsdFolderException();
         }
-        Staging staging = new StagingImpl(Paths.get(""));
-        RevisionTree revTree = new RevisionTreeImpl();
+        a_staging = new StagingImpl(Paths.get(""));
+        a_tree = new RevisionTreeImpl();
     }
 }
