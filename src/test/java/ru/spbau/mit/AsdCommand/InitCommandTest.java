@@ -11,10 +11,6 @@ import static org.junit.Assert.*;
 public class InitCommandTest {
 
     @Rule
-    public final EnvironmentVariables environmentVariables
-            = new EnvironmentVariables();
-
-    @Rule
     public final TemporaryFolder folder = new TemporaryFolder();
 
     @Test(expected = AlreadyAnAsdFolderException.class)
@@ -22,8 +18,8 @@ public class InitCommandTest {
         String t = folder.getRoot().getAbsolutePath();
         System.setProperty("user.dir", t);
         AsdCommand init = AsdCommandFactory.createCommand("init");
-        init.run();
-        init.run();
+        init.run(null, null);
+        init.run(null, null);
     }
 
 }

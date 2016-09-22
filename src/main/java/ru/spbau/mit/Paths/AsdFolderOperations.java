@@ -22,10 +22,10 @@ public class AsdFolderOperations {
     }
 
     public static Path getRoot() {
-        Path folder = Paths.get("").toAbsolutePath();
+        Path folder = Paths.get("").toFile().getAbsoluteFile().toPath();
         while (true) {
-            if (!(new File(folder.toString(),
-                    SaveDirLocation.getFolderName()).exists()))
+            if (new File(folder.toString(),
+                    SaveDirLocation.getFolderName()).exists())
                 return folder;
             folder = folder.getParent();
             if (folder == null)

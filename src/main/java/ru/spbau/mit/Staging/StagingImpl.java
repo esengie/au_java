@@ -24,26 +24,27 @@ public class StagingImpl implements Staging {
 
     @Override
     public void add(Path a_file) throws IOException {
-        if (!a_file.toFile().exists())
+        if (!a_file.toFile().getAbsoluteFile().exists())
             throw new FileShouldExistError(a_file.toString());
 
-        String relativePath = relativize(m_root.toAbsolutePath(), a_file.toAbsolutePath());
-        String stagingPath = m_root.toString() + "/" + m_stagingArea + "/" + relativePath;
+        String relativePath = relativize(m_root.toAbsolutePath(),
+                a_file.toAbsolutePath());
+        String stagingPath = m_root.toAbsolutePath() + "/" + m_stagingArea + "/" + relativePath;
         File movee = new File(stagingPath);
         FileUtils.forceMkdirParent(movee);
 
-        if (a_file.toFile().isFile()) {
-            FileUtils.copyFile(a_file.toFile(), movee);
+        if (a_file.toFile().getAbsoluteFile().isFile()) {
+            FileUtils.copyFile(a_file.toFile().getAbsoluteFile(), movee);
         }
-        if (a_file.toFile().isDirectory()) {
-            FileUtils.copyDirectory(a_file.toFile(), movee);
+        if (a_file.toFile().getAbsoluteFile().isDirectory()) {
+            FileUtils.copyDirectory(a_file.toFile().getAbsoluteFile(), movee);
         }
     }
 
     private String relativize(Path a_root, Path a_filePath) {
-        return new File(a_root.toString())
+        return new File(a_root.toAbsolutePath().toString())
                 .toURI()
-                .relativize(new File(a_filePath.toString()).toURI())
+                .relativize(new File(a_filePath.toAbsolutePath().toString()).toURI())
                 .getPath();
     }
 
@@ -64,7 +65,7 @@ public class StagingImpl implements Staging {
         String path = m_root.toString() + "/" + m_saveDirectoryName + "/" + number.toString();
         File commitDirectory = new File(path);
 
-        for (File f : m_root.toFile().listFiles((FileFilter)
+        for (File f : m_root.toFile().getAbsoluteFile().listFiles((FileFilter)
                 new NotFileFilter(
                         new WildcardFileFilter(m_saveDirectoryName))
         )) {
@@ -76,14 +77,14 @@ public class StagingImpl implements Staging {
 
         FileUtils.copyDirectory(
                 commitDirectory,
-                m_root.toFile());
+                m_root.toFile().getAbsoluteFile());
         emptyStagingArea();
     }
 
     @Override
     public void emptyStagingArea() throws IOException {
-        FileUtils.deleteDirectory(new File(m_root.toString() + "/" + m_stagingArea));
-        new File(m_root.toString() + "/" + m_stagingArea).mkdir();
+        FileUtils.deleteDirectory(new File(m_root.toAbsolutePath() + "/" + m_stagingArea));
+        new File(m_root.toAbsolutePath() + "/" + m_stagingArea).mkdir();
     }
 
 }

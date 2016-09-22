@@ -1,5 +1,7 @@
 package ru.spbau.mit.App;
 
+import com.beust.jcommander.MissingCommandException;
+import com.beust.jcommander.ParameterException;
 import ru.spbau.mit.AsdCommand.Exceptions.NotAnAsdFolder;
 import ru.spbau.mit.AsdCommand.Exceptions.SerializedTreeNotFoundError;
 import ru.spbau.mit.AsdCommand.AsdCommand;
@@ -60,7 +62,9 @@ public class Asd {
             try {
                 String line = scanner.nextLine();
                 if (line == null) continue;
+
                 AsdCommand cmd = Cli.parseAndDispatch(line.split("\\s"));
+
                 if (!isAnAsdFolder() && !InitCommand.class.isInstance(cmd))
                     throw new NotAnAsdFolder();
 
@@ -69,15 +73,28 @@ public class Asd {
                     asd.m_staging = new StagingImpl(getRoot());
                     loaded = true;
                 }
+
                 cmd.run(asd.m_tree, asd.m_staging);
+
+                if (InitCommand.class.isInstance(cmd))
+                    loaded = true;
 
             } catch (AlreadyAnAsdFolderException e) {
                 System.out.println("Can't init an asd folder");
             } catch (NotAnAsdFolder e) {
                 System.out.println("Not an asd folder you should init first");
+            } catch (ParameterException e) {
+                System.out.println(e.getMessage());
+                Cli.getParser().usage();
             } catch (IOException e) {
                 System.out.println(e.getMessage());
             }
+        }
+
+        try{
+            asd.saveRevisionTree();
+        } catch (NotAnAsdFolder notAnAsdFolder) {
+            notAnAsdFolder.printStackTrace();
         }
     }
 

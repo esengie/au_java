@@ -26,7 +26,7 @@ public class InitCommand extends AsdCommand {
         if (isAnAsdFolder()) {
             throw new AlreadyAnAsdFolderException();
         }
-        a_staging = new StagingImpl(Paths.get(""));
+        a_staging = new StagingImpl(Paths.get("").toFile().getAbsoluteFile().toPath());
         a_tree = new RevisionTreeImpl();
     }
 }

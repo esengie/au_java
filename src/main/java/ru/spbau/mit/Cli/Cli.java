@@ -30,4 +30,10 @@ public class Cli {
         return (AsdCommand) parsedJCommander.getObjects().get(0);
     }
 
+    // Kostyl tk biblioteka zdes, for printing usage
+    public static JCommander getParser(){
+        Setup();
+        return jCommander;
+    }
+
 }
