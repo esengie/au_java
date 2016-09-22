@@ -1,12 +1,15 @@
-package ru.spbau.mit.Revisions;
+package ru.spbau.mit.Revisions.RevisionTree;
 
 import com.sun.istack.internal.NotNull;
+import ru.spbau.mit.Revisions.Branches.AsdBranch;
+import ru.spbau.mit.Revisions.CommitNodes.CommitNode;
 import ru.spbau.mit.Revisions.Exceptions.BranchDoesntExistException;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
-public interface RevisionTree {
+public interface RevisionTree extends Serializable {
     @NotNull
     List<CommitNode> getLogPath();
     @NotNull

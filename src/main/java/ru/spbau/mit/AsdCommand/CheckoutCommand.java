@@ -16,6 +16,6 @@ public class CheckoutCommand extends AsdCommand {
 
     @Override
     public void run() throws IOException {
-        super.run();
+//        super.run();
     }
 }

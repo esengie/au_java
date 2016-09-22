@@ -15,6 +15,6 @@ public class MergeCommand extends AsdCommand {
 
     @Override
     public void run() throws IOException {
-        super.run();
+//        super.run();
     }
 }

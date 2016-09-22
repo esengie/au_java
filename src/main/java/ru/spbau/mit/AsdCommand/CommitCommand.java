@@ -18,6 +18,6 @@ public class CommitCommand extends AsdCommand {
 
     @Override
     public void run() throws IOException {
-        super.run();
+//        super.run();
     }
 }

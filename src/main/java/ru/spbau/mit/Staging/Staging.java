@@ -1,6 +1,6 @@
 package ru.spbau.mit.Staging;
 
-import ru.spbau.mit.Revisions.CommitNode;
+import ru.spbau.mit.Revisions.CommitNodes.CommitNode;
 
 import java.io.IOException;
 import java.nio.file.Path;

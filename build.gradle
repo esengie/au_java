@@ -6,11 +6,19 @@ sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile "org.mockito:mockito-core:1.+"
+    // Cli
     compile group: 'com.beust', name: 'jcommander', version: '1.48'
+    // Graphs and Dags
     compile group: 'org.jgrapht', name: 'jgrapht-core', version: '1.0.0'
+    // Files tools
     compile group: 'commons-io', name: 'commons-io', version: '2.5'
+    // Rules for testing
+    compile group: 'com.github.stefanbirkner', name: 'system-rules', version: '1.16.1'
+
 }

@@ -19,6 +19,6 @@ public class BranchCommand extends AsdCommand {
 
     @Override
     public void run() throws IOException {
-        super.run();
+//        super.run();
     }
 }

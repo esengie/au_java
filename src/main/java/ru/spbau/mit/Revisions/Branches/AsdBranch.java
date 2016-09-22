@@ -1,4 +1,4 @@
-package ru.spbau.mit.Revisions;
+package ru.spbau.mit.Revisions.Branches;
 
 import com.sun.istack.internal.NotNull;
 
