@@ -6,6 +6,10 @@ import ru.spbau.mit.Staging.Exceptions.CantMergeException;
 import java.io.IOException;
 import java.nio.file.Path;
 
+/**
+ * The interface that does the actual work:
+ * commiting to disk, merging, adding to the staging area
+ */
 public interface Staging {
     void add(Path a_file) throws IOException;
     void commitToDisk(CommitNode a_node) throws IOException;

@@ -13,34 +13,34 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import java.util.*;
 
 public class RevisionTreeImpl implements RevisionTree {
-    public RevisionTreeImpl() {
-        class CNode implements CommitNode {
-            @Override
-            public String getMessage() {
-                return "Init Commit contains everything before init";
-            }
-
-            @Override
-            public int getRevisionNumber() {
-                return 0;
-            }
-
-            @Override
-            public AsdBranch getBranch() {
-                return AsdBranchFactory.createBranch("master");
-            }
-
-            @Override
-            public int hashCode() {
-                return hashCoder();
-            }
-
-            @Override
-            public boolean equals(Object obj) {
-                return equalser(obj);
-            }
+    static class CNode implements CommitNode {
+        @Override
+        public String getMessage() {
+            return "Init Commit contains everything before init";
         }
 
+        @Override
+        public int getRevisionNumber() {
+            return 0;
+        }
+
+        @Override
+        public AsdBranch getBranch() {
+            return AsdBranchFactory.createBranch("master");
+        }
+
+        @Override
+        public int hashCode() {
+            return hashCoder();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return equalser(obj);
+        }
+    }
+
+    public RevisionTreeImpl() {
         CommitNode c = new CNode();
         m_graph.addVertex(c);
         setHeadCommitForBranch(m_currentBranch, c);
@@ -101,6 +101,13 @@ public class RevisionTreeImpl implements RevisionTree {
     @Override
     public int getRevisionNumber() {
         return m_graph.vertexSet().size();
+    }
+
+    @Override
+    public boolean isEarlierThanCurrent(AsdBranch a_branch) throws BranchDoesntExistException {
+        CommitNode c = getHeadOfBranch(a_branch);
+        Set<CommitNode> set = new HashSet<>(getLogPath());
+        return set.contains(c);
     }
 
     @Override
@@ -165,7 +172,21 @@ public class RevisionTreeImpl implements RevisionTree {
     }
 
     /**
-     * Performs a three-way merge, always
+     * Performs a "history forgetting" merge, always
+     *
+     * Except when the merged branch is in the log path, then we do nothing.
+     *
+     * Example of "forgetting":
+     * A->B->E
+     * |
+     * C->D->         <- if we have two paths ACD and ABE,
+     *
+     * and merge D to E we get the log ABEF
+     * if we merge E to D we get the log ACDF.
+     *
+     * So we "forget" the commits,
+     * but keep the changes (we forget them from outside only).
+     * Any suggestions how to fix this are welcome
      *
      * @param a_branch a branchCreate to merge into the current one
      */
@@ -186,7 +207,7 @@ public class RevisionTreeImpl implements RevisionTree {
     }
 
     @Override
-    public CommitNode getHeadCommitOfBranch(AsdBranch a_branch) throws BranchDoesntExistException {
+    public CommitNode getHeadOfBranch(AsdBranch a_branch) throws BranchDoesntExistException {
         CommitNode retVal = getHeadCommitForBranch(a_branch);
         if (retVal == null)
             throw new BranchDoesntExistException(a_branch.getName());

@@ -6,6 +6,14 @@ import ru.spbau.mit.AsdCommand.AsdCommandFactory;
 import ru.spbau.mit.AsdCommand.Exceptions.AlreadyAnAsdFolderException;
 import ru.spbau.mit.AsdCommand.Exceptions.CommandCreationError;
 
+
+/**
+ * The Cli.
+ *
+ * Because Jcommander is intended for single use at the start of the program
+ * and not in the loop as used here I have a Setup method and I also return the instance
+ * for usage printing -- JCommander's fault
+ */
 public class Cli {
     private static JCommander jCommander;
 
@@ -19,9 +27,7 @@ public class Cli {
                 jCommander.addCommand(s, AsdCommandFactory.createCommand(s)));
     }
 
-    // AddCommand error handling for parsing
     public static AsdCommand parseAndDispatch(String... line) throws CommandCreationError {
-        // Because it's intended for single use at the start of the program
         Setup();
         jCommander.parse(line);
 

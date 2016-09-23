@@ -7,6 +7,14 @@ import ru.spbau.mit.Revisions.Branches.AsdBranch;
 
 import java.io.Serializable;
 
+/**
+ * CommitNode represents a node in the Revision tree
+ *
+ * Comes with it's own branch, get assigned a revision number BY THE TREE
+ *
+ * Needs to be commited to the tree before getting any other Nodes from the Factory
+ * Needs to provide equals and hashcode
+ */
 public interface CommitNode extends Serializable {
     @NotNull
     String getMessage();

@@ -12,17 +12,23 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * The Revision tree in all its glory
+ *
+ * Needs to provide equals and hashcode
+ */
 public interface RevisionTree extends Serializable {
     @NotNull
     List<CommitNode> getLogPath();
     @NotNull
     AsdBranch getCurrentBranch();
     @NotNull
-    CommitNode getHeadCommitOfBranch(AsdBranch a_branch) throws BranchDoesntExistException;
+    CommitNode getHeadOfBranch(AsdBranch a_branch) throws BranchDoesntExistException;
     @NotNull
     Set<AsdBranch> getBranches();
 
     int getRevisionNumber();
+    boolean isEarlierThanCurrent(AsdBranch a_branch) throws BranchDoesntExistException;
 
     void branchCreate(AsdBranch a_branch) throws BranchAlreadyExistsException;
     void branchRemove(AsdBranch a_branch);

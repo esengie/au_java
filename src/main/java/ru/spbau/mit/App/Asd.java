@@ -28,6 +28,16 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
+/**
+ * The main class, loads the Revision tree or does the init (used init command for that,
+ * until realising that Java copies the references)
+ *
+ * Loops until the input is gone and saves the tree
+ *
+ * More robust option is to save the tree each time and launch the command each time,
+ * but it's easier to test this way. Also AsdTest class is for manual testing.
+ */
 public class Asd {
     private RevisionTree m_tree;
     private Staging m_staging;

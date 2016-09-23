@@ -33,14 +33,16 @@ public class AsdTest {
 
         String inp = "init\n" +
                 "branch left\n" +
+                "checkout left\n" +
                 "add README.md\n" +
                 "add src\n" +
                 "commit -m \"asdf\"\n" +
                 "checkout master\n" +
-                "merge left";
+                "merge left\n" +
+                "log";
 
         ByteArrayInputStream in = new ByteArrayInputStream(inp.getBytes());
-//        System.setIn(in);
+        System.setIn(in);
 
         Asd.main();
 //        FileUtils.deleteDirectory(asd.folder);

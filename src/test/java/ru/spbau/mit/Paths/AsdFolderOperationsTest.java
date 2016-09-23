@@ -32,12 +32,6 @@ public class AsdFolderOperationsTest {
         File f2 = folder.newFile(F2DIR + "/" + F2);
     }
 
-    @Ignore
-    @Test
-    public void getSerializedTreePath() throws Exception {
-
-    }
-
     @Test
     public void isAnAsdFolder() throws Exception {
         assertFalse(AsdFolderOperations.isAnAsdFolder());
