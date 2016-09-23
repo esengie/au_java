@@ -13,7 +13,7 @@ import java.io.PrintStream;
 import java.util.List;
 
 @Parameters(commandDescription = "Branch managements")
-public class BranchCommand extends AsdCommand {
+public class BranchCommand implements AsdCommand {
 
     @Parameter(description = "The branch name")
     private List<String> branchName;
@@ -21,18 +21,19 @@ public class BranchCommand extends AsdCommand {
     @Parameter(names = "-d", description = "delete branch")
     private boolean deleteMode = false;
 
-    protected BranchCommand(){super();}
+    protected BranchCommand() {
+    }
 
     @Override
     public void run(RevisionTree a_tree, Staging a_staging, PrintStream a_writer) throws IOException {
         if (branchName.size() > 1)
             throw new TooManyArgumentsException("branch command needs only one branch");
-        if (branchName.size() == 1){
+        if (branchName.size() == 1) {
             a_tree.branchCreate(AsdBranchFactory.createBranch(branchName.get(0)));
             return;
         }
 
-        for (AsdBranch b : a_tree.getBranches()){
+        for (AsdBranch b : a_tree.getBranches()) {
             a_writer.println(b.getName());
         }
     }

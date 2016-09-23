@@ -8,9 +8,10 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 @Parameters(commandDescription = "Show commit log")
-public class LogCommand extends AsdCommand {
+public class LogCommand implements AsdCommand {
 
-    protected LogCommand(){super();}
+    protected LogCommand() {
+    }
 
     @Override
     public void run(RevisionTree a_tree, Staging a_staging, PrintStream a_writer) throws IOException {

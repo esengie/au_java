@@ -9,6 +9,7 @@ import ru.spbau.mit.AsdCommand.Exceptions.AlreadyAnAsdFolderException;
 import ru.spbau.mit.AsdCommand.InitCommand;
 import ru.spbau.mit.Cli.Cli;
 import ru.spbau.mit.Revisions.RevisionTree.RevisionTree;
+import ru.spbau.mit.Revisions.RevisionTree.RevisionTreeImpl;
 import ru.spbau.mit.Revisions.RevisionTree.RevisionTreeSerializer;
 import ru.spbau.mit.Revisions.RevisionTree.RevisionTreeSerializerImpl;
 import ru.spbau.mit.Staging.Staging;
@@ -20,6 +21,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 public class Asd {
@@ -57,6 +59,14 @@ public class Asd {
 
     }
 
+    private void initCommand() throws AlreadyAnAsdFolderException {
+        if (isAnAsdFolder()) {
+            throw new AlreadyAnAsdFolderException();
+        }
+        m_staging = new StagingImpl(Paths.get("").toFile().getAbsoluteFile().toPath());
+        m_tree = new RevisionTreeImpl();
+    }
+
     public static void main(String... argv) {
         Scanner scanner = new Scanner(System.in);
         Asd asd = new Asd();
@@ -77,10 +87,11 @@ public class Asd {
                     loaded = true;
                 }
 
-                cmd.run(asd.m_tree, asd.m_staging, System.out);
-
-                if (InitCommand.class.isInstance(cmd))
+                if (InitCommand.class.isInstance(cmd)) {
+                    asd.initCommand();
                     loaded = true;
+                } else
+                    cmd.run(asd.m_tree, asd.m_staging, System.out);
 
             } catch (AlreadyAnAsdFolderException e) {
                 System.out.println("Can't init an asd folder");

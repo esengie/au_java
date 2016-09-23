@@ -45,7 +45,7 @@ public class AsdFolderOperationsTest {
         System.setProperty("user.dir", folder.getRoot().getAbsolutePath());
         assertFalse(AsdFolderOperations.isAnAsdFolder());
 
-        AsdCommandFactory.createCommand("init").run(null, null, null);
+        folder.newFolder(SaveDirLocation.getFolderName());
 
         assertTrue(AsdFolderOperations.isAnAsdFolder());
 
@@ -61,7 +61,7 @@ public class AsdFolderOperationsTest {
         System.setProperty("user.dir", folder.getRoot().getAbsolutePath());
         assertNull(AsdFolderOperations.getRoot());
 
-        AsdCommandFactory.createCommand("init").run(null, null, null);
+        folder.newFolder(SaveDirLocation.getFolderName());
 
         assertEquals(AsdFolderOperations.getRoot().toString(),
                 folder.getRoot().getAbsolutePath());

@@ -6,12 +6,6 @@ import ru.spbau.mit.Staging.Staging;
 import java.io.IOException;
 import java.io.PrintStream;
 
-abstract public class AsdCommand {
-    AsdCommand(){
-    }
-
-    public void run(RevisionTree a_tree, Staging a_staging, PrintStream a_writer) throws IOException {
-        throw new NoSuchMethodError("Not implemented");
-    }
-
+public interface AsdCommand {
+    void run(RevisionTree a_tree, Staging a_staging, PrintStream a_writer) throws IOException;
 }

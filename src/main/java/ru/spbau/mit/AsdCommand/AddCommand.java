@@ -12,12 +12,11 @@ import ru.spbau.mit.Revisions.RevisionTree.RevisionTree;
 import ru.spbau.mit.Staging.Staging;
 
 @Parameters(commandDescription = "Add files to the index")
-public class AddCommand extends AsdCommand {
+public class AddCommand implements AsdCommand {
     @Parameter(description = "File patterns to add to the index")
     private List<String> patterns;
 
     protected AddCommand() {
-        super();
     }
 
     @Override

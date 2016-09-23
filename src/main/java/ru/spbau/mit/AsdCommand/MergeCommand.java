@@ -10,11 +10,12 @@ import java.io.PrintStream;
 import java.util.List;
 
 @Parameters(commandDescription = "Merge a branch to this one")
-public class MergeCommand extends AsdCommand {
+public class MergeCommand implements AsdCommand {
     @Parameter(description = "The branch name")
     private List<String> branchName;
 
-    protected MergeCommand(){super();}
+    protected MergeCommand() {
+    }
 
     @Override
     public void run(RevisionTree a_tree, Staging a_staging, PrintStream a_writer) throws IOException {

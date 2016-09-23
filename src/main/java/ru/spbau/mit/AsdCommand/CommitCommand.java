@@ -10,8 +10,9 @@ import java.io.PrintStream;
 import java.util.List;
 
 @Parameters(commandDescription = "Record changes to the repository")
-public class CommitCommand extends AsdCommand {
-    protected CommitCommand(){super();}
+public class CommitCommand implements AsdCommand {
+    protected CommitCommand() {
+    }
 
     @Parameter(names = "-m", description = "Commit message", required = true)
     private String message = "";

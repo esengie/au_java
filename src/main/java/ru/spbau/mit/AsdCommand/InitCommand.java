@@ -1,6 +1,7 @@
 package ru.spbau.mit.AsdCommand;
 
 import com.beust.jcommander.Parameters;
+import org.apache.commons.lang.NotImplementedException;
 import ru.spbau.mit.AsdCommand.Exceptions.AlreadyAnAsdFolderException;
 import ru.spbau.mit.Revisions.RevisionTree.RevisionTree;
 import ru.spbau.mit.Revisions.RevisionTree.RevisionTreeImpl;
@@ -14,18 +15,14 @@ import java.nio.file.Paths;
 import static ru.spbau.mit.Paths.AsdFolderOperations.isAnAsdFolder;
 
 @Parameters(commandDescription = "Initialise the repo (if uninitialised)")
-public class InitCommand extends AsdCommand {
+public class InitCommand implements AsdCommand {
 
     protected InitCommand() {
-        super();
     }
 
     @Override
-    public void run(RevisionTree a_tree, Staging a_staging, PrintStream a_writer) throws IOException, AlreadyAnAsdFolderException {
-        if (isAnAsdFolder()) {
-            throw new AlreadyAnAsdFolderException();
-        }
-        a_staging = new StagingImpl(Paths.get("").toFile().getAbsoluteFile().toPath());
-        a_tree = new RevisionTreeImpl();
+    public void run(RevisionTree a_tree, Staging a_staging, PrintStream a_writer) throws IOException {
+        // Cause java copies references
+        throw new NotImplementedException("Shouldn't be here at all");
     }
 }

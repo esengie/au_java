@@ -1,8 +1,6 @@
 package ru.spbau.mit.AsdCommand;
 
-import com.beust.jcommander.IParameterValidator;
 import com.beust.jcommander.Parameter;
-import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 import ru.spbau.mit.App.Exceptions.TooManyArgumentsException;
 import ru.spbau.mit.AsdCommand.Exceptions.TooLittleArgumentsException;
@@ -16,12 +14,13 @@ import java.io.PrintStream;
 import java.util.List;
 
 @Parameters(commandDescription = "Checkout a branch or a commit")
-public class CheckoutCommand extends AsdCommand {
+public class CheckoutCommand implements AsdCommand {
 
     @Parameter(description = "Branch name or revision")
     private List<String> input;
 
-    protected CheckoutCommand(){super();}
+    protected CheckoutCommand() {
+    }
 
     @Override
     public void run(RevisionTree a_tree, Staging a_staging, PrintStream a_writer) throws IOException {
@@ -32,9 +31,9 @@ public class CheckoutCommand extends AsdCommand {
 
         int revision;
         String arg = input.get(0);
-        try{
+        try {
             revision = Integer.parseInt(arg);
-        } catch (NumberFormatException e){
+        } catch (NumberFormatException e) {
             revision = -1;
         }
 
