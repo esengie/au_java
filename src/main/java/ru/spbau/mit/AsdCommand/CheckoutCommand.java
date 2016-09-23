@@ -24,10 +24,11 @@ public class CheckoutCommand implements AsdCommand {
 
     @Override
     public void run(RevisionTree a_tree, Staging a_staging, PrintStream a_writer) throws IOException {
+        if (input == null)
+            throw new TooLittleArgumentsException("checkout needs one argument");
+
         if (input.size() > 1)
             throw new TooManyArgumentsException("checkout needs only one argument");
-        if (input.size() == 0)
-            throw new TooLittleArgumentsException("checkout needs one argument");
 
         int revision;
         String arg = input.get(0);

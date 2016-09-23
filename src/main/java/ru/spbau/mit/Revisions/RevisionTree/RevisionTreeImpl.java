@@ -185,6 +185,14 @@ public class RevisionTreeImpl implements RevisionTree {
         setHeadCommitForBranch(m_currentBranch, a_merged);
     }
 
+    @Override
+    public CommitNode getHeadCommitOfBranch(AsdBranch a_branch) throws BranchDoesntExistException {
+        CommitNode retVal = getHeadCommitForBranch(a_branch);
+        if (retVal == null)
+            throw new BranchDoesntExistException(a_branch.getName());
+        return retVal;
+    }
+
     private CommitNode getHeadCommitForBranch(AsdBranch a_branch) {
         return m_branchToHeadCommitMap.get(a_branch);
     }

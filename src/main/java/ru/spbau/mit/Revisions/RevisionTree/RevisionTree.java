@@ -18,6 +18,8 @@ public interface RevisionTree extends Serializable {
     @NotNull
     AsdBranch getCurrentBranch();
     @NotNull
+    CommitNode getHeadCommitOfBranch(AsdBranch a_branch) throws BranchDoesntExistException;
+    @NotNull
     Set<AsdBranch> getBranches();
 
     int getRevisionNumber();

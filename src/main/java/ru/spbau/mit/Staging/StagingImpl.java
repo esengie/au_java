@@ -1,16 +1,18 @@
 package ru.spbau.mit.Staging;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.NotFileFilter;
-import org.apache.commons.io.filefilter.WildcardFileFilter;
+import org.apache.commons.io.filefilter.*;
 import ru.spbau.mit.Paths.SaveDirLocation;
 import ru.spbau.mit.Revisions.CommitNodes.CommitNode;
+import ru.spbau.mit.Staging.Exceptions.CantMergeException;
 import ru.spbau.mit.Staging.Exceptions.FileShouldExistException;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class StagingImpl implements Staging {
     private final Path m_root;
@@ -97,9 +99,56 @@ public class StagingImpl implements Staging {
     }
 
     @Override
+    public void merge(CommitNode a_from, CommitNode a_to, CommitNode a_result) throws IOException {
+        Set<String> from = new TreeSet<>(listAllFilesRecursively(a_from));
+        Set<String> to = new TreeSet<>(listAllFilesRecursively(a_to));
+
+        Set<String> set = new TreeSet<>(from);
+        set.retainAll(to);
+
+        for (String p : set) {
+            if (filesDiffer(p, a_from, a_to))
+                throw new CantMergeException(p);
+        }
+
+        copyFilesFromOneCommitToAnother(from.stream().collect(Collectors.toList()), a_from, a_result);
+        to.removeAll(from);
+        copyFilesFromOneCommitToAnother(to.stream().collect(Collectors.toList()), a_to, a_result);
+
+        checkout(a_result);
+    }
+
+    @Override
     public void emptyStagingArea() throws IOException {
         FileUtils.deleteDirectory(new File(m_root.toAbsolutePath() + "/" + m_stagingArea));
         new File(m_root.toAbsolutePath() + "/" + m_stagingArea).mkdir();
     }
 
+    private void copyFilesFromOneCommitToAnother(List<String> a_paths, CommitNode a_from, CommitNode a_to) throws IOException {
+        String prefixFrom = commitNodeToPath(a_from);
+        File folderTo = new File(commitNodeToPath(a_to));
+        for (String s : a_paths) {
+            FileUtils.copyFileToDirectory(new File(prefixFrom + s), folderTo);
+        }
+    }
+
+    private boolean filesDiffer(String a_path, CommitNode a_left, CommitNode a_right) throws IOException {
+        String left = commitNodeToPath(a_left) + a_path;
+        String right = commitNodeToPath(a_right) + a_path;
+
+        return FileUtils.contentEquals(new File(left), new File(right));
+    }
+
+    private String commitNodeToPath(CommitNode a_node) {
+        return m_root.toAbsolutePath() + "/" + String.valueOf(a_node.getRevisionNumber());
+    }
+
+    private List<String> listAllFilesRecursively(CommitNode a_node) {
+        String path = commitNodeToPath(a_node);
+        Collection<File> files = FileUtils.listFiles(new File(path), FileFileFilter.FILE, TrueFileFilter.INSTANCE);
+
+        return files.stream()
+                .map(File::getAbsolutePath)
+                .collect(Collectors.toList());
+    }
 }
