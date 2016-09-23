@@ -101,7 +101,7 @@ public class Asd {
                 System.out.println(e.getMessage());
                 Cli.getParser().usage();
             } catch (IOException e) {
-                System.out.println(e.getMessage());
+                System.out.println(e);
             }
         }
 
