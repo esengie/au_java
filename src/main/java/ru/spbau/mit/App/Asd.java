@@ -59,7 +59,7 @@ public class Asd {
 
     }
 
-    private void initCommand() throws AlreadyAnAsdFolderException {
+    private void initCommand() throws IOException {
         if (isAnAsdFolder()) {
             throw new AlreadyAnAsdFolderException();
         }

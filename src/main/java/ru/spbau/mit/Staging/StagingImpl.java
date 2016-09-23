@@ -5,7 +5,7 @@ import org.apache.commons.io.filefilter.NotFileFilter;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import ru.spbau.mit.Paths.SaveDirLocation;
 import ru.spbau.mit.Revisions.CommitNodes.CommitNode;
-import ru.spbau.mit.Staging.Exceptions.FileShouldExistError;
+import ru.spbau.mit.Staging.Exceptions.FileShouldExistException;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -17,15 +17,26 @@ public class StagingImpl implements Staging {
     private final String m_saveDirectoryName = SaveDirLocation.getFolderName();
     private final String m_stagingArea = m_saveDirectoryName + "/staging";
 
-    public StagingImpl(Path a_root) {
+    public StagingImpl(Path a_root) throws IOException {
         m_root = a_root;
         boolean res = new File(m_root + "/" + m_stagingArea).mkdirs();
+
+        File dest = new File(m_root + "/" + m_saveDirectoryName + "/0");
+        for (File f : m_root.toFile().getAbsoluteFile().listFiles((FileFilter)
+                new NotFileFilter(
+                        new WildcardFileFilter(m_saveDirectoryName))
+        )) {
+            if (f.isDirectory())
+                FileUtils.copyDirectoryToDirectory(f, dest);
+            else
+                FileUtils.copyFileToDirectory(f, dest);
+        }
     }
 
     @Override
     public void add(Path a_file) throws IOException {
         if (!a_file.toFile().getAbsoluteFile().exists())
-            throw new FileShouldExistError(a_file.toString());
+            throw new FileShouldExistException(a_file.toString());
 
         String relativePath = relativize(m_root.toAbsolutePath(),
                 a_file.toAbsolutePath());
@@ -37,7 +48,7 @@ public class StagingImpl implements Staging {
             FileUtils.copyFile(a_file.toFile().getAbsoluteFile(), movee);
         }
         if (a_file.toFile().getAbsoluteFile().isDirectory()) {
-            FileUtils.copyDirectory(a_file.toFile().getAbsoluteFile(), movee);
+            FileUtils.copyDirectoryToDirectory(a_file.toFile().getAbsoluteFile(), movee);
         }
     }
 

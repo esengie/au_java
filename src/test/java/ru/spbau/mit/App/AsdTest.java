@@ -17,9 +17,10 @@ public class AsdTest {
 //    @Rule
 //    public final TemporaryFolder folder = new TemporaryFolder();
 
+    File folder;
     @Before
     public void before() throws IOException {
-        File folder = new File("/tmp/junit123");
+        folder = new File("/tmp/junit123");
         folder.mkdir();
         FileUtils.copyDirectory(new File("res"), folder); //.getRoot().getAbsoluteFile()
         System.setProperty("user.dir", folder.getAbsolutePath());
@@ -30,6 +31,7 @@ public class AsdTest {
         AsdTest asd = new AsdTest();
         asd.before();
         Asd.main();
+        FileUtils.deleteDirectory(asd.folder);
     }
 
 }

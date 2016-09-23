@@ -9,6 +9,7 @@ import ru.spbau.mit.Paths.SaveDirLocation;
 import ru.spbau.mit.Revisions.CommitNodes.CommitNode;
 
 import java.io.File;
+import java.io.IOException;
 
 import static org.junit.Assert.*;
 
@@ -20,7 +21,7 @@ public class StagingImplTest {
     public final TemporaryFolder folder = new TemporaryFolder();
 
     @Before
-    public void before(){
+    public void before() throws IOException {
         stagingLocation = folder.getRoot() + "/" + SaveDirLocation.getFolderName() + "/staging/";
         commitLocation = folder.getRoot() + "/" + SaveDirLocation.getFolderName() + "/0/";
         commitNode = mock(CommitNode.class);

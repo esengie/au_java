@@ -63,7 +63,7 @@ public class RevisionTreeImpl implements RevisionTree {
         List<CommitNode> path = new ArrayList<>();
         path.add(node);
 
-        Set<CommitNode> ancSet = null;
+        Set<CommitNode> ancSet;
         while ((ancSet = m_graph.getAncestors(m_graph, node)).size() > 0) {
             CommitNode ancestor = null;
             if (ancSet.size() > 2)
