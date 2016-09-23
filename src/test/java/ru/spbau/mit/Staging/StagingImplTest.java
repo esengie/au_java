@@ -7,7 +7,6 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import ru.spbau.mit.Paths.SaveDirLocation;
 import ru.spbau.mit.Revisions.CommitNodes.CommitNode;
-import ru.spbau.mit.Revisions.CommitNodes.CommitNodeImpl;
 
 import java.io.File;
 
@@ -24,7 +23,7 @@ public class StagingImplTest {
     public void before(){
         stagingLocation = folder.getRoot() + "/" + SaveDirLocation.getFolderName() + "/staging/";
         commitLocation = folder.getRoot() + "/" + SaveDirLocation.getFolderName() + "/0/";
-        commitNode = mock(CommitNodeImpl.class);
+        commitNode = mock(CommitNode.class);
         when(commitNode.getRevisionNumber()).thenReturn(0);
         staging = new StagingImpl(folder.getRoot().toPath());
     }

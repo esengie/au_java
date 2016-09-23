@@ -1,6 +1,8 @@
 package ru.spbau.mit.Revisions.Exceptions;
 
-public class BranchDoesntExistException extends Exception {
+import java.io.IOException;
+
+public class BranchDoesntExistException extends IOException {
     public BranchDoesntExistException(String s) {
         super(s);
     }

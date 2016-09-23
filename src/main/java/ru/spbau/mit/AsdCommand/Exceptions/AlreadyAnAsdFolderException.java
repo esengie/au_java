@@ -1,4 +1,6 @@
 package ru.spbau.mit.AsdCommand.Exceptions;
 
-public class AlreadyAnAsdFolderException extends Exception {
+import java.io.IOException;
+
+public class AlreadyAnAsdFolderException extends IOException {
 }

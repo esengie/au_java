@@ -2,7 +2,9 @@ package ru.spbau.mit.Revisions.Branches;
 
 import com.sun.istack.internal.NotNull;
 
-public interface AsdBranch {
+import java.io.Serializable;
+
+public interface AsdBranch extends Serializable {
     @NotNull
     String getName();
 }

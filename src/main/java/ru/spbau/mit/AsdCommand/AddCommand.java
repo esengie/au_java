@@ -1,6 +1,9 @@
 package ru.spbau.mit.AsdCommand;
 
 import java.io.IOException;
+import java.io.PrintStream;
+import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.List;
 
 import com.beust.jcommander.Parameter;
@@ -18,9 +21,9 @@ public class AddCommand extends AsdCommand {
     }
 
     @Override
-    public void run(RevisionTree a_tree, Staging a_staging) throws IOException {
-        for (String s : patterns) {
-            System.out.println(s);
+    public void run(RevisionTree a_tree, Staging a_staging, PrintStream a_writer) throws IOException {
+        for (String s : new HashSet<>(patterns)) {
+            a_staging.add(Paths.get(s));
         }
     }
 }

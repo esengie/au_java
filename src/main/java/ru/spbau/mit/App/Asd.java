@@ -1,7 +1,7 @@
 package ru.spbau.mit.App;
 
-import com.beust.jcommander.MissingCommandException;
 import com.beust.jcommander.ParameterException;
+import ru.spbau.mit.App.Exceptions.RevisionTreeLoadError;
 import ru.spbau.mit.AsdCommand.Exceptions.NotAnAsdFolder;
 import ru.spbau.mit.AsdCommand.Exceptions.SerializedTreeNotFoundError;
 import ru.spbau.mit.AsdCommand.AsdCommand;
@@ -36,6 +36,9 @@ public class Asd {
         } catch (IOException e) {
             throw new SerializedTreeNotFoundError();
         }
+
+        if (m_tree == null)
+            throw new RevisionTreeLoadError();
     }
 
     private void saveRevisionTree() throws NotAnAsdFolder {
@@ -74,7 +77,7 @@ public class Asd {
                     loaded = true;
                 }
 
-                cmd.run(asd.m_tree, asd.m_staging);
+                cmd.run(asd.m_tree, asd.m_staging, System.out);
 
                 if (InitCommand.class.isInstance(cmd))
                     loaded = true;
@@ -91,7 +94,7 @@ public class Asd {
             }
         }
 
-        try{
+        try {
             asd.saveRevisionTree();
         } catch (NotAnAsdFolder notAnAsdFolder) {
             notAnAsdFolder.printStackTrace();

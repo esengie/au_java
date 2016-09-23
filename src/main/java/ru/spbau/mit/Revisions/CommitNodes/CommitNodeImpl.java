@@ -1,5 +1,7 @@
 package ru.spbau.mit.Revisions.CommitNodes;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import ru.spbau.mit.Revisions.Branches.AsdBranch;
 
 public class CommitNodeImpl implements CommitNode {
@@ -26,5 +28,15 @@ public class CommitNodeImpl implements CommitNode {
     @Override
     public AsdBranch getBranch() {
         return m_branch;
+    }
+
+    @Override
+    public int hashCode() {
+        return hashCoder();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return equalser(obj);
     }
 }
