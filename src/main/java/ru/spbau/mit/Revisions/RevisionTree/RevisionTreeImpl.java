@@ -17,7 +17,7 @@ public class RevisionTreeImpl implements RevisionTree {
         class CNode implements CommitNode {
             @Override
             public String getMessage() {
-                return "";
+                return "Init Commit contains everything before init";
             }
 
             @Override
@@ -56,7 +56,7 @@ public class RevisionTreeImpl implements RevisionTree {
     @Override
     public List<CommitNode> getLogPath() {
         CommitNode node = getHeadCommitForBranch(m_currentBranch);
-        AsdBranch branch = m_currentBranch;
+        AsdBranch branch = node.getBranch();
 
         List<CommitNode> path = new ArrayList<>();
         path.add(node);
@@ -66,12 +66,15 @@ public class RevisionTreeImpl implements RevisionTree {
             CommitNode ancestor = null;
             if (ancSet.size() > 2)
                 throw new RevisionTreeAncestorsRuntimeError("Error: >2 ancestors");
-
-            for (CommitNode a : ancSet) {
-                if (a.getBranch().getName().equals(branch.getName())) {
-                    if (ancestor != null)
-                        throw new RevisionTreeAncestorsRuntimeError("Error: passed >2 ancestors check, we don't handle weird merging cases yet");
-                    ancestor = a;
+            if (ancSet.size() == 1){
+                ancestor = ancSet.iterator().next();
+            } else {
+                for (CommitNode a : ancSet) {
+                    if (a.getBranch().equals(branch)) {
+                        if (ancestor != null)
+                            throw new RevisionTreeAncestorsRuntimeError("Error: passed >2 ancestors check, we don't handle weird merging cases yet");
+                        ancestor = a;
+                    }
                 }
             }
 
@@ -82,7 +85,6 @@ public class RevisionTreeImpl implements RevisionTree {
             branch = ancestor.getBranch();
         }
 
-        Collections.reverse(path);
         return path;
     }
 
