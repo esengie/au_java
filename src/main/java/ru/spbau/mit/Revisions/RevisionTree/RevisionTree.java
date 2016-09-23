@@ -6,7 +6,7 @@ import ru.spbau.mit.Revisions.CommitNodes.CommitNode;
 import ru.spbau.mit.Revisions.Exceptions.BranchAlreadyExistsException;
 import ru.spbau.mit.Revisions.Exceptions.BranchDoesntExistException;
 import ru.spbau.mit.Revisions.Exceptions.CommitDoesntExistException;
-import ru.spbau.mit.Revisions.Exceptions.CommitNodeAlreadyExistsException;
+import ru.spbau.mit.Revisions.Exceptions.CommitNodeAlreadyExistsError;
 
 import java.io.Serializable;
 import java.util.List;
@@ -25,7 +25,7 @@ public interface RevisionTree extends Serializable {
     void branchCreate(AsdBranch a_branch) throws BranchAlreadyExistsException;
     void branchRemove(AsdBranch a_branch);
 
-    void commit(CommitNode a_node) throws CommitNodeAlreadyExistsException;
+    void commit(CommitNode a_node) throws CommitNodeAlreadyExistsError;
 
     @NotNull
     CommitNode checkout(AsdBranch a_branch) throws BranchDoesntExistException;

@@ -67,7 +67,6 @@ public class StagingImpl implements Staging {
         FileUtils.copyDirectory(
                 new File(m_root.toString() + "/" + m_stagingArea),
                 commitDirectory);
-        emptyStagingArea();
     }
 
     @Override
@@ -89,7 +88,7 @@ public class StagingImpl implements Staging {
         FileUtils.copyDirectory(
                 commitDirectory,
                 m_root.toFile().getAbsoluteFile());
-        emptyStagingArea();
+//        emptyStagingArea();
     }
 
     @Override

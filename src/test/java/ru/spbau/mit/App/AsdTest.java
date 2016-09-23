@@ -31,7 +31,7 @@ public class AsdTest {
         AsdTest asd = new AsdTest();
         asd.before();
         Asd.main();
-        FileUtils.deleteDirectory(asd.folder);
+//        FileUtils.deleteDirectory(asd.folder);
     }
 
 }

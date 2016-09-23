@@ -22,7 +22,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Asd {
     private RevisionTree m_tree;
@@ -74,9 +78,9 @@ public class Asd {
         while (scanner.hasNextLine()) {
             try {
                 String line = scanner.nextLine();
-                if (line == null) continue;
+                if (line == null || line.trim().equals("")) continue;
 
-                AsdCommand cmd = Cli.parseAndDispatch(line.split("\\s"));
+                AsdCommand cmd = Cli.parseAndDispatch(splitOnWhiteSpace(line));
 
                 if (!isAnAsdFolder() && !InitCommand.class.isInstance(cmd))
                     throw new NotAnAsdFolder();
@@ -112,4 +116,13 @@ public class Asd {
         }
     }
 
+    private static String[] splitOnWhiteSpace(String a_string){
+        List<String> matchList = new ArrayList<String>();
+        Pattern regex = Pattern.compile("[^\\s\"']+|\"[^\"]*\"|'[^']*'");
+        Matcher regexMatcher = regex.matcher(a_string);
+        while (regexMatcher.find()) {
+            matchList.add(regexMatcher.group());
+        }
+        return matchList.toArray(new String[matchList.size()]);
+    }
 }

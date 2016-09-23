@@ -26,15 +26,19 @@ public class BranchCommand implements AsdCommand {
 
     @Override
     public void run(RevisionTree a_tree, Staging a_staging, PrintStream a_writer) throws IOException {
-        if (branchName.size() > 1)
-            throw new TooManyArgumentsException("branch command needs only one branch");
-        if (branchName.size() == 1) {
-            a_tree.branchCreate(AsdBranchFactory.createBranch(branchName.get(0)));
+        if (branchName == null) {
+            for (AsdBranch b : a_tree.getBranches()) {
+                if (b.equals(a_tree.getCurrentBranch()))
+                    a_writer.println("*" + b.getName());
+                else
+                    a_writer.println(" " + b.getName());
+            }
             return;
         }
 
-        for (AsdBranch b : a_tree.getBranches()) {
-            a_writer.println(b.getName());
-        }
+        if (branchName.size() > 1)
+            throw new TooManyArgumentsException("branch command needs only one branch");
+
+        a_tree.branchCreate(AsdBranchFactory.createBranch(branchName.get(0)));
     }
 }

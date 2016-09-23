@@ -4,10 +4,8 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 import org.jgrapht.graph.DefaultEdge;
-import ru.spbau.mit.AsdCommand.AsdCommandFactory;
 import ru.spbau.mit.Revisions.Branches.AsdBranch;
 import ru.spbau.mit.Revisions.Branches.AsdBranchFactory;
-import ru.spbau.mit.Revisions.Branches.AsdBranchImpl;
 import ru.spbau.mit.Revisions.CommitNodes.CommitNode;
 import ru.spbau.mit.Revisions.Exceptions.*;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -116,9 +114,9 @@ public class RevisionTreeImpl implements RevisionTree {
     }
 
     @Override
-    public void commit(CommitNode a_node) throws CommitNodeAlreadyExistsException {
+    public void commit(CommitNode a_node) {
         if (a_node.getRevisionNumber() != getRevisionNumber())
-            throw new CommitNodeAlreadyExistsException();
+            throw new CommitNodeAlreadyExistsError();
         CommitNode current = getHeadCommitForBranch(m_currentBranch);
         addDagEdge(current, a_node);
         setHeadCommitForBranch(m_currentBranch, a_node);
