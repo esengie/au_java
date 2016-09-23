@@ -88,7 +88,12 @@ public class StagingImpl implements Staging {
         FileUtils.copyDirectory(
                 commitDirectory,
                 m_root.toFile().getAbsoluteFile());
-//        emptyStagingArea();
+
+        emptyStagingArea();
+        FileUtils.copyDirectory(
+                commitDirectory,
+                new File(m_root.toAbsolutePath() + "/" + m_stagingArea));
+
     }
 
     @Override

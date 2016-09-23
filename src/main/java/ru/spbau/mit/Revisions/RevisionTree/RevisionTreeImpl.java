@@ -132,7 +132,7 @@ public class RevisionTreeImpl implements RevisionTree {
 
     @Override
     public CommitNode checkout(int a_revisionNumber) throws CommitDoesntExistException {
-        if (getRevisionNumber() < a_revisionNumber)
+        if (getRevisionNumber() <= a_revisionNumber)
             throw new CommitDoesntExistException(String.valueOf(a_revisionNumber));
 
         CommitNode retVal = null;
