@@ -23,13 +23,16 @@ public class StagingImpl implements Staging {
         m_root = a_root;
         boolean res = new File(m_root + "/" + m_stagingArea).mkdirs();
 
-        File dest = new File(m_root + "/" + m_saveDirectoryName + "/0");
+        String relativePath = m_root.toAbsolutePath() + "/" + m_saveDirectoryName + "/0";
+        File dest = new File(relativePath);
         for (File f : m_root.toFile().getAbsoluteFile().listFiles((FileFilter)
                 new NotFileFilter(
                         new WildcardFileFilter(m_saveDirectoryName))
         )) {
-            if (f.isDirectory())
-                FileUtils.copyDirectoryToDirectory(f, dest);
+            if (f.getAbsoluteFile().isDirectory()) {
+                String from = relativize(m_root, f.toPath());
+                FileUtils.copyDirectoryToDirectory(f.getAbsoluteFile(), new File(relativePath + "/" + from));
+            }
             else
                 FileUtils.copyFileToDirectory(f, dest);
         }
@@ -54,6 +57,13 @@ public class StagingImpl implements Staging {
         }
     }
 
+    /**
+     * Returns a relative path: second minus first
+     *
+     * @param a_root
+     * @param a_filePath
+     * @return
+     */
     private String relativize(Path a_root, Path a_filePath) {
         return new File(a_root.toAbsolutePath().toString())
                 .toURI()
@@ -128,19 +138,19 @@ public class StagingImpl implements Staging {
         String prefixFrom = commitNodeToPath(a_from);
         File folderTo = new File(commitNodeToPath(a_to));
         for (String s : a_paths) {
-            FileUtils.copyFileToDirectory(new File(prefixFrom + s), folderTo);
+            FileUtils.copyFileToDirectory(new File(prefixFrom + "/" + s), folderTo);
         }
     }
 
     private boolean filesDiffer(String a_path, CommitNode a_left, CommitNode a_right) throws IOException {
-        String left = commitNodeToPath(a_left) + a_path;
-        String right = commitNodeToPath(a_right) + a_path;
+        String left = commitNodeToPath(a_left) + "/" + a_path;
+        String right = commitNodeToPath(a_right) + "/" + a_path;
 
-        return FileUtils.contentEquals(new File(left), new File(right));
+        return !FileUtils.contentEquals(new File(left), new File(right));
     }
 
     private String commitNodeToPath(CommitNode a_node) {
-        return m_root.toAbsolutePath() + "/" + String.valueOf(a_node.getRevisionNumber());
+        return m_root.toAbsolutePath() + "/" + m_saveDirectoryName + "/" + String.valueOf(a_node.getRevisionNumber());
     }
 
     private List<String> listAllFilesRecursively(CommitNode a_node) {
@@ -149,6 +159,7 @@ public class StagingImpl implements Staging {
 
         return files.stream()
                 .map(File::getAbsolutePath)
+                .map(s -> s.substring(path.length() + 1))
                 .collect(Collectors.toList());
     }
 }

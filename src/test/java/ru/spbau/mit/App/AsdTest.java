@@ -30,6 +30,18 @@ public class AsdTest {
     public static void main(String... argv) throws Exception {
         AsdTest asd = new AsdTest();
         asd.before();
+
+        String inp = "init\n" +
+                "branch left\n" +
+                "add README.md\n" +
+                "add src\n" +
+                "commit -m \"asdf\"\n" +
+                "checkout master\n" +
+                "merge left";
+
+        ByteArrayInputStream in = new ByteArrayInputStream(inp.getBytes());
+//        System.setIn(in);
+
         Asd.main();
 //        FileUtils.deleteDirectory(asd.folder);
     }
