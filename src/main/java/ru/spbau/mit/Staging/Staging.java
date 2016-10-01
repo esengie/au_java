@@ -23,4 +23,6 @@ public interface Staging {
     void reset(Path a_file) throws IOException;
 
     void remove(Path a_file) throws IOException;
+
+    RepoStatus status() throws IOException;
 }

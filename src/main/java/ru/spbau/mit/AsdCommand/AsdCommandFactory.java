@@ -20,10 +20,10 @@ public class AsdCommandFactory {
         COMMANDS.put("log", LogCommand.class);
         COMMANDS.put("merge", MergeCommand.class);
         COMMANDS.put("init", InitCommand.class);
-        COMMANDS.put("reset", InitCommand.class);
-        COMMANDS.put("status", InitCommand.class);
-        COMMANDS.put("rm", InitCommand.class);
-        COMMANDS.put("clean", InitCommand.class);
+        COMMANDS.put("reset", ResetCommand.class);
+        COMMANDS.put("status", StatusCommand.class);
+        COMMANDS.put("rm", RmCommand.class);
+        COMMANDS.put("clean", CleanCommand.class);
 
     }
 

@@ -35,12 +35,15 @@ public class AsdTest {
                 "commit -m \"asdf\"\n" +
                 "checkout master\n" +
                 "merge left\n" +
+//                "rm README.md\n" +
+                "commit -m \"Lol\"\n" +
+//                "status\n" +
                 "log";
 
         ByteArrayInputStream in = new ByteArrayInputStream(inp.getBytes());
         System.setIn(in);
         AsdVersionControlSystem.main();
-//        FileUtils.deleteDirectory(asd.folder);
+        FileUtils.deleteDirectory(asd.folder);
     }
 
 }

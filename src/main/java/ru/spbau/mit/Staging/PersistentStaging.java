@@ -1,5 +1,6 @@
 package ru.spbau.mit.Staging;
 
+import com.sun.istack.internal.NotNull;
 import org.apache.commons.io.FileUtils;
 import org.organicdesign.fp.collections.PersistentTreeMap;
 import ru.spbau.mit.Paths.SaveDirLocation;
@@ -26,7 +27,6 @@ public class PersistentStaging implements Staging, Serializable {
     private final List<PersistentTreeMap<String, byte[]>> m_commits = new ArrayList<>();
     private int m_currentCommit = 0;
     private PersistentTreeMap<String, byte[]> m_staging;
-
 
     /**
      * This constructor should be called only when there's no state saved on disk
@@ -154,6 +154,53 @@ public class PersistentStaging implements Staging, Serializable {
 
         m_staging = m_staging.without(path);
         removeOnDisk(path);
+
+    }
+
+    @NotNull
+    @Override
+    public RepoStatus status() throws IOException {
+        Set<String> allRemoved = formRemoved();
+        Set<String> allAdded = formAdded();
+        Set<String> allModified = formModified();
+        Set<String> allUntracked = formUntracked();
+        return new RepoStatusImpl(allAdded, allModified, allUntracked, allRemoved);
+    }
+
+    private Set<String> formUntracked() {
+        Set<String> allPresentInRepo = new TreeSet<>(listAllFilesRecursively(m_root));
+        Set<String> allTracked = new TreeSet<>(m_staging.keySet());
+        allPresentInRepo.removeAll(allTracked);
+        return allPresentInRepo;
+    }
+
+    private Set<String> formRemoved() {
+        PersistentTreeMap<String, byte[]> lastCommit = m_commits.get(m_currentCommit);
+        Set<String> allRemoved = new TreeSet<>(lastCommit.keySet());
+        allRemoved.removeAll(m_staging.keySet());
+        return allRemoved;
+    }
+
+    private Set<String> formAdded() {
+        PersistentTreeMap<String, byte[]> lastCommit = m_commits.get(m_currentCommit);
+        Set<String> allAdded = new TreeSet<>(m_staging.keySet());
+        allAdded.removeAll(lastCommit.keySet());
+        return allAdded;
+    }
+
+    private Set<String> formModified(){
+        PersistentTreeMap<String, byte[]> lastCommit = m_commits.get(m_currentCommit);
+        Set<String> containedInStagingAndLastCommit = new TreeSet<>(lastCommit.keySet());
+        containedInStagingAndLastCommit.retainAll(m_staging.keySet());
+        Set<String> allModified = new TreeSet<>();
+
+        for (String s : containedInStagingAndLastCommit){
+            if (filesDiffer(lastCommit.get(s), m_staging.get(s))){
+                allModified.add(s);
+            }
+        }
+
+        return  allModified;
     }
 
     private void removeOnDisk(String path) throws IOException {

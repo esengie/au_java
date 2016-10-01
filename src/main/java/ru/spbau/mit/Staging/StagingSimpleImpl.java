@@ -129,6 +129,11 @@ public class StagingSimpleImpl implements Staging, Serializable {
     }
 
     @Override
+    public RepoStatus status() throws IOException {
+        throw new NotImplementedException();
+    }
+
+    @Override
     public void emptyStagingArea() throws IOException {
         FileUtils.deleteDirectory(new File(m_root + "/" + m_stagingArea));
         new File(m_root + "/" + m_stagingArea).mkdir();

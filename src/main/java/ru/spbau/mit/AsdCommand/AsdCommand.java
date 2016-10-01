@@ -19,7 +19,7 @@ public interface AsdCommand {
      * @param a_tree    A Revision tree
      * @param a_staging The Staging and disk class
      * @param a_writer  OutPutStream
-     * @throws IOException IOexceptions may happen
+     * @throws IOException may throw depending on staging class implementation
      */
     void run(RevisionTree a_tree, Staging a_staging, PrintStream a_writer) throws IOException;
 }

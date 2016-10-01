@@ -20,14 +20,6 @@ public class ResetCommand implements AsdCommand {
     protected ResetCommand() {
     }
 
-    /**
-     * Resets the files to the latest known state
-     *
-     * @param a_tree    A Revision tree
-     * @param a_staging The Staging and disk class
-     * @param a_writer  OutPutStream
-     * @throws IOException may throw depending on staging class implementation
-     */
     @Override
     public void run(RevisionTree a_tree, Staging a_staging, PrintStream a_writer) throws IOException {
         if (files == null)
