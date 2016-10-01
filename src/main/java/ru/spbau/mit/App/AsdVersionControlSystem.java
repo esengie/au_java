@@ -3,7 +3,7 @@ package ru.spbau.mit.App;
 import com.beust.jcommander.ParameterException;
 import ru.spbau.mit.App.Exceptions.RevisionTreeLoadRuntimeException;
 import ru.spbau.mit.AsdCommand.Exceptions.NotAnAsdFolderException;
-import ru.spbau.mit.AsdCommand.Exceptions.SerializedTreeNotFoundRuntimeException;
+import ru.spbau.mit.AsdCommand.Exceptions.SerializedStateNotFoundRuntimeException;
 import ru.spbau.mit.AsdCommand.AsdCommand;
 import ru.spbau.mit.AsdCommand.Exceptions.AlreadyAnAsdFolderException;
 import ru.spbau.mit.AsdCommand.InitCommand;
@@ -12,8 +12,7 @@ import ru.spbau.mit.Revisions.RevisionTree.RevisionTree;
 import ru.spbau.mit.Revisions.RevisionTree.RevisionTreeImpl;
 import ru.spbau.mit.Revisions.RevisionTree.RevisionTreeSerializer;
 import ru.spbau.mit.Revisions.RevisionTree.RevisionTreeSerializerImpl;
-import ru.spbau.mit.Staging.Staging;
-import ru.spbau.mit.Staging.StagingImpl;
+import ru.spbau.mit.Staging.*;
 
 import static ru.spbau.mit.Paths.AsdFolderOperations.*;
 
@@ -42,33 +41,41 @@ public class AsdVersionControlSystem {
     private RevisionTree m_tree;
     private Staging m_staging;
 
-    private void loadRevisionTree() throws NotAnAsdFolderException {
+    private void loadState() throws NotAnAsdFolderException {
         if (!isAnAsdFolder())
             throw new NotAnAsdFolderException();
-        RevisionTreeSerializer serializer = new RevisionTreeSerializerImpl();
+
+        RevisionTreeSerializer serializerTree = new RevisionTreeSerializerImpl();
+        StagingSerializer serializerStaging = new PersistentStagingSerializer();
 
         try {
-            m_tree = serializer.deserialize(new FileInputStream(new File(getSerializedTreePath())));
+            m_tree = serializerTree.deserialize(new FileInputStream(new File(getSerializedTreePath())));
+            m_staging = serializerStaging.deserialize(new FileInputStream(new File(getSerializedStagingPath())));
         } catch (IOException e) {
-            throw new SerializedTreeNotFoundRuntimeException();
+            throw new SerializedStateNotFoundRuntimeException();
         }
 
-        if (m_tree == null)
+        if (m_tree == null || m_staging == null)
             throw new RevisionTreeLoadRuntimeException();
     }
 
-    private void saveRevisionTree() throws NotAnAsdFolderException {
+    private void saveState() throws NotAnAsdFolderException {
         if (!isAnAsdFolder())
             throw new NotAnAsdFolderException();
 
-        RevisionTreeSerializer serializer = new RevisionTreeSerializerImpl();
+        RevisionTreeSerializer serializerTree = new RevisionTreeSerializerImpl();
+        StagingSerializer serializerStaging = new PersistentStagingSerializer();
 
-        File out = new File(getSerializedTreePath());
+        File outTree = new File(getSerializedTreePath());
+        File outStaging = new File(getSerializedStagingPath());
         try {
-            out.createNewFile();
-            serializer.serialize(m_tree, new FileOutputStream(out));
+            outTree.createNewFile();
+            outStaging.createNewFile();
+            serializerTree.serialize(m_tree, new FileOutputStream(outTree));
+            serializerStaging.serialize(m_staging, new FileOutputStream(outStaging));
+
         } catch (IOException e) {
-            throw new IllegalStateException("Unknown error during saving the tree");
+            throw new IllegalStateException("Unknown error during saving the tree", e);
         }
 
     }
@@ -77,7 +84,7 @@ public class AsdVersionControlSystem {
         if (isAnAsdFolder()) {
             throw new AlreadyAnAsdFolderException();
         }
-        m_staging = new StagingImpl(Paths.get("").toFile().getAbsoluteFile().toPath());
+        m_staging = new PersistentStaging(Paths.get("").toFile().getAbsoluteFile().toPath());
         m_tree = new RevisionTreeImpl();
     }
 
@@ -96,8 +103,7 @@ public class AsdVersionControlSystem {
                     throw new NotAnAsdFolderException();
 
                 if (!loaded && isAnAsdFolder()) {
-                    asd.loadRevisionTree();
-                    asd.m_staging = new StagingImpl(getRoot());
+                    asd.loadState();
                     loaded = true;
                 }
 
@@ -120,7 +126,7 @@ public class AsdVersionControlSystem {
         }
 
         try {
-            asd.saveRevisionTree();
+            asd.saveState();
         } catch (NotAnAsdFolderException notAnAsdFolder) {
             notAnAsdFolder.printStackTrace();
         }

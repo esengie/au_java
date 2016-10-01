@@ -36,7 +36,7 @@ public class MergeCommand implements AsdCommand {
 
         CommitNode result = CommitNodeFactory.createNode(a_tree,
                 "merged: " + from.getBranch().getName() +
-                        "into: " + into.getBranch().getName());
+                        " into: " + into.getBranch().getName());
 
         if (a_tree.isEarlierThanCurrent(fromBranch)) {
             a_writer.println("Already up-to date");

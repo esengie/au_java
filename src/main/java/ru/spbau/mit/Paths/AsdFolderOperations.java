@@ -1,6 +1,7 @@
 package ru.spbau.mit.Paths;
 
 import com.sun.istack.internal.NotNull;
+import ru.spbau.mit.Staging.Staging;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -18,6 +19,13 @@ public class AsdFolderOperations {
         return getRoot().toAbsolutePath() + "/" +
                 SaveDirLocation.getFolderName() + "/" +
                 RevisionTreeFileName.getFileName();
+    }
+
+    @NotNull
+    public static String getSerializedStagingPath() {
+        return getRoot().toAbsolutePath() + "/" +
+                SaveDirLocation.getFolderName() + "/" +
+                StagingFileName.getFileName();
     }
 
     public static boolean isAnAsdFolder() {

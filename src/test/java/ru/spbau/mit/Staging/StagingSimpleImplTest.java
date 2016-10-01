@@ -15,7 +15,7 @@ import static org.junit.Assert.*;
 
 import static org.mockito.Mockito.*;
 
-public class StagingImplTest {
+public class StagingSimpleImplTest {
 
     @Rule
     public final TemporaryFolder folder = new TemporaryFolder();
@@ -26,7 +26,7 @@ public class StagingImplTest {
         commitLocation = folder.getRoot() + "/" + SaveDirLocation.getFolderName() + "/0/";
         commitNode = mock(CommitNode.class);
         when(commitNode.getRevisionNumber()).thenReturn(0);
-        staging = new StagingImpl(folder.getRoot().toPath());
+        staging = new StagingSimpleImpl(folder.getRoot().toPath());
     }
 
     private final static String s1 = "adm";
