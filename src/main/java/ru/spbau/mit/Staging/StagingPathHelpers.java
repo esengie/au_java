@@ -30,13 +30,18 @@ class StagingPathHelpers {
     }
 
     /**
-     * Lists all files' relative paths in a directory
+     * Lists all files' relative paths in a directory,
+     * but skips .asd folders (all of them)
      *
      * @param path . dir from which we start - must be absolute
      * @return all files listed (but not directories)
      */
     static List<String> listAllFilesRecursively(String path) {
-        Collection<File> files = FileUtils.listFiles(new File(path), FileFileFilter.FILE, TrueFileFilter.INSTANCE);
+        Collection<File> files = FileUtils.listFiles(
+                new File(path),
+                FileFileFilter.FILE,
+                new NotFileFilter(
+                        new WildcardFileFilter(SaveDirLocation.getFolderName())));
 
         return files.stream()
                 .map(File::getAbsolutePath)

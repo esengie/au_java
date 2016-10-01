@@ -78,14 +78,18 @@ public class PersistentStagingTest {
     public void statusResetRemove() throws Exception {
         staging.remove(f.toPath());
         FileUtils.writeStringToFile(f2, dataWritten + dataWritten + dataWritten, Charset.defaultCharset());
+        folder.newFile("asd");
+
+
         RepoStatus st = staging.status();
         assertEquals(new ArrayList<>(), st.added());
         assertEquals(new ArrayList<>(), st.modifiedAdded());
         assertEquals(Arrays.asList(F2DIR + "/" + F2), st.modifiedUnAdded());
         assertEquals(Arrays.asList(F1DIR + "/" + F1), st.removed());
-        assertEquals(new ArrayList<>(), st.untracked());
+        assertEquals(Arrays.asList("asd"), st.untracked());
 
         staging.reset(f.toPath());
+
         st = staging.status();
         assertEquals(new ArrayList<>(), st.removed());
     }
