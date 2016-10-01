@@ -20,6 +20,9 @@ dependencies {
     compile group: 'commons-io', name: 'commons-io', version: '2.5'
     // Rules for testing
     compile group: 'com.github.stefanbirkner', name: 'system-rules', version: '1.16.1'
-    // For equality
+    // For object equality
     compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
+    // For persistence
+    compile group: 'org.organicdesign', name: 'UncleJim', version: '2.0.13'
+
 }

@@ -25,8 +25,9 @@ public class StagingImpl implements Staging {
 
         String relativePath = m_root.toAbsolutePath() + "/" + m_saveDirectoryName + "/0";
         File dest = new File(relativePath);
-        for (File f : m_root.toFile().getAbsoluteFile().listFiles((FileFilter)
-                new NotFileFilter(
+        for (File f : m_root.toFile()
+                .getAbsoluteFile()
+                .listFiles((FileFilter)new NotFileFilter(
                         new WildcardFileFilter(m_saveDirectoryName))
         )) {
             if (f.getAbsoluteFile().isDirectory()) {

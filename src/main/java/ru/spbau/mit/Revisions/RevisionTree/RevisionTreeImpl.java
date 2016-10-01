@@ -13,6 +13,11 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import java.util.*;
 
 public class RevisionTreeImpl implements RevisionTree {
+    /**
+     * Default zero node, because I decided to have a zero commit.
+     * Also this means staging has to provide a zero commit - but this is high-level
+     * and would be in a project description or something
+     */
     static class CNode implements CommitNode {
         @Override
         public String getMessage() {
@@ -61,25 +66,25 @@ public class RevisionTreeImpl implements RevisionTree {
         List<CommitNode> path = new ArrayList<>();
         path.add(node);
 
-        Set<CommitNode> ancSet;
-        while ((ancSet = m_graph.getAncestors(m_graph, node)).size() > 0) {
+        Set<CommitNode> ancestorSet;
+        while ((ancestorSet = m_graph.getAncestors(m_graph, node)).size() > 0) {
             CommitNode ancestor = null;
-            if (ancSet.size() > 2)
-                throw new RevisionTreeAncestorsRuntimeError("Error: >2 ancestors");
-            if (ancSet.size() == 1){
-                ancestor = ancSet.iterator().next();
+            if (ancestorSet.size() > 2)
+                throw new RevisionTreeAncestorsRuntimeException("Error: >2 ancestors");
+            if (ancestorSet.size() == 1){
+                ancestor = ancestorSet.iterator().next();
             } else {
-                for (CommitNode a : ancSet) {
+                for (CommitNode a : ancestorSet) {
                     if (a.getBranch().equals(branch)) {
                         if (ancestor != null)
-                            throw new RevisionTreeAncestorsRuntimeError("Error: passed >2 ancestors check, we don't handle weird merging cases yet");
+                            throw new RevisionTreeAncestorsRuntimeException("Error: passed >2 ancestors check, we don't handle weird merging cases yet");
                         ancestor = a;
                     }
                 }
             }
 
             if (ancestor == null)
-                throw new RevisionTreeAncestorsRuntimeError("Error: no ancestors");
+                throw new RevisionTreeAncestorsRuntimeException("Error: no ancestors");
             path.add(ancestor);
             node = ancestor;
             branch = ancestor.getBranch();
@@ -125,7 +130,7 @@ public class RevisionTreeImpl implements RevisionTree {
     @Override
     public void commit(CommitNode a_node) {
         if (a_node.getRevisionNumber() != getRevisionNumber())
-            throw new CommitNodeAlreadyExistsError();
+            throw new CommitNodeAlreadyExistsRuntimeException();
         CommitNode current = getHeadCommitForBranch(m_currentBranch);
         addDagEdge(current, a_node);
         setHeadCommitForBranch(m_currentBranch, a_node);

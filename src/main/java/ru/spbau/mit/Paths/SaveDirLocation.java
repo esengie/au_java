@@ -6,8 +6,9 @@ package ru.spbau.mit.Paths;
  * Comments on how to improve this are welcome and expected
  */
 public class SaveDirLocation {
+    private static final String m_name = ".asd";
     private SaveDirLocation(){}
     public static String getFolderName(){
-        return ".asd";
+        return m_name;
     }
 }

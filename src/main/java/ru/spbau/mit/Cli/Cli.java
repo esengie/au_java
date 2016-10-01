@@ -3,8 +3,7 @@ package ru.spbau.mit.Cli;
 import com.beust.jcommander.JCommander;
 import ru.spbau.mit.AsdCommand.AsdCommand;
 import ru.spbau.mit.AsdCommand.AsdCommandFactory;
-import ru.spbau.mit.AsdCommand.Exceptions.AlreadyAnAsdFolderException;
-import ru.spbau.mit.AsdCommand.Exceptions.CommandCreationError;
+import ru.spbau.mit.AsdCommand.Exceptions.CommandCreationRuntimeException;
 
 
 /**
@@ -20,14 +19,14 @@ public class Cli {
     private Cli() {
     }
 
-    private static void Setup() throws CommandCreationError {
+    private static void Setup() throws CommandCreationRuntimeException {
         Cli cli = new Cli();
         jCommander = new JCommander(cli);
         AsdCommandFactory.getCommandNames().forEach(s ->
                 jCommander.addCommand(s, AsdCommandFactory.createCommand(s)));
     }
 
-    public static AsdCommand parseAndDispatch(String... line) throws CommandCreationError {
+    public static AsdCommand parseAndDispatch(String... line) throws CommandCreationRuntimeException {
         Setup();
         jCommander.parse(line);
 

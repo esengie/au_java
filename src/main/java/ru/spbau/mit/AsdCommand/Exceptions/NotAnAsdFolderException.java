@@ -2,5 +2,5 @@ package ru.spbau.mit.AsdCommand.Exceptions;
 
 import java.io.IOException;
 
-public class NotAnAsdFolder extends IOException {
+public class NotAnAsdFolderException extends IOException {
 }

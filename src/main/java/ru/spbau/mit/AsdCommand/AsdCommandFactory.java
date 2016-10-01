@@ -1,13 +1,13 @@
 package ru.spbau.mit.AsdCommand;
 
-import ru.spbau.mit.AsdCommand.Exceptions.CommandCreationError;
+import ru.spbau.mit.AsdCommand.Exceptions.CommandCreationRuntimeException;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 public class AsdCommandFactory {
     private static final Map<String, Class<? extends AsdCommand>> COMMANDS = new ConcurrentHashMap<>();
@@ -23,7 +23,7 @@ public class AsdCommandFactory {
     }
 
     public static List<String> getCommandNames(){
-        return COMMANDS.keySet().stream().collect(Collectors.toList());
+        return new ArrayList<>(COMMANDS.keySet());
     }
 
     public static AsdCommand createCommand(String a_commandName) {
@@ -32,7 +32,7 @@ public class AsdCommandFactory {
             Constructor<? extends AsdCommand> constructor = commandClass.getDeclaredConstructor();
             return constructor.newInstance();
         } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
-            throw new CommandCreationError(a_commandName, e);
+            throw new CommandCreationRuntimeException(a_commandName, e);
         }
     }
 }

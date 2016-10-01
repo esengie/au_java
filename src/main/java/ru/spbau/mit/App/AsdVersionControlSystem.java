@@ -1,9 +1,9 @@
 package ru.spbau.mit.App;
 
 import com.beust.jcommander.ParameterException;
-import ru.spbau.mit.App.Exceptions.RevisionTreeLoadError;
-import ru.spbau.mit.AsdCommand.Exceptions.NotAnAsdFolder;
-import ru.spbau.mit.AsdCommand.Exceptions.SerializedTreeNotFoundError;
+import ru.spbau.mit.App.Exceptions.RevisionTreeLoadRuntimeException;
+import ru.spbau.mit.AsdCommand.Exceptions.NotAnAsdFolderException;
+import ru.spbau.mit.AsdCommand.Exceptions.SerializedTreeNotFoundRuntimeException;
 import ru.spbau.mit.AsdCommand.AsdCommand;
 import ru.spbau.mit.AsdCommand.Exceptions.AlreadyAnAsdFolderException;
 import ru.spbau.mit.AsdCommand.InitCommand;
@@ -38,28 +38,28 @@ import java.util.regex.Pattern;
  * More robust option is to save the tree each time and launch the command each time,
  * but it's easier to test this way. Also AsdTest class is for manual testing.
  */
-public class Asd {
+public class AsdVersionControlSystem {
     private RevisionTree m_tree;
     private Staging m_staging;
 
-    private void loadRevisionTree() throws NotAnAsdFolder {
+    private void loadRevisionTree() throws NotAnAsdFolderException {
         if (!isAnAsdFolder())
-            throw new NotAnAsdFolder();
+            throw new NotAnAsdFolderException();
         RevisionTreeSerializer serializer = new RevisionTreeSerializerImpl();
 
         try {
             m_tree = serializer.deserialize(new FileInputStream(new File(getSerializedTreePath())));
         } catch (IOException e) {
-            throw new SerializedTreeNotFoundError();
+            throw new SerializedTreeNotFoundRuntimeException();
         }
 
         if (m_tree == null)
-            throw new RevisionTreeLoadError();
+            throw new RevisionTreeLoadRuntimeException();
     }
 
-    private void saveRevisionTree() throws NotAnAsdFolder {
+    private void saveRevisionTree() throws NotAnAsdFolderException {
         if (!isAnAsdFolder())
-            throw new NotAnAsdFolder();
+            throw new NotAnAsdFolderException();
 
         RevisionTreeSerializer serializer = new RevisionTreeSerializerImpl();
 
@@ -83,17 +83,17 @@ public class Asd {
 
     public static void main(String... argv) {
         Scanner scanner = new Scanner(System.in);
-        Asd asd = new Asd();
+        AsdVersionControlSystem asd = new AsdVersionControlSystem();
         boolean loaded = false;
         while (scanner.hasNextLine()) {
             try {
                 String line = scanner.nextLine();
-                if (line == null || line.trim().equals("")) continue;
+                if (line == null || line.trim().isEmpty()) continue;
 
                 AsdCommand cmd = Cli.parseAndDispatch(splitOnWhiteSpace(line));
 
                 if (!isAnAsdFolder() && !InitCommand.class.isInstance(cmd))
-                    throw new NotAnAsdFolder();
+                    throw new NotAnAsdFolderException();
 
                 if (!loaded && isAnAsdFolder()) {
                     asd.loadRevisionTree();
@@ -109,7 +109,7 @@ public class Asd {
 
             } catch (AlreadyAnAsdFolderException e) {
                 System.out.println("Can't init an asd folder");
-            } catch (NotAnAsdFolder e) {
+            } catch (NotAnAsdFolderException e) {
                 System.out.println("Not an asd folder you should init first");
             } catch (ParameterException e) {
                 System.out.println(e.getMessage());
@@ -121,7 +121,7 @@ public class Asd {
 
         try {
             asd.saveRevisionTree();
-        } catch (NotAnAsdFolder notAnAsdFolder) {
+        } catch (NotAnAsdFolderException notAnAsdFolder) {
             notAnAsdFolder.printStackTrace();
         }
     }

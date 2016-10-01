@@ -6,7 +6,7 @@ import ru.spbau.mit.Revisions.Branches.AsdBranch;
 import ru.spbau.mit.Revisions.RevisionTree.RevisionTreeImpl;
 
 public class AsdBranchImpl implements AsdBranch {
-    String m_name;
+    private final String m_name;
 
     public AsdBranchImpl(String a_name) {
         m_name = a_name;

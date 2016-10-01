@@ -30,21 +30,20 @@ public class MergeCommand implements AsdCommand {
         if (branchName.size() > 1)
             throw new TooManyArgumentsException("merge needs one argument");
 
-        CommitNode into = a_tree.getHeadOfBranch(
-                a_tree.getCurrentBranch());
-        AsdBranch fromB = AsdBranchFactory.createBranch(branchName.get(0));
-        CommitNode from = a_tree.getHeadOfBranch(fromB);
+        CommitNode into = a_tree.getHeadOfBranch(a_tree.getCurrentBranch());
+        AsdBranch fromBranch = AsdBranchFactory.createBranch(branchName.get(0));
+        CommitNode from = a_tree.getHeadOfBranch(fromBranch);
 
         CommitNode result = CommitNodeFactory.createNode(a_tree,
                 "merged: " + from.getBranch().getName() +
-                "into: " + into.getBranch().getName());
+                        "into: " + into.getBranch().getName());
 
-        if (a_tree.isEarlierThanCurrent(fromB)){
+        if (a_tree.isEarlierThanCurrent(fromBranch)) {
             a_writer.println("Already up-to date");
             return;
         }
 
         a_staging.merge(from, into, result);
-        a_tree.merge(fromB, result);
+        a_tree.merge(fromBranch, result);
     }
 }
