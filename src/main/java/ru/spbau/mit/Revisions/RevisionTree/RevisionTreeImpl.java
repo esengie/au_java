@@ -67,7 +67,7 @@ public class RevisionTreeImpl implements RevisionTree {
         path.add(node);
 
         Set<CommitNode> ancestorSet;
-        while ((ancestorSet = m_graph.getAncestors(m_graph, node)).size() > 0) {
+        while ((ancestorSet = directParentsOf(node)).size() > 0) {
             CommitNode ancestor = null;
             if (ancestorSet.size() > 2)
                 throw new RevisionTreeAncestorsRuntimeException("Error: >2 ancestors");
@@ -91,6 +91,15 @@ public class RevisionTreeImpl implements RevisionTree {
         }
 
         return path;
+    }
+
+    private Set<CommitNode> directParentsOf(CommitNode node) {
+        Set<DefaultEdge> incomingEdges = m_graph.incomingEdgesOf(node);
+        Set<CommitNode> retVal = new HashSet<>();
+        for (DefaultEdge e : incomingEdges){
+            retVal.add(m_graph.getEdgeSource(e));
+        }
+        return retVal;
     }
 
     @Override
