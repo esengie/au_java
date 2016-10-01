@@ -1,11 +1,9 @@
 package ru.spbau.mit.Paths;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import ru.spbau.mit.AsdCommand.AsdCommandFactory;
 
 import java.io.File;
 import java.io.IOException;

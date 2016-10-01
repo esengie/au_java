@@ -3,8 +3,9 @@ package ru.spbau.mit.Revisions.CommitNodes;
 import org.junit.Test;
 import ru.spbau.mit.Revisions.Branches.AsdBranch;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class CommitNodeImplTest {
     @Test

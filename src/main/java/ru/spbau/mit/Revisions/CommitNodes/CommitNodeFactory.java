@@ -11,6 +11,7 @@ public class CommitNodeFactory {
     private CommitNodeFactory() {
 
     }
+
     private static Map<RevisionTree, Integer> m_map = new HashMap<>();
 
     public static CommitNode createNode(RevisionTree a_tree, String a_message) {

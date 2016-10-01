@@ -2,7 +2,6 @@ package ru.spbau.mit.Serialization;
 
 import com.sun.istack.internal.NotNull;
 import ru.spbau.mit.Revisions.Exceptions.IncorrectFileRuntimeException;
-import ru.spbau.mit.Revisions.RevisionTree.RevisionTree;
 
 import java.io.*;
 

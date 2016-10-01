@@ -5,8 +5,8 @@ import org.organicdesign.fp.collections.PersistentTreeMap;
 import ru.spbau.mit.Paths.SaveDirLocation;
 import ru.spbau.mit.Revisions.CommitNodes.CommitNode;
 import ru.spbau.mit.Staging.Exceptions.CantMergeException;
-import ru.spbau.mit.Staging.Exceptions.FileShouldExistException;
 import ru.spbau.mit.Staging.Exceptions.CommitNumberConflictRuntimeException;
+import ru.spbau.mit.Staging.Exceptions.FileShouldExistException;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,8 +17,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static ru.spbau.mit.Staging.StagingPathHelpers.*;
-
-import static ru.spbau.mit.Staging.StagingPathHelpers.relativize;
 
 /**
  * Does the staging stage persistently
@@ -67,7 +65,7 @@ public class PersistentStaging implements Staging, Serializable {
             filePaths = filePaths.stream()
                     .map(s -> relPath + s)
                     .collect(Collectors.toList());
-            for (String s : filePaths){
+            for (String s : filePaths) {
                 m_staging = m_staging.assoc(s,
                         FileUtils.readFileToByteArray(new File(s).getAbsoluteFile()));
             }
@@ -90,7 +88,7 @@ public class PersistentStaging implements Staging, Serializable {
 
     @Override
     public void checkout(CommitNode a_node) throws IOException {
-        if (! (a_node.getRevisionNumber() < m_commits.size()))
+        if (!(a_node.getRevisionNumber() < m_commits.size()))
             throw new CommitNumberConflictRuntimeException();
 
         eraseWorkingDir(m_root);
@@ -98,7 +96,7 @@ public class PersistentStaging implements Staging, Serializable {
         PersistentTreeMap<String, byte[]> commitContents =
                 m_commits.get(a_node.getRevisionNumber());
 
-        for (Map.Entry<String, byte[]> it : commitContents.entrySet()){
+        for (Map.Entry<String, byte[]> it : commitContents.entrySet()) {
             byteArrayToFile(m_root + "/" + it.getKey(), it.getValue());
         }
 
@@ -126,7 +124,7 @@ public class PersistentStaging implements Staging, Serializable {
 
         set = new TreeSet<>(from.keySet());
         set.removeAll(to.keySet());
-        for (String s : set){
+        for (String s : set) {
             res = res.assoc(s, from.get(s));
         }
 
@@ -136,13 +134,45 @@ public class PersistentStaging implements Staging, Serializable {
         emptyStagingArea();
     }
 
+    @Override
+    public void reset(Path a_file) throws IOException {
+        PersistentTreeMap<String, byte[]> commitContents =
+                m_commits.get(m_currentCommit);
+
+        String path = relativize(m_root, a_file.toString());
+        if (!commitContents.containsKey(path))
+            throw new FileShouldExistException(path);
+
+        byteArrayToFile(path, commitContents.get(path));
+    }
+
+    @Override
+    public void remove(Path a_file) throws IOException {
+        String path = relativize(m_root, a_file.toString());
+        if (!m_staging.containsKey(path))
+            throw new FileShouldExistException(path);
+
+        m_staging = m_staging.without(path);
+        removeOnDisk(path);
+    }
+
+    private void removeOnDisk(String path) throws IOException {
+        File f = new File(path).getAbsoluteFile();
+        if (f.isDirectory()) {
+            FileUtils.deleteDirectory(f);
+        }
+        if (f.isFile()) {
+            FileUtils.deleteQuietly(f);
+        }
+    }
+
     private void byteArrayToFile(String a_relativePath, byte[] a_contents) throws IOException {
         File f = new File(a_relativePath).getAbsoluteFile();
         f.getParentFile().mkdirs();
         FileUtils.writeByteArrayToFile(f, a_contents);
     }
 
-    private boolean filesDiffer(byte[] a_left, byte[] a_right){
+    private boolean filesDiffer(byte[] a_left, byte[] a_right) {
         return !Arrays.equals(a_left, a_right);
     }
 }

@@ -2,21 +2,10 @@ package ru.spbau.mit.App;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.organicdesign.fp.collections.PersistentTreeMap;
-import org.organicdesign.fp.collections.PersistentTreeSet;
-import ru.spbau.mit.Revisions.RevisionTree.RevisionTree;
 
-import java.io.*;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.TreeMap;
-
-import static org.junit.Assert.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 
 public class AsdTest {
 
@@ -24,6 +13,7 @@ public class AsdTest {
 //    public final TemporaryFolder folder = new TemporaryFolder();
 
     File folder;
+
     @Before
     public void before() throws IOException {
         folder = new File("/tmp/junit123");
@@ -32,7 +22,7 @@ public class AsdTest {
         System.setProperty("user.dir", folder.getAbsolutePath());
     }
 
-//    @Test
+    //    @Test
     public static void main(String... argv) throws Exception {
         AsdTest asd = new AsdTest();
         asd.before();

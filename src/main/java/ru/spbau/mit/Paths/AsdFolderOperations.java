@@ -1,7 +1,6 @@
 package ru.spbau.mit.Paths;
 
 import com.sun.istack.internal.NotNull;
-import ru.spbau.mit.Staging.Staging;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -11,7 +10,8 @@ import java.nio.file.Paths;
  * Common asd path operations
  */
 public class AsdFolderOperations {
-    private AsdFolderOperations(){}
+    private AsdFolderOperations() {
+    }
 
 
     @NotNull

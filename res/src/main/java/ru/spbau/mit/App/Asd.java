@@ -2,10 +2,10 @@ package ru.spbau.mit.App;
 
 import com.beust.jcommander.ParameterException;
 import ru.spbau.mit.App.Exceptions.RevisionTreeLoadError;
-import ru.spbau.mit.AsdCommand.Exceptions.NotAnAsdFolder;
-import ru.spbau.mit.AsdCommand.Exceptions.SerializedTreeNotFoundError;
 import ru.spbau.mit.AsdCommand.AsdCommand;
 import ru.spbau.mit.AsdCommand.Exceptions.AlreadyAnAsdFolderException;
+import ru.spbau.mit.AsdCommand.Exceptions.NotAnAsdFolder;
+import ru.spbau.mit.AsdCommand.Exceptions.SerializedTreeNotFoundError;
 import ru.spbau.mit.AsdCommand.InitCommand;
 import ru.spbau.mit.Cli.Cli;
 import ru.spbau.mit.Revisions.RevisionTree.RevisionTree;
@@ -15,14 +15,14 @@ import ru.spbau.mit.Revisions.RevisionTree.RevisionTreeSerializerImpl;
 import ru.spbau.mit.Staging.Staging;
 import ru.spbau.mit.Staging.StagingImpl;
 
-import static ru.spbau.mit.Paths.AsdFolderOperations.*;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Scanner;
+
+import static ru.spbau.mit.Paths.AsdFolderOperations.*;
 
 public class Asd {
     private RevisionTree m_tree;

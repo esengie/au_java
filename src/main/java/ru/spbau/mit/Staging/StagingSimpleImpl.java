@@ -1,7 +1,9 @@
 package ru.spbau.mit.Staging;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.*;
+import org.apache.commons.io.filefilter.NotFileFilter;
+import org.apache.commons.io.filefilter.WildcardFileFilter;
+import org.apache.commons.lang.NotImplementedException;
 import ru.spbau.mit.Paths.SaveDirLocation;
 import ru.spbau.mit.Revisions.CommitNodes.CommitNode;
 import ru.spbau.mit.Staging.Exceptions.CantMergeException;
@@ -12,11 +14,17 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import static ru.spbau.mit.Staging.StagingPathHelpers.*;
 
+/**
+ * First version of staging implementation - copies the repo,
+ * doesn't support the new commands
+ */
 public class StagingSimpleImpl implements Staging, Serializable {
     private final String m_root;
     private static final String m_saveDirectoryName = SaveDirLocation.getFolderName();
@@ -108,6 +116,16 @@ public class StagingSimpleImpl implements Staging, Serializable {
         copyFilesFromOneCommitToAnother(to.stream().collect(Collectors.toList()), a_to, a_result);
 
         checkout(a_result);
+    }
+
+    @Override
+    public void reset(Path a_file) throws IOException {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public void remove(Path a_file) throws IOException {
+        throw new NotImplementedException();
     }
 
     @Override

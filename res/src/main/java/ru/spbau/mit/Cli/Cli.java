@@ -3,7 +3,6 @@ package ru.spbau.mit.Cli;
 import com.beust.jcommander.JCommander;
 import ru.spbau.mit.AsdCommand.AsdCommand;
 import ru.spbau.mit.AsdCommand.AsdCommandFactory;
-import ru.spbau.mit.AsdCommand.Exceptions.AlreadyAnAsdFolderException;
 import ru.spbau.mit.AsdCommand.Exceptions.CommandCreationError;
 
 public class Cli {
@@ -31,7 +30,7 @@ public class Cli {
     }
 
     // Kostyl tk biblioteka zdes, for printing usage
-    public static JCommander getParser(){
+    public static JCommander getParser() {
         Setup();
         return jCommander;
     }

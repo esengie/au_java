@@ -3,8 +3,6 @@ package ru.spbau.mit.Revisions.RevisionTree;
 import com.sun.istack.internal.NotNull;
 import ru.spbau.mit.Revisions.Exceptions.IncorrectFileError;
 
-import java.io.*;
-
 public class RevisionTreeSerializerImpl implements RevisionTreeSerializer {
     @Override
     public void serialize(RevisionTree a_tree, OutputStream a_out) throws IOException {

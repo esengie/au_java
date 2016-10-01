@@ -10,7 +10,6 @@ import ru.spbau.mit.Paths.SaveDirLocation;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,7 +18,7 @@ class StagingPathHelpers {
     /**
      * Returns a relative path: second minus first
      *
-     * @param a_root shorter path
+     * @param a_root     shorter path
      * @param a_filePath longer path
      * @return difference betwen the two
      */

@@ -9,9 +9,9 @@ import java.io.Serializable;
 
 /**
  * CommitNode represents a node in the Revision tree
- *
+ * <p>
  * Comes with it's own branch, get assigned a revision number BY THE TREE
- *
+ * <p>
  * Needs to be commited to the tree before getting any other Nodes from the Factory
  * Needs to provide equals and hashcode
  */

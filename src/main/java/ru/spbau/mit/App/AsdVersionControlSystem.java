@@ -2,19 +2,18 @@ package ru.spbau.mit.App;
 
 import com.beust.jcommander.ParameterException;
 import ru.spbau.mit.App.Exceptions.RevisionTreeLoadRuntimeException;
-import ru.spbau.mit.AsdCommand.Exceptions.NotAnAsdFolderException;
-import ru.spbau.mit.AsdCommand.Exceptions.SerializedStateNotFoundRuntimeException;
 import ru.spbau.mit.AsdCommand.AsdCommand;
 import ru.spbau.mit.AsdCommand.Exceptions.AlreadyAnAsdFolderException;
+import ru.spbau.mit.AsdCommand.Exceptions.NotAnAsdFolderException;
+import ru.spbau.mit.AsdCommand.Exceptions.SerializedStateNotFoundRuntimeException;
 import ru.spbau.mit.AsdCommand.InitCommand;
 import ru.spbau.mit.Cli.Cli;
 import ru.spbau.mit.Revisions.RevisionTree.RevisionTree;
 import ru.spbau.mit.Revisions.RevisionTree.RevisionTreeImpl;
 import ru.spbau.mit.Serialization.Serializer;
 import ru.spbau.mit.Serialization.SerializerImpl;
-import ru.spbau.mit.Staging.*;
-
-import static ru.spbau.mit.Paths.AsdFolderOperations.*;
+import ru.spbau.mit.Staging.PersistentStaging;
+import ru.spbau.mit.Staging.Staging;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,13 +26,15 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static ru.spbau.mit.Paths.AsdFolderOperations.*;
+
 
 /**
  * The main class, loads the Revision tree or does the init (used init command for that,
  * until realising that Java copies the references)
- *
+ * <p>
  * Loops until the input is gone and saves the tree
- *
+ * <p>
  * More robust option is to save the tree each time and launch the command each time,
  * but it's easier to test this way. Also AsdTest class is for manual testing.
  */
@@ -132,7 +133,7 @@ public class AsdVersionControlSystem {
         }
     }
 
-    private static String[] splitOnWhiteSpace(String a_string){
+    private static String[] splitOnWhiteSpace(String a_string) {
         List<String> matchList = new ArrayList<String>();
         Pattern regex = Pattern.compile("[^\\s\"']+|\"[^\"]*\"|'[^']*'");
         Matcher regexMatcher = regex.matcher(a_string);

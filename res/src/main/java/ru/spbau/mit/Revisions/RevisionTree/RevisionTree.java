@@ -15,20 +15,24 @@ import java.util.Set;
 public interface RevisionTree extends Serializable {
     @NotNull
     List<CommitNode> getLogPath();
+
     @NotNull
     AsdBranch getCurrentBranch();
+
     @NotNull
     Set<AsdBranch> getBranches();
 
     int getRevisionNumber();
 
     void branchCreate(AsdBranch a_branch) throws BranchAlreadyExistsException;
+
     void branchRemove(AsdBranch a_branch);
 
     void commit(CommitNode a_node) throws CommitNodeAlreadyExistsException;
 
     @NotNull
     CommitNode checkout(AsdBranch a_branch) throws BranchDoesntExistException;
+
     @NotNull
     CommitNode checkout(int a_revisionNumber) throws CommitDoesntExistException;
 

@@ -8,7 +8,7 @@ import ru.spbau.mit.AsdCommand.Exceptions.CommandCreationRuntimeException;
 
 /**
  * The Cli.
- *
+ * <p>
  * Because Jcommander is intended for single use at the start of the program
  * and not in the loop as used here I have a Setup method and I also return the instance
  * for usage printing -- JCommander's fault
@@ -36,7 +36,7 @@ public class Cli {
     }
 
     // Kostyl tk biblioteka zdes, for printing usage
-    public static JCommander getParser(){
+    public static JCommander getParser() {
         Setup();
         return jCommander;
     }

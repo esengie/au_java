@@ -11,7 +11,6 @@ import ru.spbau.mit.Revisions.CommitNodes.CommitNode;
 import java.io.File;
 
 import static org.junit.Assert.*;
-
 import static org.mockito.Mockito.*;
 
 public class StagingImplTest {
@@ -20,7 +19,7 @@ public class StagingImplTest {
     public final TemporaryFolder folder = new TemporaryFolder();
 
     @Before
-    public void before(){
+    public void before() {
         stagingLocation = folder.getRoot() + "/" + SaveDirLocation.getFolderName() + "/staging/";
         commitLocation = folder.getRoot() + "/" + SaveDirLocation.getFolderName() + "/0/";
         commitNode = mock(CommitNode.class);
@@ -83,20 +82,20 @@ public class StagingImplTest {
         commitToDisk();
 
         FileUtils.deleteQuietly(new File(folder.getRoot() + "/" + DIR + "/" + F1));
-        FileUtils.writeStringToFile(new File(folder.getRoot() + "/"  + F2DIR + "/" + F2),
+        FileUtils.writeStringToFile(new File(folder.getRoot() + "/" + F2DIR + "/" + F2),
                 dataWritten + dataWritten + dataWritten);
 
-        File file = new File(folder.getRoot() + "/"  + DIR + "/" + F1);
+        File file = new File(folder.getRoot() + "/" + DIR + "/" + F1);
         assertFalse(file.exists());
-        file = new File(folder.getRoot() + "/"  + F2DIR + "/" + F2);
+        file = new File(folder.getRoot() + "/" + F2DIR + "/" + F2);
         assertTrue(file.exists());
         assertNotEquals(FileUtils.readFileToString(file), dataWritten);
 
         staging.checkout(commitNode);
 
-        file = new File(folder.getRoot() + "/"  + DIR + "/" + F1);
+        file = new File(folder.getRoot() + "/" + DIR + "/" + F1);
         assertTrue(file.exists());
-        file = new File(folder.getRoot() + "/"  + F2DIR + "/" + F2);
+        file = new File(folder.getRoot() + "/" + F2DIR + "/" + F2);
         assertTrue(file.exists());
         assertEquals(FileUtils.readFileToString(file), dataWritten);
     }

@@ -37,21 +37,21 @@ public class RevisionTreeSerializerImplTest {
                 tree.branchCreate(b2);
                 tree.checkout(b2);
             }
-            if (i == 7){
+            if (i == 7) {
                 tree.checkout(b1);
             }
             tree.commit(c);
         }
 
-    RevisionTreeSerializer ser = new RevisionTreeSerializerImpl();
+        RevisionTreeSerializer ser = new RevisionTreeSerializerImpl();
 
-    FileOutputStream out = new FileOutputStream(f);
-        ser.serialize(tree,out);
+        FileOutputStream out = new FileOutputStream(f);
+        ser.serialize(tree, out);
         out.close();
 
-    RevisionTree tree2 = ser.deserialize(new FileInputStream(f));
+        RevisionTree tree2 = ser.deserialize(new FileInputStream(f));
 
-    assertEquals(tree2, tree);
-}
+        assertEquals(tree2, tree);
+    }
 
 }

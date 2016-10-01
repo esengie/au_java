@@ -9,7 +9,6 @@ import ru.spbau.mit.Staging.Staging;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.List;
 
 @Parameters(commandDescription = "Record changes to the repository")
 public class CommitCommand implements AsdCommand {

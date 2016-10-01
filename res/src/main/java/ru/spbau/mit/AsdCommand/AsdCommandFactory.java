@@ -22,7 +22,7 @@ public class AsdCommandFactory {
         COMMANDS.put("init", InitCommand.class);
     }
 
-    public static List<String> getCommandNames(){
+    public static List<String> getCommandNames() {
         return COMMANDS.keySet().stream().collect(Collectors.toList());
     }
 

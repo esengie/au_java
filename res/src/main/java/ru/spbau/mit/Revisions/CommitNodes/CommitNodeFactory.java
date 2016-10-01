@@ -7,6 +7,7 @@ public class CommitNodeFactory {
     private CommitNodeFactory() {
 
     }
+
     public static CommitNode createNode(RevisionTree a_tree, String a_message) {
         CommitNode retVal = new CommitNodeImpl(a_tree.getCurrentBranch(),
                 a_tree.getRevisionNumber(),

@@ -7,7 +7,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class AsdFolderOperations {
-    private AsdFolderOperations(){}
+    private AsdFolderOperations() {
+    }
 
 
     @NotNull

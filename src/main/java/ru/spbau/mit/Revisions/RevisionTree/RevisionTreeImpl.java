@@ -71,7 +71,7 @@ public class RevisionTreeImpl implements RevisionTree {
             CommitNode ancestor = null;
             if (ancestorSet.size() > 2)
                 throw new RevisionTreeAncestorsRuntimeException("Error: >2 ancestors");
-            if (ancestorSet.size() == 1){
+            if (ancestorSet.size() == 1) {
                 ancestor = ancestorSet.iterator().next();
             } else {
                 for (CommitNode a : ancestorSet) {
@@ -178,17 +178,17 @@ public class RevisionTreeImpl implements RevisionTree {
 
     /**
      * Performs a "history forgetting" merge, always
-     *
+     * <p>
      * Except when the merged branch is in the log path, then we do nothing.
-     *
+     * <p>
      * Example of "forgetting":
      * A->B->E
      * |
      * C->D->         <- if we have two paths ACD and ABE,
-     *
+     * <p>
      * and merge D to E we get the log ABEF
      * if we merge E to D we get the log ACDF.
-     *
+     * <p>
      * So we "forget" the commits,
      * but keep the changes (we forget them from outside only).
      * Any suggestions how to fix this are welcome

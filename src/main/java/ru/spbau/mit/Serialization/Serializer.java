@@ -9,5 +9,6 @@ import java.io.OutputStream;
  */
 public interface Serializer<T> {
     void serialize(T a_tree, OutputStream a_out) throws IOException;
+
     T deserialize(InputStream a_in) throws IOException;
 }

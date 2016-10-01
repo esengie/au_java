@@ -13,7 +13,7 @@ public class AsdTest {
     public final TemporaryFolder folder = new TemporaryFolder();
 
     @Before
-    public void before(){
+    public void before() {
         System.setProperty("user.dir", folder.getRoot().getAbsolutePath());
     }
 

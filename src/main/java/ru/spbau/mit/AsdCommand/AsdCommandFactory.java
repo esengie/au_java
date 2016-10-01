@@ -20,9 +20,14 @@ public class AsdCommandFactory {
         COMMANDS.put("log", LogCommand.class);
         COMMANDS.put("merge", MergeCommand.class);
         COMMANDS.put("init", InitCommand.class);
+        COMMANDS.put("reset", InitCommand.class);
+        COMMANDS.put("status", InitCommand.class);
+        COMMANDS.put("rm", InitCommand.class);
+        COMMANDS.put("clean", InitCommand.class);
+
     }
 
-    public static List<String> getCommandNames(){
+    public static List<String> getCommandNames() {
         return new ArrayList<>(COMMANDS.keySet());
     }
 
