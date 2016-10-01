@@ -43,9 +43,6 @@ public class AsdVersionControlSystem {
     private Staging m_staging;
 
     private void loadState() throws NotAnAsdFolderException {
-        if (!isAnAsdFolder())
-            throw new NotAnAsdFolderException();
-
         Serializer<RevisionTree> serializerTree = new SerializerImpl<>();
         Serializer<Staging> serializerStaging = new SerializerImpl<>();
 
