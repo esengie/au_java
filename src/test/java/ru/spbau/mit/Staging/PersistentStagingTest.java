@@ -73,23 +73,9 @@ public class PersistentStagingTest {
         assertEquals("", FileUtils.readFileToString(f2, Charset.defaultCharset()));
     }
 
-    @Test
-    public void merge() throws Exception {
-
-    }
 
     @Test
-    public void reset() throws Exception {
-
-    }
-
-    @Test
-    public void remove() throws Exception {
-
-    }
-
-    @Test
-    public void status() throws Exception {
+    public void statusResetRemove() throws Exception {
         staging.remove(f.toPath());
         FileUtils.writeStringToFile(f2, dataWritten + dataWritten + dataWritten, Charset.defaultCharset());
         RepoStatus st = staging.status();
