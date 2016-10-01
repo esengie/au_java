@@ -18,11 +18,14 @@ public class StatusCommand implements AsdCommand {
     public void run(RevisionTree tree, Staging staging, PrintStream writer) throws IOException {
         RepoStatus stats = staging.status();
 
-        writer.println("Added:");
+        writer.println("Newly Added:");
         printList(stats.added(), writer);
 
-        writer.println("Modified:");
-        printList(stats.modified(), writer);
+        writer.println("Modified Added:");
+        printList(stats.modifiedAdded(), writer);
+
+        writer.println("Modified UnAdded:");
+        printList(stats.modifiedUnAdded(), writer);
 
         writer.println("Untracked:");
         printList(stats.untracked(), writer);

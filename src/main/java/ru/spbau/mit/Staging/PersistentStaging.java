@@ -144,6 +144,7 @@ public class PersistentStaging implements Staging, Serializable {
             throw new FileShouldExistException(path);
 
         byteArrayToFile(path, commitContents.get(path));
+        add(new File(path).getAbsoluteFile().toPath()); // add it again if need be
     }
 
     @Override
@@ -161,10 +162,12 @@ public class PersistentStaging implements Staging, Serializable {
     @Override
     public RepoStatus status() throws IOException {
         Set<String> allRemoved = formRemoved();
-        Set<String> allAdded = formAdded();
-        Set<String> allModified = formModified();
+        Set<String> allAdded = formNewlyAdded();
+        Set<String> allModifiedAdded = formModifiedAdded();
+        Set<String> allModifiedUnAdded = formModifiedUnAdded();
         Set<String> allUntracked = formUntracked();
-        return new RepoStatusImpl(allAdded, allModified, allUntracked, allRemoved);
+        return new RepoStatusImpl(allAdded, allModifiedAdded,
+                allModifiedUnAdded, allUntracked, allRemoved);
     }
 
     private Set<String> formUntracked() {
@@ -181,14 +184,14 @@ public class PersistentStaging implements Staging, Serializable {
         return allRemoved;
     }
 
-    private Set<String> formAdded() {
+    private Set<String> formNewlyAdded() {
         PersistentTreeMap<String, byte[]> lastCommit = m_commits.get(m_currentCommit);
         Set<String> allAdded = new TreeSet<>(m_staging.keySet());
         allAdded.removeAll(lastCommit.keySet());
         return allAdded;
     }
 
-    private Set<String> formModified(){
+    private Set<String> formModifiedAdded(){
         PersistentTreeMap<String, byte[]> lastCommit = m_commits.get(m_currentCommit);
         Set<String> containedInStagingAndLastCommit = new TreeSet<>(lastCommit.keySet());
         containedInStagingAndLastCommit.retainAll(m_staging.keySet());
@@ -196,6 +199,20 @@ public class PersistentStaging implements Staging, Serializable {
 
         for (String s : containedInStagingAndLastCommit){
             if (filesDiffer(lastCommit.get(s), m_staging.get(s))){
+                allModified.add(s);
+            }
+        }
+
+        return  allModified;
+    }
+
+    private Set<String> formModifiedUnAdded() throws IOException {
+        Set<String> containedInStagingAndLastCommit = new TreeSet<>(listAllFilesRecursively(m_root));
+        containedInStagingAndLastCommit.retainAll(m_staging.keySet());
+        Set<String> allModified = new TreeSet<>();
+
+        for (String s : containedInStagingAndLastCommit){
+            if (filesDiffer(FileUtils.readFileToByteArray(new File(m_root + "/" + s)), m_staging.get(s))){
                 allModified.add(s);
             }
         }
