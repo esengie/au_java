@@ -15,7 +15,7 @@ public class InitCommand implements AsdCommand {
     }
 
     @Override
-    public void run(RevisionTree a_tree, Staging a_staging, PrintStream a_writer) throws IOException {
+    public void run(RevisionTree tree, Staging staging, PrintStream writer) throws IOException {
         // Cause java copies references
         throw new NotImplementedException("Shouldn't be here at all");
     }

@@ -18,7 +18,7 @@ public class RevisionTreeImpl implements RevisionTree {
      * Also this means staging has to provide a zero commit - but this is high-level
      * and would be in a project description or something
      */
-    static class CNode implements CommitNode {
+    static class HeadNode implements CommitNode {
         @Override
         public String getMessage() {
             return "Init Commit contains everything before init";
@@ -46,7 +46,7 @@ public class RevisionTreeImpl implements RevisionTree {
     }
 
     public RevisionTreeImpl() {
-        CommitNode c = new CNode();
+        CommitNode c = new HeadNode();
         m_graph.addVertex(c);
         setHeadCommitForBranch(m_currentBranch, c);
     }
@@ -118,49 +118,49 @@ public class RevisionTreeImpl implements RevisionTree {
     }
 
     @Override
-    public boolean isEarlierThanCurrent(AsdBranch a_branch) throws BranchDoesntExistException {
-        CommitNode c = getHeadOfBranch(a_branch);
+    public boolean isEarlierThanCurrent(AsdBranch branch) throws BranchDoesntExistException {
+        CommitNode c = getHeadOfBranch(branch);
         Set<CommitNode> set = new HashSet<>(getLogPath());
         return set.contains(c);
     }
 
     @Override
-    public void branchCreate(AsdBranch a_branch) throws BranchAlreadyExistsException {
-        if (branchExists(a_branch))
-            throw new BranchAlreadyExistsException(a_branch.getName());
-        setHeadCommitForBranch(a_branch, getHeadCommitForBranch(m_currentBranch));
+    public void branchCreate(AsdBranch branch) throws BranchAlreadyExistsException {
+        if (branchExists(branch))
+            throw new BranchAlreadyExistsException(branch.getName());
+        setHeadCommitForBranch(branch, getHeadCommitForBranch(m_currentBranch));
     }
 
     @Override
-    public void branchRemove(AsdBranch a_branch) {
+    public void branchRemove(AsdBranch branch) {
         throw new NotImplementedException();
     }
 
     @Override
-    public void commit(CommitNode a_node) {
-        if (a_node.getRevisionNumber() != getRevisionNumber())
+    public void commit(CommitNode node) {
+        if (node.getRevisionNumber() != getRevisionNumber())
             throw new CommitNodeAlreadyExistsRuntimeException();
         CommitNode current = getHeadCommitForBranch(m_currentBranch);
-        addDagEdge(current, a_node);
-        setHeadCommitForBranch(m_currentBranch, a_node);
+        addDagEdge(current, node);
+        setHeadCommitForBranch(m_currentBranch, node);
     }
 
     @Override
-    public CommitNode checkout(AsdBranch a_branch) throws BranchDoesntExistException {
-        if (!branchExists(a_branch))
-            throw new BranchDoesntExistException(a_branch.getName());
-        m_currentBranch = a_branch;
-        return getHeadCommitForBranch(a_branch);
+    public CommitNode checkout(AsdBranch branch) throws BranchDoesntExistException {
+        if (!branchExists(branch))
+            throw new BranchDoesntExistException(branch.getName());
+        m_currentBranch = branch;
+        return getHeadCommitForBranch(branch);
     }
 
     @Override
-    public CommitNode checkout(int a_revisionNumber) throws CommitDoesntExistException {
-        if (getRevisionNumber() <= a_revisionNumber)
-            throw new CommitDoesntExistException(String.valueOf(a_revisionNumber));
+    public CommitNode checkout(int revisionNumber) throws CommitDoesntExistException {
+        if (getRevisionNumber() <= revisionNumber)
+            throw new CommitDoesntExistException(String.valueOf(revisionNumber));
 
         CommitNode retVal = null;
         for (CommitNode c : m_graph) {
-            if (c.getRevisionNumber() == a_revisionNumber) {
+            if (c.getRevisionNumber() == revisionNumber) {
                 retVal = c;
                 break;
             }
@@ -175,11 +175,11 @@ public class RevisionTreeImpl implements RevisionTree {
         return retVal;
     }
 
-    private void addDagEdge(CommitNode a_from, CommitNode a_to) {
+    private void addDagEdge(CommitNode from, CommitNode to) {
         try {
-            if (a_to.getRevisionNumber() >= m_graph.vertexSet().size())
-                m_graph.addVertex(a_to);
-            m_graph.addDagEdge(a_from, a_to);
+            if (to.getRevisionNumber() >= m_graph.vertexSet().size())
+                m_graph.addVertex(to);
+            m_graph.addDagEdge(from, to);
         } catch (DirectedAcyclicGraph.CycleFoundException e) {
             throw new DagContainsCyclesRuntimeException("Error: Dag contains cycles, program error", e);
         }
@@ -202,42 +202,42 @@ public class RevisionTreeImpl implements RevisionTree {
      * but keep the changes (we forget them from outside only).
      * Any suggestions how to fix this are welcome
      *
-     * @param a_branch a branchCreate to merge into the current one
+     * @param branch a branchCreate to merge into the current one
      */
     @Override
-    public void merge(AsdBranch a_branch, CommitNode a_merged) throws BranchDoesntExistException {
-        if (!branchExists(a_branch))
-            throw new BranchDoesntExistException("No such branchCreate: " + a_branch.getName());
+    public void merge(AsdBranch branch, CommitNode merged) throws BranchDoesntExistException {
+        if (!branchExists(branch))
+            throw new BranchDoesntExistException("No such branchCreate: " + branch.getName());
 
-        CommitNode mergee = getHeadCommitForBranch(a_branch);
+        CommitNode mergee = getHeadCommitForBranch(branch);
         CommitNode current = getHeadCommitForBranch(m_currentBranch);
 
-        addDagEdge(mergee, a_merged);
-        addDagEdge(current, a_merged);
+        addDagEdge(mergee, merged);
+        addDagEdge(current, merged);
 
 
-        setHeadCommitForBranch(a_branch, a_merged);
-        setHeadCommitForBranch(m_currentBranch, a_merged);
+        setHeadCommitForBranch(branch, merged);
+        setHeadCommitForBranch(m_currentBranch, merged);
     }
 
     @Override
-    public CommitNode getHeadOfBranch(AsdBranch a_branch) throws BranchDoesntExistException {
-        CommitNode retVal = getHeadCommitForBranch(a_branch);
+    public CommitNode getHeadOfBranch(AsdBranch branch) throws BranchDoesntExistException {
+        CommitNode retVal = getHeadCommitForBranch(branch);
         if (retVal == null)
-            throw new BranchDoesntExistException(a_branch.getName());
+            throw new BranchDoesntExistException(branch.getName());
         return retVal;
     }
 
-    private CommitNode getHeadCommitForBranch(AsdBranch a_branch) {
-        return m_branchToHeadCommitMap.get(a_branch);
+    private CommitNode getHeadCommitForBranch(AsdBranch branch) {
+        return m_branchToHeadCommitMap.get(branch);
     }
 
-    private void setHeadCommitForBranch(AsdBranch a_branch, CommitNode a_node) {
-        m_branchToHeadCommitMap.put(a_branch, a_node);
+    private void setHeadCommitForBranch(AsdBranch branch, CommitNode node) {
+        m_branchToHeadCommitMap.put(branch, node);
     }
 
-    private boolean branchExists(AsdBranch a_branch) {
-        return m_branchToHeadCommitMap.containsKey(a_branch);
+    private boolean branchExists(AsdBranch branch) {
+        return m_branchToHeadCommitMap.containsKey(branch);
     }
 
     @Override

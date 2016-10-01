@@ -10,19 +10,19 @@ import java.nio.file.Path;
  * commiting to disk, merging, adding to the staging area
  */
 public interface Staging {
-    void add(Path a_file) throws IOException;
+    void add(Path file) throws IOException;
 
-    void commitToDisk(CommitNode a_node) throws IOException;
+    void commitToDisk(CommitNode node) throws IOException;
 
     void emptyStagingArea() throws IOException;
 
-    void checkout(CommitNode a_node) throws IOException;
+    void checkout(CommitNode node) throws IOException;
 
-    void merge(CommitNode a_from, CommitNode a_to, CommitNode a_result) throws IOException;
+    void merge(CommitNode from, CommitNode to, CommitNode result) throws IOException;
 
-    void reset(Path a_file) throws IOException;
+    void reset(Path file) throws IOException;
 
-    void remove(Path a_file) throws IOException;
+    void remove(Path file) throws IOException;
 
     RepoStatus status() throws IOException;
 }

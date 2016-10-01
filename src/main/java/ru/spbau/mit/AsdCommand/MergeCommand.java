@@ -24,26 +24,26 @@ public class MergeCommand implements AsdCommand {
     }
 
     @Override
-    public void run(RevisionTree a_tree, Staging a_staging, PrintStream a_writer) throws IOException {
+    public void run(RevisionTree tree, Staging staging, PrintStream writer) throws IOException {
         if (branchName == null)
             throw new TooLittleArgumentsException("merge needs a branch name to merge");
         if (branchName.size() > 1)
             throw new TooManyArgumentsException("merge needs one argument");
 
-        CommitNode into = a_tree.getHeadOfBranch(a_tree.getCurrentBranch());
+        CommitNode into = tree.getHeadOfBranch(tree.getCurrentBranch());
         AsdBranch fromBranch = AsdBranchFactory.createBranch(branchName.get(0));
-        CommitNode from = a_tree.getHeadOfBranch(fromBranch);
+        CommitNode from = tree.getHeadOfBranch(fromBranch);
 
-        CommitNode result = CommitNodeFactory.createNode(a_tree,
+        CommitNode result = CommitNodeFactory.createNode(tree,
                 "merged: " + from.getBranch().getName() +
                         " into: " + into.getBranch().getName());
 
-        if (a_tree.isEarlierThanCurrent(fromBranch)) {
-            a_writer.println("Already up-to date");
+        if (tree.isEarlierThanCurrent(fromBranch)) {
+            writer.println("Already up-to date");
             return;
         }
 
-        a_staging.merge(from, into, result);
-        a_tree.merge(fromBranch, result);
+        staging.merge(from, into, result);
+        tree.merge(fromBranch, result);
     }
 }

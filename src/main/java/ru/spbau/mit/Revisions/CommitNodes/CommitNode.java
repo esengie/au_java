@@ -25,7 +25,7 @@ public interface CommitNode extends Serializable {
     @NotNull
     AsdBranch getBranch();
 
-    default public int hashCoder() {
+    default int hashCoder() {
         return new HashCodeBuilder(17, 31).
                 append(getBranch()).
                 append(getMessage()).
@@ -33,11 +33,11 @@ public interface CommitNode extends Serializable {
                 toHashCode();
     }
 
-    default public boolean equalser(Object obj) {
-        if (!(obj instanceof CommitNode))
-            return false;
+    default boolean equalser(Object obj) {
         if (obj == this)
             return true;
+        if (!(obj instanceof CommitNode))
+            return false;
 
         CommitNode rhs = (CommitNode) obj;
         return new EqualsBuilder().

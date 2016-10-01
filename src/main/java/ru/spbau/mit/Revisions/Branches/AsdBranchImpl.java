@@ -3,11 +3,11 @@ package ru.spbau.mit.Revisions.Branches;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
-public class AsdBranchImpl implements AsdBranch {
+class AsdBranchImpl implements AsdBranch {
     private final String m_name;
 
-    public AsdBranchImpl(String a_name) {
-        m_name = a_name;
+    AsdBranchImpl(String name) {
+        m_name = name;
     }
 
     @Override
@@ -24,10 +24,10 @@ public class AsdBranchImpl implements AsdBranch {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof AsdBranch))
-            return false;
         if (obj == this)
             return true;
+        if (!(obj instanceof AsdBranch))
+            return false;
 
         AsdBranch rhs = (AsdBranch) obj;
         return new EqualsBuilder().

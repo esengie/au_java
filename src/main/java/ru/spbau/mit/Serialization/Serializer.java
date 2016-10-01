@@ -8,7 +8,7 @@ import java.io.OutputStream;
  * Plain and simple, nothing fancy, code from StackOverflow
  */
 public interface Serializer<T> {
-    void serialize(T a_tree, OutputStream a_out) throws IOException;
+    void serialize(T tree, OutputStream out) throws IOException;
 
-    T deserialize(InputStream a_in) throws IOException;
+    T deserialize(InputStream in) throws IOException;
 }

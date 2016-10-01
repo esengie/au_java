@@ -7,23 +7,23 @@ import java.io.*;
 
 public class SerializerImpl<T> implements Serializer<T> {
     @Override
-    public void serialize(T a_tree, OutputStream a_out) throws IOException {
-        ObjectOutputStream out = new ObjectOutputStream(a_out);
-        out.writeObject(a_tree);
-        out.close();
+    public void serialize(T tree, OutputStream out) throws IOException {
+        ObjectOutputStream output = new ObjectOutputStream(out);
+        output.writeObject(tree);
+        output.close();
     }
 
     @NotNull
     @Override
-    public T deserialize(InputStream a_in) throws IOException {
-        ObjectInputStream in = new ObjectInputStream(a_in);
+    public T deserialize(InputStream in) throws IOException {
+        ObjectInputStream input = new ObjectInputStream(in);
         T retVal = null;
         try {
-            retVal = (T) in.readObject();
+            retVal = (T) input.readObject();
         } catch (ClassNotFoundException e) {
-            throw new IncorrectFileRuntimeException(a_in.toString(), e);
+            throw new IncorrectFileRuntimeException(in.toString(), e);
         }
-        in.close();
+        input.close();
         return retVal;
     }
 }

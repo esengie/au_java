@@ -21,11 +21,11 @@ public class AddCommand implements AsdCommand {
     }
 
     @Override
-    public void run(RevisionTree a_tree, Staging a_staging, PrintStream a_writer) throws IOException {
+    public void run(RevisionTree tree, Staging staging, PrintStream writer) throws IOException {
         if (patterns == null)
             throw new TooLittleArgumentsException("add needs some args");
         for (String s : new HashSet<>(patterns)) {
-            a_staging.add(Paths.get(s));
+            staging.add(Paths.get(s));
         }
     }
 }

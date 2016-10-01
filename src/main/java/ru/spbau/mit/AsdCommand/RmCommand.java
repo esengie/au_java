@@ -21,11 +21,11 @@ public class RmCommand implements AsdCommand {
     }
 
     @Override
-    public void run(RevisionTree a_tree, Staging a_staging, PrintStream a_writer) throws IOException {
+    public void run(RevisionTree tree, Staging staging, PrintStream writer) throws IOException {
         if (patterns == null)
             throw new TooLittleArgumentsException("rm needs some args");
         for (String s : new HashSet<>(patterns)) {
-            a_staging.remove(Paths.get(s));
+            staging.remove(Paths.get(s));
         }
     }
 }

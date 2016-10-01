@@ -5,7 +5,7 @@ public class AsdBranchFactory {
 
     }
 
-    public static AsdBranch createBranch(String a_name) {
-        return new AsdBranchImpl(a_name);
+    public static AsdBranch createBranch(String name) {
+        return new AsdBranchImpl(name);
     }
 }

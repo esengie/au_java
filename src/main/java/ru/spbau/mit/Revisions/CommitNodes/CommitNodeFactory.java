@@ -14,15 +14,15 @@ public class CommitNodeFactory {
 
     private static Map<RevisionTree, Integer> m_map = new HashMap<>();
 
-    public static CommitNode createNode(RevisionTree a_tree, String a_message) {
-        int revisionNumber = a_tree.getRevisionNumber();
-        if (m_map.getOrDefault(a_tree, -1) >= revisionNumber)
+    public static CommitNode createNode(RevisionTree tree, String message) {
+        int revisionNumber = tree.getRevisionNumber();
+        if (m_map.getOrDefault(tree, -1) >= revisionNumber)
             throw new PreviousCommitNodeWasntPassedToTreeRuntimeException();
-        CommitNode retVal = new CommitNodeImpl(a_tree.getCurrentBranch(),
+        CommitNode retVal = new CommitNodeImpl(tree.getCurrentBranch(),
                 revisionNumber,
-                a_message);
+                message);
 
-        m_map.put(a_tree, revisionNumber);
+        m_map.put(tree, revisionNumber);
         return retVal;
     }
 }

@@ -30,8 +30,8 @@ public class StagingSimpleImpl implements Staging, Serializable {
     private static final String m_saveDirectoryName = SaveDirLocation.getFolderName();
     private static final String m_stagingArea = m_saveDirectoryName + "/staging";
 
-    public StagingSimpleImpl(Path a_root) throws IOException {
-        m_root = a_root.toAbsolutePath().toString();
+    public StagingSimpleImpl(Path root) throws IOException {
+        m_root = root.toAbsolutePath().toString();
         boolean res = new File(m_root + "/" + m_stagingArea).mkdirs();
         if (!res)
             return;
@@ -51,27 +51,27 @@ public class StagingSimpleImpl implements Staging, Serializable {
     }
 
     @Override
-    public void add(Path a_file) throws IOException {
-        if (!a_file.toFile().getAbsoluteFile().exists())
-            throw new FileShouldExistException(a_file.toString());
+    public void add(Path file) throws IOException {
+        if (!file.toFile().getAbsoluteFile().exists())
+            throw new FileShouldExistException(file.toString());
 
         String relativePath = relativize(m_root,
-                a_file.toAbsolutePath().toString());
+                file.toAbsolutePath().toString());
         String stagingPath = m_root + "/" + m_stagingArea + "/" + relativePath;
         File movee = new File(stagingPath);
         FileUtils.forceMkdirParent(movee);
 
-        if (a_file.toFile().getAbsoluteFile().isFile()) {
-            FileUtils.copyFile(a_file.toFile().getAbsoluteFile(), movee);
+        if (file.toFile().getAbsoluteFile().isFile()) {
+            FileUtils.copyFile(file.toFile().getAbsoluteFile(), movee);
         }
-        if (a_file.toFile().getAbsoluteFile().isDirectory()) {
-            FileUtils.copyDirectoryToDirectory(a_file.toFile().getAbsoluteFile(), movee);
+        if (file.toFile().getAbsoluteFile().isDirectory()) {
+            FileUtils.copyDirectoryToDirectory(file.toFile().getAbsoluteFile(), movee);
         }
     }
 
     @Override
-    public void commitToDisk(CommitNode a_node) throws IOException {
-        Integer number = a_node.getRevisionNumber();
+    public void commitToDisk(CommitNode node) throws IOException {
+        Integer number = node.getRevisionNumber();
         String path = m_root.toString() + "/" + m_saveDirectoryName + "/" + number.toString();
         File commitDirectory = new File(path);
         FileUtils.copyDirectory(
@@ -80,8 +80,8 @@ public class StagingSimpleImpl implements Staging, Serializable {
     }
 
     @Override
-    public void checkout(CommitNode a_node) throws IOException {
-        Integer number = a_node.getRevisionNumber();
+    public void checkout(CommitNode node) throws IOException {
+        Integer number = node.getRevisionNumber();
         String path = m_root + "/" + m_saveDirectoryName + "/" + number.toString();
         File commitDirectory = new File(path);
 
@@ -99,32 +99,32 @@ public class StagingSimpleImpl implements Staging, Serializable {
     }
 
     @Override
-    public void merge(CommitNode a_from, CommitNode a_to, CommitNode a_result) throws IOException {
-        Set<String> from = new TreeSet<>(listAllFilesRecursively(commitNodeToPath(a_from)));
-        Set<String> to = new TreeSet<>(listAllFilesRecursively(commitNodeToPath(a_to)));
+    public void merge(CommitNode from, CommitNode to, CommitNode result) throws IOException {
+        Set<String> fromFiles = new TreeSet<>(listAllFilesRecursively(commitNodeToPath(from)));
+        Set<String> toFiles = new TreeSet<>(listAllFilesRecursively(commitNodeToPath(to)));
 
-        Set<String> set = new TreeSet<>(from);
-        set.retainAll(to);
+        Set<String> set = new TreeSet<>(fromFiles);
+        set.retainAll(toFiles);
 
         for (String p : set) {
-            if (filesDiffer(p, a_from, a_to))
+            if (filesDiffer(p, from, to))
                 throw new CantMergeException(p);
         }
 
-        copyFilesFromOneCommitToAnother(from.stream().collect(Collectors.toList()), a_from, a_result);
-        to.removeAll(from);
-        copyFilesFromOneCommitToAnother(to.stream().collect(Collectors.toList()), a_to, a_result);
+        copyFilesFromOneCommitToAnother(fromFiles.stream().collect(Collectors.toList()), from, result);
+        toFiles.removeAll(fromFiles);
+        copyFilesFromOneCommitToAnother(toFiles.stream().collect(Collectors.toList()), to, result);
 
-        checkout(a_result);
+        checkout(result);
     }
 
     @Override
-    public void reset(Path a_file) throws IOException {
+    public void reset(Path file) throws IOException {
         throw new NotImplementedException();
     }
 
     @Override
-    public void remove(Path a_file) throws IOException {
+    public void remove(Path file) throws IOException {
         throw new NotImplementedException();
     }
 
@@ -139,23 +139,23 @@ public class StagingSimpleImpl implements Staging, Serializable {
         new File(m_root + "/" + m_stagingArea).mkdir();
     }
 
-    private void copyFilesFromOneCommitToAnother(List<String> a_paths, CommitNode a_from, CommitNode a_to) throws IOException {
-        String prefixFrom = commitNodeToPath(a_from);
-        File folderTo = new File(commitNodeToPath(a_to));
-        for (String s : a_paths) {
+    private void copyFilesFromOneCommitToAnother(List<String> paths, CommitNode from, CommitNode to) throws IOException {
+        String prefixFrom = commitNodeToPath(from);
+        File folderTo = new File(commitNodeToPath(to));
+        for (String s : paths) {
             FileUtils.copyFileToDirectory(new File(prefixFrom + "/" + s), folderTo);
         }
     }
 
-    private boolean filesDiffer(String a_path, CommitNode a_left, CommitNode a_right) throws IOException {
-        String left = commitNodeToPath(a_left) + "/" + a_path;
-        String right = commitNodeToPath(a_right) + "/" + a_path;
+    private boolean filesDiffer(String path, CommitNode left, CommitNode right) throws IOException {
+        String leftPath = commitNodeToPath(left) + "/" + path;
+        String rightPath = commitNodeToPath(right) + "/" + path;
 
-        return !FileUtils.contentEquals(new File(left), new File(right));
+        return !FileUtils.contentEquals(new File(leftPath), new File(rightPath));
     }
 
-    private String commitNodeToPath(CommitNode a_node) {
-        return m_root + "/" + m_saveDirectoryName + "/" + String.valueOf(a_node.getRevisionNumber());
+    private String commitNodeToPath(CommitNode node) {
+        return m_root + "/" + m_saveDirectoryName + "/" + String.valueOf(node.getRevisionNumber());
     }
 
 }

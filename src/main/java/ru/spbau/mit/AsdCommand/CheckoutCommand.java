@@ -23,7 +23,7 @@ public class CheckoutCommand implements AsdCommand {
     }
 
     @Override
-    public void run(RevisionTree a_tree, Staging a_staging, PrintStream a_writer) throws IOException {
+    public void run(RevisionTree tree, Staging staging, PrintStream writer) throws IOException {
         if (input == null)
             throw new TooLittleArgumentsException("checkout needs one argument");
 
@@ -40,10 +40,10 @@ public class CheckoutCommand implements AsdCommand {
 
         CommitNode c;
         if (revision == -1)
-            c = a_tree.checkout(AsdBranchFactory.createBranch(arg));
+            c = tree.checkout(AsdBranchFactory.createBranch(arg));
         else
-            c = a_tree.checkout(revision);
+            c = tree.checkout(revision);
 
-        a_staging.checkout(c);
+        staging.checkout(c);
     }
 }

@@ -15,20 +15,20 @@ public class StatusCommand implements AsdCommand {
     }
 
     @Override
-    public void run(RevisionTree a_tree, Staging a_staging, PrintStream a_writer) throws IOException {
-        RepoStatus stats = a_staging.status();
+    public void run(RevisionTree tree, Staging staging, PrintStream writer) throws IOException {
+        RepoStatus stats = staging.status();
 
-        a_writer.println("Added:");
-        printList(stats.added(), a_writer);
+        writer.println("Added:");
+        printList(stats.added(), writer);
 
-        a_writer.println("Modified:");
-        printList(stats.modified(), a_writer);
+        writer.println("Modified:");
+        printList(stats.modified(), writer);
 
-        a_writer.println("Untracked:");
-        printList(stats.untracked(), a_writer);
+        writer.println("Untracked:");
+        printList(stats.untracked(), writer);
 
-        a_writer.println("Removed:");
-        printList(stats.removed(), a_writer);
+        writer.println("Removed:");
+        printList(stats.removed(), writer);
     }
 
     private void printList(List<String> list, PrintStream writer){

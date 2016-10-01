@@ -18,34 +18,34 @@ class StagingPathHelpers {
     /**
      * Returns a relative path: second minus first
      *
-     * @param a_root     shorter path
-     * @param a_filePath longer path
+     * @param root     shorter path
+     * @param filePath longer path
      * @return difference betwen the two
      */
-    static String relativize(String a_root, String a_filePath) {
-        return new File(a_root)
+    static String relativize(String root, String filePath) {
+        return new File(root)
                 .toURI()
-                .relativize(new File(a_filePath).toURI())
+                .relativize(new File(filePath).toURI())
                 .getPath();
     }
 
     /**
      * Lists all files' relative paths in a directory
      *
-     * @param a_path . dir from which we start - must be absolute
+     * @param path . dir from which we start - must be absolute
      * @return all files listed (but not directories)
      */
-    static List<String> listAllFilesRecursively(String a_path) {
-        Collection<File> files = FileUtils.listFiles(new File(a_path), FileFileFilter.FILE, TrueFileFilter.INSTANCE);
+    static List<String> listAllFilesRecursively(String path) {
+        Collection<File> files = FileUtils.listFiles(new File(path), FileFileFilter.FILE, TrueFileFilter.INSTANCE);
 
         return files.stream()
                 .map(File::getAbsolutePath)
-                .map(s -> s.substring(a_path.length() + 1))
+                .map(s -> s.substring(path.length() + 1))
                 .collect(Collectors.toList());
     }
 
-    static void eraseWorkingDir(String a_path) throws IOException {
-        for (File f : new File(a_path).getAbsoluteFile().listFiles((FileFilter)
+    static void eraseWorkingDir(String path) throws IOException {
+        for (File f : new File(path).getAbsoluteFile().listFiles((FileFilter)
                 new NotFileFilter(
                         new WildcardFileFilter(SaveDirLocation.getFolderName()))
         )) {

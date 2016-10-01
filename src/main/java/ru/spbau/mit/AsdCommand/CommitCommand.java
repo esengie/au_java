@@ -19,9 +19,9 @@ public class CommitCommand implements AsdCommand {
     private String message = "";
 
     @Override
-    public void run(RevisionTree a_tree, Staging a_staging, PrintStream a_writer) throws IOException {
-        CommitNode c = CommitNodeFactory.createNode(a_tree, message);
-        a_tree.commit(c);
-        a_staging.commitToDisk(c);
+    public void run(RevisionTree tree, Staging staging, PrintStream writer) throws IOException {
+        CommitNode c = CommitNodeFactory.createNode(tree, message);
+        tree.commit(c);
+        staging.commitToDisk(c);
     }
 }

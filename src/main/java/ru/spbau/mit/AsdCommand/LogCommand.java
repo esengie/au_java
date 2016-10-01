@@ -16,11 +16,11 @@ public class LogCommand implements AsdCommand {
     }
 
     @Override
-    public void run(RevisionTree a_tree, Staging a_staging, PrintStream a_writer) throws IOException {
-        List<CommitNode> log = a_tree.getLogPath();
+    public void run(RevisionTree tree, Staging staging, PrintStream writer) throws IOException {
+        List<CommitNode> log = tree.getLogPath();
 
         for (CommitNode c : log) {
-            a_writer.println(String.format("Revision: %d, Branch: %s\n" +
+            writer.println(String.format("Revision: %d, Branch: %s\n" +
                             "    message: %s",
                     c.getRevisionNumber(), c.getBranch().getName(), c.getMessage()));
         }

@@ -7,10 +7,10 @@ public class CommitNodeImpl implements CommitNode {
     private final int m_revisionNumber;
     private final AsdBranch m_branch;
 
-    CommitNodeImpl(AsdBranch a_branch, int a_revisionNumber, String a_message) {
-        m_message = a_message;
-        m_revisionNumber = a_revisionNumber;
-        m_branch = a_branch;
+    CommitNodeImpl(AsdBranch branch, int revisionNumber, String message) {
+        m_message = message;
+        m_revisionNumber = revisionNumber;
+        m_branch = branch;
     }
 
     @Override

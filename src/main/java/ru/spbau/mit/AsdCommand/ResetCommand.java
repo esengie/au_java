@@ -21,11 +21,11 @@ public class ResetCommand implements AsdCommand {
     }
 
     @Override
-    public void run(RevisionTree a_tree, Staging a_staging, PrintStream a_writer) throws IOException {
+    public void run(RevisionTree tree, Staging staging, PrintStream writer) throws IOException {
         if (files == null)
             throw new TooLittleArgumentsException("reset needs some args");
         for (String s : new HashSet<>(files)) {
-            a_staging.reset(new File(s).getAbsoluteFile().toPath());
+            staging.reset(new File(s).getAbsoluteFile().toPath());
         }
     }
 }

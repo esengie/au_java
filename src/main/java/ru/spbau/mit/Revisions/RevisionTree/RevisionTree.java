@@ -25,26 +25,26 @@ public interface RevisionTree extends Serializable {
     AsdBranch getCurrentBranch();
 
     @NotNull
-    CommitNode getHeadOfBranch(AsdBranch a_branch) throws BranchDoesntExistException;
+    CommitNode getHeadOfBranch(AsdBranch branch) throws BranchDoesntExistException;
 
     @NotNull
     Set<AsdBranch> getBranches();
 
     int getRevisionNumber();
 
-    boolean isEarlierThanCurrent(AsdBranch a_branch) throws BranchDoesntExistException;
+    boolean isEarlierThanCurrent(AsdBranch branch) throws BranchDoesntExistException;
 
-    void branchCreate(AsdBranch a_branch) throws BranchAlreadyExistsException;
+    void branchCreate(AsdBranch branch) throws BranchAlreadyExistsException;
 
-    void branchRemove(AsdBranch a_branch);
+    void branchRemove(AsdBranch branch);
 
-    void commit(CommitNode a_node) throws CommitNodeAlreadyExistsRuntimeException;
-
-    @NotNull
-    CommitNode checkout(AsdBranch a_branch) throws BranchDoesntExistException;
+    void commit(CommitNode node) throws CommitNodeAlreadyExistsRuntimeException;
 
     @NotNull
-    CommitNode checkout(int a_revisionNumber) throws CommitDoesntExistException;
+    CommitNode checkout(AsdBranch branch) throws BranchDoesntExistException;
 
-    void merge(AsdBranch a_branch, CommitNode merged) throws BranchDoesntExistException;
+    @NotNull
+    CommitNode checkout(int revisionNumber) throws CommitDoesntExistException;
+
+    void merge(AsdBranch branch, CommitNode merged) throws BranchDoesntExistException;
 }

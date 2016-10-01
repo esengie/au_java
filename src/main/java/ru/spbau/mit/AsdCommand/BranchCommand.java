@@ -25,13 +25,13 @@ public class BranchCommand implements AsdCommand {
     }
 
     @Override
-    public void run(RevisionTree a_tree, Staging a_staging, PrintStream a_writer) throws IOException {
+    public void run(RevisionTree tree, Staging staging, PrintStream writer) throws IOException {
         if (branchName == null) {
-            for (AsdBranch b : a_tree.getBranches()) {
-                if (b.equals(a_tree.getCurrentBranch()))
-                    a_writer.println("*" + b.getName());
+            for (AsdBranch b : tree.getBranches()) {
+                if (b.equals(tree.getCurrentBranch()))
+                    writer.println("*" + b.getName());
                 else
-                    a_writer.println(" " + b.getName());
+                    writer.println(" " + b.getName());
             }
             return;
         }
@@ -39,6 +39,6 @@ public class BranchCommand implements AsdCommand {
         if (branchName.size() > 1)
             throw new TooManyArgumentsException("branch command needs only one branch");
 
-        a_tree.branchCreate(AsdBranchFactory.createBranch(branchName.get(0)));
+        tree.branchCreate(AsdBranchFactory.createBranch(branchName.get(0)));
     }
 }

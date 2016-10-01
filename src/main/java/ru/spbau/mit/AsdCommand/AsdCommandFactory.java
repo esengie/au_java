@@ -31,13 +31,13 @@ public class AsdCommandFactory {
         return new ArrayList<>(COMMANDS.keySet());
     }
 
-    public static AsdCommand createCommand(String a_commandName) {
-        Class<? extends AsdCommand> commandClass = COMMANDS.get(a_commandName);
+    public static AsdCommand createCommand(String commandName) {
+        Class<? extends AsdCommand> commandClass = COMMANDS.get(commandName);
         try {
             Constructor<? extends AsdCommand> constructor = commandClass.getDeclaredConstructor();
             return constructor.newInstance();
         } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
-            throw new CommandCreationRuntimeException(a_commandName, e);
+            throw new CommandCreationRuntimeException(commandName, e);
         }
     }
 }

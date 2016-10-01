@@ -133,10 +133,10 @@ public class AsdVersionControlSystem {
         }
     }
 
-    private static String[] splitOnWhiteSpace(String a_string) {
+    private static String[] splitOnWhiteSpace(String string) {
         List<String> matchList = new ArrayList<String>();
         Pattern regex = Pattern.compile("[^\\s\"']+|\"[^\"]*\"|'[^']*'");
-        Matcher regexMatcher = regex.matcher(a_string);
+        Matcher regexMatcher = regex.matcher(string);
         while (regexMatcher.find()) {
             matchList.add(regexMatcher.group());
         }
