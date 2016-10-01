@@ -35,9 +35,10 @@ public class AsdTest {
                 "commit -m \"asdf\"\n" +
                 "checkout master\n" +
                 "merge left\n" +
-//                "rm README.md\n" +
+                "rm README.md\n" +
+                "status\n" +
                 "commit -m \"Lol\"\n" +
-//                "status\n" +
+                "status\n" +
                 "log";
 
         ByteArrayInputStream in = new ByteArrayInputStream(inp.getBytes());

@@ -7,9 +7,11 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import ru.spbau.mit.Paths.SaveDirLocation;
 import ru.spbau.mit.Revisions.CommitNodes.CommitNode;
+import sun.text.normalizer.UTF16;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -54,7 +56,7 @@ public class StagingSimpleImplTest {
         staging.add(dir.toPath());
 
         dataWritten = "lalalalalalal";
-        FileUtils.writeStringToFile(f2, dataWritten);
+        FileUtils.writeStringToFile(f2, dataWritten, Charset.defaultCharset());
         staging.add(f2.toPath());
 
         File file = new File(stagingLocation + DIR + "/" + F1);
@@ -62,7 +64,7 @@ public class StagingSimpleImplTest {
         file = new File(stagingLocation + F2DIR + "/" + F2);
         assertTrue(file.exists());
 
-        assertEquals(FileUtils.readFileToString(file), dataWritten);
+        assertEquals(FileUtils.readFileToString(file, Charset.defaultCharset()), dataWritten);
     }
 
     @Test
@@ -75,7 +77,7 @@ public class StagingSimpleImplTest {
         assertTrue(file.exists());
         file = new File(commitLocation + F2DIR + "/" + F2);
         assertTrue(file.exists());
-        assertEquals(FileUtils.readFileToString(file), dataWritten);
+        assertEquals(FileUtils.readFileToString(file, Charset.defaultCharset()), dataWritten);
 
     }
 
@@ -85,13 +87,13 @@ public class StagingSimpleImplTest {
 
         FileUtils.deleteQuietly(new File(folder.getRoot() + "/" + DIR + "/" + F1));
         FileUtils.writeStringToFile(new File(folder.getRoot() + "/" + F2DIR + "/" + F2),
-                dataWritten + dataWritten + dataWritten);
+                dataWritten + dataWritten + dataWritten, Charset.defaultCharset());
 
         File file = new File(folder.getRoot() + "/" + DIR + "/" + F1);
         assertFalse(file.exists());
         file = new File(folder.getRoot() + "/" + F2DIR + "/" + F2);
         assertTrue(file.exists());
-        assertNotEquals(FileUtils.readFileToString(file), dataWritten);
+        assertNotEquals(FileUtils.readFileToString(file, Charset.defaultCharset()), dataWritten);
 
         staging.checkout(commitNode);
 
@@ -99,7 +101,7 @@ public class StagingSimpleImplTest {
         assertTrue(file.exists());
         file = new File(folder.getRoot() + "/" + F2DIR + "/" + F2);
         assertTrue(file.exists());
-        assertEquals(FileUtils.readFileToString(file), dataWritten);
+        assertEquals(FileUtils.readFileToString(file, Charset.defaultCharset()), dataWritten);
     }
 
 
