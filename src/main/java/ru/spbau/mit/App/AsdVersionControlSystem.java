@@ -10,8 +10,8 @@ import ru.spbau.mit.AsdCommand.InitCommand;
 import ru.spbau.mit.Cli.Cli;
 import ru.spbau.mit.Revisions.RevisionTree.RevisionTree;
 import ru.spbau.mit.Revisions.RevisionTree.RevisionTreeImpl;
-import ru.spbau.mit.Revisions.RevisionTree.RevisionTreeSerializer;
-import ru.spbau.mit.Revisions.RevisionTree.RevisionTreeSerializerImpl;
+import ru.spbau.mit.Serialization.Serializer;
+import ru.spbau.mit.Serialization.SerializerImpl;
 import ru.spbau.mit.Staging.*;
 
 import static ru.spbau.mit.Paths.AsdFolderOperations.*;
@@ -45,8 +45,8 @@ public class AsdVersionControlSystem {
         if (!isAnAsdFolder())
             throw new NotAnAsdFolderException();
 
-        RevisionTreeSerializer serializerTree = new RevisionTreeSerializerImpl();
-        StagingSerializer serializerStaging = new PersistentStagingSerializer();
+        Serializer<RevisionTree> serializerTree = new SerializerImpl<>();
+        Serializer<Staging> serializerStaging = new SerializerImpl<>();
 
         try {
             m_tree = serializerTree.deserialize(new FileInputStream(new File(getSerializedTreePath())));
@@ -63,8 +63,8 @@ public class AsdVersionControlSystem {
         if (!isAnAsdFolder())
             throw new NotAnAsdFolderException();
 
-        RevisionTreeSerializer serializerTree = new RevisionTreeSerializerImpl();
-        StagingSerializer serializerStaging = new PersistentStagingSerializer();
+        Serializer<RevisionTree> serializerTree = new SerializerImpl<>();
+        Serializer<Staging> serializerStaging = new SerializerImpl<>();
 
         File outTree = new File(getSerializedTreePath());
         File outStaging = new File(getSerializedStagingPath());

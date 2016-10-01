@@ -1,27 +1,26 @@
-package ru.spbau.mit.Staging;
-
+package ru.spbau.mit.Serialization;
 
 import com.sun.istack.internal.NotNull;
 import ru.spbau.mit.Revisions.Exceptions.IncorrectFileRuntimeException;
+import ru.spbau.mit.Revisions.RevisionTree.RevisionTree;
 
 import java.io.*;
 
-public class PersistentStagingSerializer implements StagingSerializer {
-
+public class SerializerImpl<T> implements Serializer<T> {
     @Override
-    public void serialize(Staging a_staging, OutputStream a_out) throws IOException {
+    public void serialize(T a_tree, OutputStream a_out) throws IOException {
         ObjectOutputStream out = new ObjectOutputStream(a_out);
-        out.writeObject(a_staging);
+        out.writeObject(a_tree);
         out.close();
     }
 
     @NotNull
     @Override
-    public Staging deserialize(InputStream a_in) throws IOException {
+    public T deserialize(InputStream a_in) throws IOException {
         ObjectInputStream in = new ObjectInputStream(a_in);
-        Staging retVal = null;
+        T retVal = null;
         try {
-            retVal = (Staging) in.readObject();
+            retVal = (T) in.readObject();
         } catch (ClassNotFoundException e) {
             throw new IncorrectFileRuntimeException(a_in.toString(), e);
         }

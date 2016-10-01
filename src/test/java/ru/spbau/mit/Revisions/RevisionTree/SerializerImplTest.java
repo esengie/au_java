@@ -7,6 +7,8 @@ import ru.spbau.mit.Revisions.Branches.AsdBranch;
 import ru.spbau.mit.Revisions.Branches.AsdBranchFactory;
 import ru.spbau.mit.Revisions.CommitNodes.CommitNode;
 import ru.spbau.mit.Revisions.CommitNodes.CommitNodeFactory;
+import ru.spbau.mit.Serialization.Serializer;
+import ru.spbau.mit.Serialization.SerializerImpl;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,7 +16,7 @@ import java.io.FileOutputStream;
 
 import static org.junit.Assert.assertEquals;
 
-public class RevisionTreeSerializerImplTest {
+public class SerializerImplTest {
 
     @Rule
     public final TemporaryFolder folder = new TemporaryFolder();
@@ -43,7 +45,7 @@ public class RevisionTreeSerializerImplTest {
             tree.commit(c);
         }
 
-    RevisionTreeSerializer ser = new RevisionTreeSerializerImpl();
+    Serializer<RevisionTree> ser = new SerializerImpl<>();
 
     FileOutputStream out = new FileOutputStream(f);
         ser.serialize(tree,out);
