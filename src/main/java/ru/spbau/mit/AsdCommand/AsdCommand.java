@@ -9,7 +9,8 @@ import java.io.PrintStream;
 
 /**
  * The interface of all the Commands.
- * <p>
+ * The commands usually delegate to revision tree or staging depending on their logic
+ *
  * Commands get parsed by JCommander for more coupling and less stability
  */
 public interface AsdCommand {

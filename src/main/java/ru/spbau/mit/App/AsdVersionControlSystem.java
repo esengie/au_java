@@ -42,7 +42,11 @@ public class AsdVersionControlSystem {
     private RevisionTree m_tree;
     private Staging m_staging;
 
-    private void loadState() throws NotAnAsdFolderException {
+    /**
+     * Loads the revision tree and the staging state
+     * (depending on the staging implementation chosen may store all of the repo in memory)
+     */
+    private void loadState() {
         Serializer<RevisionTree> serializerTree = new SerializerImpl<>();
         Serializer<Staging> serializerStaging = new SerializerImpl<>();
 
@@ -78,6 +82,10 @@ public class AsdVersionControlSystem {
 
     }
 
+    /**
+     * Init command is here to create the revision tree and staging
+     * @throws IOException io
+     */
     private void initCommand() throws IOException {
         if (isAnAsdFolder()) {
             throw new AlreadyAnAsdFolderException();
@@ -86,6 +94,14 @@ public class AsdVersionControlSystem {
         m_tree = new RevisionTreeImpl();
     }
 
+    /**
+     * Loops while we have input doing the git commands
+     *
+     * Loads the repo if it was initted
+     * Finishes and saves the repo state if it was initted
+     *
+     * @param argv - not used
+     */
     public static void main(String... argv) {
         Scanner scanner = new Scanner(System.in);
         AsdVersionControlSystem asd = new AsdVersionControlSystem();

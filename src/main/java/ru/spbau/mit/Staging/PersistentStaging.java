@@ -20,7 +20,12 @@ import java.util.stream.Collectors;
 import static ru.spbau.mit.Staging.StagingPathHelpers.*;
 
 /**
- * Does the staging stage persistently
+ * Does the staging persistently using an array of the same Persistent map
+ * at different points in time. The index is the commit number
+ *
+ * Staging area is some element of the array that got updated, and yet to be added to the array
+ *
+ * The map is from filepaths to byte[] of the files
  */
 public class PersistentStaging implements Staging, Serializable {
     private final String m_root;
@@ -144,7 +149,8 @@ public class PersistentStaging implements Staging, Serializable {
             throw new FileShouldExistException(path);
 
         byteArrayToFile(path, commitContents.get(path));
-        add(new File(path).getAbsoluteFile().toPath()); // add it again if need be
+        // add the file again in case it was deleted
+        add(new File(path).getAbsoluteFile().toPath());
     }
 
     @Override

@@ -8,6 +8,9 @@ import ru.spbau.mit.Staging.Staging;
 import java.io.IOException;
 import java.io.PrintStream;
 
+/**
+ * Doesn't do anything, init is handled by the main class
+ */
 @Parameters(commandDescription = "Initialise the repo (if uninitialised)")
 public class InitCommand implements AsdCommand {
 

@@ -23,7 +23,8 @@ import static ru.spbau.mit.Staging.StagingPathHelpers.*;
 
 /**
  * First version of staging implementation - copies the repo,
- * doesn't support the new commands
+ * doesn't support the new commands, namely status, remove and reset
+ * 
  */
 public class StagingSimpleImpl implements Staging, Serializable {
     private final String m_root;

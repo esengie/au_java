@@ -185,25 +185,6 @@ public class RevisionTreeImpl implements RevisionTree {
         }
     }
 
-    /**
-     * Performs a "history forgetting" merge, always
-     * <p>
-     * Except when the merged branch is in the log path, then we do nothing.
-     * <p>
-     * Example of "forgetting":
-     * A->B->E
-     * |
-     * C->D->         <- if we have two paths ACD and ABE,
-     * <p>
-     * and merge D to E we get the log ABEF
-     * if we merge E to D we get the log ACDF.
-     * <p>
-     * So we "forget" the commits,
-     * but keep the changes (we forget them from outside only).
-     * Any suggestions how to fix this are welcome
-     *
-     * @param branch a branchCreate to merge into the current one
-     */
     @Override
     public void merge(AsdBranch branch, CommitNode merged) throws BranchDoesntExistException {
         if (!branchExists(branch))

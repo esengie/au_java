@@ -49,6 +49,12 @@ class StagingPathHelpers {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Erases everything in a directory except for .asd folder
+     *
+     * @param path the directory in question
+     * @throws IOException could
+     */
     static void eraseWorkingDir(String path) throws IOException {
         for (File f : new File(path).getAbsoluteFile().listFiles((FileFilter)
                 new NotFileFilter(
