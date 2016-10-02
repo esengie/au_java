@@ -33,8 +33,8 @@ public class PersistentStagingTest {
         f = folder.newFile(F1DIR + "/" + F1);
         dir = folder.newFolder(F2DIR);
         f2 = folder.newFile(F2DIR + "/" + F2);
-        System.setProperty("user.dir", folder.getRoot().toString());
-        staging = new PersistentStaging(folder.getRoot().toPath());
+        System.setProperty("user.dir", folder.getRoot().getAbsolutePath());
+        staging = new PersistentStaging(folder.getRoot().getAbsoluteFile().toPath());
     }
 
     private final static String F1DIR = "adm/adm";

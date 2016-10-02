@@ -44,7 +44,7 @@ public class PersistentStaging implements Staging, Serializable {
         m_staging = PersistentTreeMap.empty();
 
         new File(m_root + "/" + SaveDirLocation.getFolderName()).mkdirs();
-        add(Paths.get("").toAbsolutePath());
+        add(root.toAbsolutePath());
         m_commits.add(m_staging);
         m_currentCommit = m_commits.size() - 1;
     }
