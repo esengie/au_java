@@ -53,7 +53,7 @@ public class ClientImpl implements Client {
 
     @Override
     public void connect() {
-        
+
     }
 
     @Override

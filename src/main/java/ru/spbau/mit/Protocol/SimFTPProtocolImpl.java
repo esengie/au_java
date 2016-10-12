@@ -1,61 +1,52 @@
 package ru.spbau.mit.Protocol;
 
-public class SimFTPProtocolImpl {
-    private static final int WAITING = 0;
-    private static final int SENTKNOCKKNOCK = 1;
-    private static final int SENTCLUE = 2;
-    private static final int ANOTHER = 3;
+import ru.spbau.mit.Protocol.Requests.GetRequest;
+import ru.spbau.mit.Protocol.Requests.ListRequest;
+import ru.spbau.mit.Protocol.Requests.Request;
+import ru.spbau.mit.Protocol.Responses.Response;
 
-    private static final int NUMJOKES = 5;
+import java.util.List;
 
-    private int state = WAITING;
-    private int currentJoke = 0;
+public class SimFTPProtocolImpl implements SimFTPProtocol {
 
-    private String[] clues = { "Turnip", "Little Old Lady", "Atch", "Who", "Who" };
-    private String[] answers = { "Turnip the heat, it's cold in here!",
-            "I didn't know you could yodel!",
-            "Bless you!",
-            "Is there an owl in here?",
-            "Is there an echo in here?" };
+    @Override
+    public byte[] formListRequest(String path) {
+        Request r = new ListRequest(path);
+        return r.toBytes();
+    }
 
-    public String processInput(String theInput) {
-        String theOutput = null;
+    @Override
+    public byte[] formGetRequest(String path) {
+        Request r = new GetRequest(path);
+        return r.toBytes();
+    }
 
-        if (state == WAITING) {
-            theOutput = "Knock! Knock!";
-            state = SENTKNOCKKNOCK;
-        } else if (state == SENTKNOCKKNOCK) {
-            if (theInput.equalsIgnoreCase("Who's there?")) {
-                theOutput = clues[currentJoke];
-                state = SENTCLUE;
-            } else {
-                theOutput = "You're supposed to say \"Who's there?\"! " +
-                        "Try again. Knock! Knock!";
-            }
-        } else if (state == SENTCLUE) {
-            if (theInput.equalsIgnoreCase(clues[currentJoke] + " who?")) {
-                theOutput = answers[currentJoke] + " Want another? (y/n)";
-                state = ANOTHER;
-            } else {
-                theOutput = "You're supposed to say \"" +
-                        clues[currentJoke] +
-                        " who?\"" +
-                        "! Try again. Knock! Knock!";
-                state = SENTKNOCKKNOCK;
-            }
-        } else if (state == ANOTHER) {
-            if (theInput.equalsIgnoreCase("y")) {
-                theOutput = "Knock! Knock!";
-                if (currentJoke == (NUMJOKES - 1))
-                    currentJoke = 0;
-                else
-                    currentJoke++;
-                state = SENTKNOCKKNOCK;
-            } else {
-                theOutput = "Bye.";
-                state = WAITING;
-            }
+    @Override
+    public Response readResponse(byte[] contents) {
+        return null;
+    }
+
+    private Request parseRequest(byte[] input) {
+        return null;
+    }
+
+    @Override
+    public Response formResponse(byte[] request) {
+        Request r = parseRequest(request);
+        switch (r.getName()){
+            case "get":
+                return formGetResponse(r.getArgs());
+            case "list":
+                return formListResponse(r.getArgs());
         }
-        return theOutput;
+        throw new IllegalStateException("Can't be here");
+    }
+
+    private Response formListResponse(List<String> args) {
+        return null;
+    }
+
+    private Response formGetResponse(List<String> args) {
+        return null;
     }
 }
