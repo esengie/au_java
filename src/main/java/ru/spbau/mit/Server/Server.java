@@ -1,6 +1,6 @@
 package ru.spbau.mit.Server;
 
 public interface Server {
-    void start();
+    void start(int portNumber);
     void stop();
 }
