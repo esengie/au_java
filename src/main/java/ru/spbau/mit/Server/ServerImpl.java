@@ -4,40 +4,27 @@ package ru.spbau.mit.Server;
 import ru.spbau.mit.Protocol.SimFTPProtocol;
 import ru.spbau.mit.Protocol.SimFTPProtocolImpl;
 
-import java.net.*;
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ServerImpl implements Server {
-    public static void main(String[] args) throws IOException {
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-        if (args.length != 1) {
-            System.err.println("Usage: java KnockKnockServer <port number>");
-            System.exit(1);
-        }
-
-        int portNumber = Integer.parseInt(args[0]);
-
+    private static void runInstance(int portNumber) {
         try (
                 ServerSocket serverSocket = new ServerSocket(portNumber);
                 Socket clientSocket = serverSocket.accept();
-                PrintWriter out =
-                        new PrintWriter(clientSocket.getOutputStream(), true);
-                BufferedReader in = new BufferedReader(
-                        new InputStreamReader(clientSocket.getInputStream()));
+                DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
+                DataInputStream in = new DataInputStream(clientSocket.getInputStream());
         ) {
-
-            String inputLine, outputLine;
-
-            // Initiate conversation with client
-            SimFTPProtocolImpl kkp = new SimFTPProtocolImpl();
-            outputLine = kkp.processInput(null);
-            out.println(outputLine);
-
-            while ((inputLine = in.readLine()) != null) {
-                outputLine = kkp.processInput(inputLine);
-                out.println(outputLine);
-                if (outputLine.equals("Bye."))
-                    break;
+            SimFTPProtocol protocol = new SimFTPProtocolImpl();
+            while (!Thread.interrupted()) {
+                protocol.formResponse(in, out);
             }
         } catch (IOException e) {
             System.out.println("Exception caught when trying to listen on port "
@@ -47,12 +34,14 @@ public class ServerImpl implements Server {
     }
 
     @Override
-    public void start() {
-
+    public void start(int portNumber) {
+        executor.execute(() -> {
+            runInstance(portNumber);
+        });
     }
 
     @Override
     public void stop() {
-
+        executor.shutdownNow();
     }
 }
