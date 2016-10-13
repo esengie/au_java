@@ -1,73 +1,56 @@
 package ru.spbau.mit.Client;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import ru.spbau.mit.Protocol.RemoteFile;
+import ru.spbau.mit.Protocol.SimFTPProtocol;
+import ru.spbau.mit.Protocol.SimFTPProtocolImpl;
+
+import java.io.*;
 import java.net.Socket;
-import java.net.UnknownHostException;
+import java.util.List;
 
 public class ClientImpl implements Client {
-    public static void main(String[] args) throws IOException {
+    private boolean connected = false;
+    Socket clientSocket;
+    DataOutputStream netOut;
+    DataInputStream netIn;
+    SimFTPProtocol protocol = new SimFTPProtocolImpl();
 
-        if (args.length != 2) {
-            System.err.println(
-                    "Usage: java EchoClient <host name> <port number>");
-            System.exit(1);
-        }
+    @Override
+    public void connect(String hostName, int portNumber) throws IOException {
+        if (connected)
+            return;
 
-        String hostName = args[0];
-        int portNumber = Integer.parseInt(args[1]);
+        clientSocket = new Socket(hostName, portNumber);
+        DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
+        DataInputStream in = new DataInputStream(clientSocket.getInputStream());
 
-        try (
-                Socket kkSocket = new Socket(hostName, portNumber);
-                PrintWriter out = new PrintWriter(kkSocket.getOutputStream(), true);
-                BufferedReader in = new BufferedReader(
-                        new InputStreamReader(kkSocket.getInputStream()));
-        ) {
-            BufferedReader stdIn =
-                    new BufferedReader(new InputStreamReader(System.in));
-            String fromServer;
-            String fromUser;
-
-            while ((fromServer = in.readLine()) != null) {
-                System.out.println("Server: " + fromServer);
-                if (fromServer.equals("Bye."))
-                    break;
-
-                fromUser = stdIn.readLine();
-                if (fromUser != null) {
-                    System.out.println("Client: " + fromUser);
-                    out.println(fromUser);
-                }
-            }
-        } catch (UnknownHostException e) {
-            System.err.println("Don't know about host " + hostName);
-            System.exit(1);
-        } catch (IOException e) {
-            System.err.println("Couldn't get I/O for the connection to " +
-                    hostName);
-            System.exit(1);
-        }
+        connected = true;
     }
 
     @Override
-    public void connect() {
+    public void disconnect() throws IOException {
+        if (!connected)
+            return;
 
+        netIn.close();
+        netOut.close();
+        clientSocket.close();
     }
 
     @Override
-    public void disconnect() {
-
+    public List<RemoteFile> executeList(String path) throws IOException {
+        if (!connected)
+            return null;
+        protocol.formListRequest(path, netOut);
+        return protocol.readListResponse(netIn);
     }
 
     @Override
-    public void executeList() {
-
+    public void executeGet(String path, OutputStream out) throws IOException {
+        if (!connected)
+            return;
+        protocol.formGetRequest(path, netOut);
+        protocol.readGetResponse(netIn, out);
     }
 
-    @Override
-    public void executeGet() {
-
-    }
 }

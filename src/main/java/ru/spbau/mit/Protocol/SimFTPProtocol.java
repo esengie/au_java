@@ -1,14 +1,16 @@
 package ru.spbau.mit.Protocol;
 
-import ru.spbau.mit.Protocol.Responses.Response;
-
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.util.List;
 
-// Client and server parts?
 public interface SimFTPProtocol {
-    byte[] formListRequest(String path);
-    byte[] formGetRequest(String path);
-    Response readResponse(byte[] contents);
+    void formListRequest(String path, DataOutputStream output) throws IOException;
+    void formGetRequest(String path, DataOutputStream output) throws IOException;
+    List<RemoteFile> readListResponse(DataInputStream contents) throws IOException;
+    void readGetResponse(DataInputStream contents, OutputStream out) throws IOException;
 
-    Response formResponse(byte[] request) throws IOException;
+    void formResponse(DataInputStream request, DataOutputStream output) throws IOException;
 }

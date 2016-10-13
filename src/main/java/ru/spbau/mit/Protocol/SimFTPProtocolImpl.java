@@ -1,71 +1,86 @@
 package ru.spbau.mit.Protocol;
 
 import org.apache.commons.io.FileUtils;
-import ru.spbau.mit.Protocol.Requests.GetRequest;
-import ru.spbau.mit.Protocol.Requests.ListRequest;
-import ru.spbau.mit.Protocol.Requests.Request;
-import ru.spbau.mit.Protocol.Responses.GetResponse;
-import ru.spbau.mit.Protocol.Responses.ListResponse;
-import ru.spbau.mit.Protocol.Responses.Response;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.ByteBuffer;
+import java.io.*;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SimFTPProtocolImpl implements SimFTPProtocol {
 
     @Override
-    public byte[] formListRequest(String path) {
-        Request r = new ListRequest(path);
-        return r.toBytes();
+    public void formListRequest(String path, DataOutputStream output) throws IOException {
+        output.writeInt(1);
+        output.writeChars(path);
     }
 
     @Override
-    public byte[] formGetRequest(String path) {
-        Request r = new GetRequest(path);
-        return r.toBytes();
+    public void formGetRequest(String path, DataOutputStream output) throws IOException {
+        output.writeInt(2);
+        output.writeChars(path);
     }
 
     @Override
-    public Response readResponse(byte[] contents) {
-        return null;
-    }
-
-    private Request parseRequest(byte[] input) {
-        ByteBuffer bb = ByteBuffer.wrap(input);
-        bb.getChar();
-        return null;
-    }
-
-    @Override
-    public Response formResponse(byte[] request) throws IOException {
-        Request r = parseRequest(request);
-        switch (r.getName()) {
-            case "get":
-                return formGetResponse(r.getArgs().get(0));
-            case "list":
-                return formListResponse(r.getArgs().get(0));
+    public List<RemoteFile> readListResponse(DataInputStream contents) throws IOException {
+        int size = contents.readInt();
+        List <RemoteFile> list = new ArrayList<>();
+        for (int i = 0; i < size; ++i){
+            list.add(new RemoteFile(contents.readUTF(), contents.readBoolean()));
         }
-        throw new IllegalStateException("Can't be here");
+        return list;
     }
 
-    private Response formListResponse(String path) {
+    /**
+     * All this reading in a while loop because the length of contents may be huge
+     * Due to size : long
+     *
+     * @param input input Socket
+     * @param out output location
+     * @throws IOException IO
+     */
+    @Override
+    public void readGetResponse(DataInputStream input, OutputStream out) throws IOException {
+        long size = input.readLong();
+        byte[] buffer = new byte[1000000];
+        int len;
+        int bytesToRead = (long)buffer.length > size ? (int)size : buffer.length;
+        while (bytesToRead > 0 && (len = input.read(buffer, 0, bytesToRead)) != -1) {
+            out.write(buffer, 0, len);
+            size -= (long) len;
+            bytesToRead = (long) len > size ? (int)size : len;
+        }
+    }
+
+    @Override
+    public void formResponse(DataInputStream in, DataOutputStream out) throws IOException {
+        int request = in.readInt();
+        switch (request) {
+            case 2:
+                formGetResponse(in.readUTF(), out);
+            case 1:
+                formListResponse(in.readUTF(), out);
+        }
+        throw new BadInputException(MessageFormat.format("Unknown Command {0}", request));
+    }
+
+    private void formListResponse(String path, DataOutputStream out) throws IOException {
         File f = new File(path);
-        if (!f.exists()) {
-            return new ListResponse(0);
+        if (!f.exists() || f.isFile()) {
+            out.writeInt(0);
         }
-        if (f.isFile()) {
-            return new ListResponse(1, path, false);
-        }
-        return new ListResponse(f.listFiles().length, path, true);
+        out.writeInt(f.listFiles().length);
+        out.writeChars(path);
+        out.writeBoolean(true);
     }
 
-    private Response formGetResponse(String path) throws IOException {
+    private void formGetResponse(String path, DataOutputStream out) throws IOException {
         File f = new File(path);
         if (!f.exists()){
-            return new GetResponse(0, null);
+            out.writeInt(0);
         }
         byte[] bytes = FileUtils.readFileToByteArray(f);
-        return new GetResponse(bytes.length, bytes);
+        out.writeLong(bytes.length);
+        out.write(bytes);
     }
 }
