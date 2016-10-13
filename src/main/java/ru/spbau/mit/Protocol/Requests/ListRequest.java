@@ -26,7 +26,7 @@ public class ListRequest implements Request {
 
     @Override
     public String toString() {
-        String retVal = MessageFormat.format("<{0}> <path: {1}>", commandNumber, path);
+        String retVal = MessageFormat.format("<{0}: {0}> <path: {1}>", commandNumber, path);
         return retVal;
     }
 }

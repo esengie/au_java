@@ -12,7 +12,7 @@ public class ListResponse implements Response {
         this.size = size;
     }
 
-    ListResponse(int size, String filename, boolean is_dir) {
+    public ListResponse(int size, String filename, boolean is_dir) {
         this(size);
         this.filename = filename;
         this.is_dir = is_dir;
