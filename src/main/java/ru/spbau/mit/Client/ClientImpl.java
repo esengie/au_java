@@ -21,8 +21,8 @@ public class ClientImpl implements Client {
             return;
 
         clientSocket = new Socket(hostName, portNumber);
-        DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
-        DataInputStream in = new DataInputStream(clientSocket.getInputStream());
+        netOut = new DataOutputStream(clientSocket.getOutputStream());
+        netIn = new DataInputStream(clientSocket.getInputStream());
 
         connected = true;
     }
