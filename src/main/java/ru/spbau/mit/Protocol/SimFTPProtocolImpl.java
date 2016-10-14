@@ -3,6 +3,7 @@ package ru.spbau.mit.Protocol;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,13 +13,13 @@ public class SimFTPProtocolImpl implements SimFTPProtocol {
     @Override
     public void formListRequest(String path, DataOutputStream output) throws IOException {
         output.writeInt(1);
-        output.writeChars(path);
+        output.writeUTF(path);
     }
 
     @Override
     public void formGetRequest(String path, DataOutputStream output) throws IOException {
         output.writeInt(2);
-        output.writeChars(path);
+        output.writeUTF(path);
     }
 
     @Override
@@ -58,8 +59,10 @@ public class SimFTPProtocolImpl implements SimFTPProtocol {
         switch (request) {
             case 2:
                 formGetResponse(in.readUTF(), out);
+                return;
             case 1:
                 formListResponse(in.readUTF(), out);
+                return;
         }
         throw new BadInputException(MessageFormat.format("Unknown Command {0}", request));
     }
@@ -69,18 +72,20 @@ public class SimFTPProtocolImpl implements SimFTPProtocol {
         if (!f.exists() || f.isFile()) {
             out.writeInt(0);
         }
-        out.writeInt(f.listFiles().length);
-        out.writeChars(path);
-        out.writeBoolean(true);
+        File[] dir = f.listFiles();
+        out.writeInt(dir.length);
+        for (File fin : dir){
+            out.writeUTF(fin.getAbsolutePath());
+            out.writeBoolean(fin.isDirectory());
+        }
     }
 
     private void formGetResponse(String path, DataOutputStream out) throws IOException {
         File f = new File(path);
         if (!f.exists()){
-            out.writeInt(0);
+            out.writeLong(0);
         }
-        byte[] bytes = FileUtils.readFileToByteArray(f);
-        out.writeLong(bytes.length);
-        out.write(bytes);
+        out.writeLong(f.length());
+        Files.copy(f.toPath(), out);
     }
 }
