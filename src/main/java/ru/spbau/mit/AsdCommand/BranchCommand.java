@@ -5,6 +5,7 @@ import com.beust.jcommander.Parameters;
 import ru.spbau.mit.App.Exceptions.TooManyArgumentsException;
 import ru.spbau.mit.Revisions.Branches.AsdBranch;
 import ru.spbau.mit.Revisions.Branches.AsdBranchFactory;
+import ru.spbau.mit.Revisions.Exceptions.BranchAlreadyExistsException;
 import ru.spbau.mit.Revisions.RevisionTree.RevisionTree;
 import ru.spbau.mit.Staging.Staging;
 
@@ -18,14 +19,11 @@ public class BranchCommand implements AsdCommand {
     @Parameter(description = "The branch name")
     private List<String> branchName;
 
-    @Parameter(names = "-d", description = "delete branch")
-    private boolean deleteMode = false;
-
     protected BranchCommand() {
     }
 
     @Override
-    public void run(RevisionTree tree, Staging staging, PrintStream writer) throws IOException {
+    public void run(RevisionTree tree, Staging staging, PrintStream writer) throws TooManyArgumentsException, BranchAlreadyExistsException {
         if (branchName == null) {
             for (AsdBranch b : tree.getBranches()) {
                 if (b.equals(tree.getCurrentBranch()))

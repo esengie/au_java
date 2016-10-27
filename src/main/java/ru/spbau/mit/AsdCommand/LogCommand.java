@@ -16,7 +16,7 @@ public class LogCommand implements AsdCommand {
     }
 
     @Override
-    public void run(RevisionTree tree, Staging staging, PrintStream writer) throws IOException {
+    public void run(RevisionTree tree, Staging staging, PrintStream writer) {
         List<CommitNode> log = tree.getLogPath();
 
         for (CommitNode c : log) {

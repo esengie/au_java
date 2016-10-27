@@ -54,11 +54,14 @@ public class AsdVersionControlSystem {
             m_tree = serializerTree.deserialize(new FileInputStream(new File(getSerializedTreePath())));
             m_staging = serializerStaging.deserialize(new FileInputStream(new File(getSerializedStagingPath())));
         } catch (IOException e) {
+            System.out.println("Something is wrong with .asd files, stopping");
             throw new SerializedStateNotFoundRuntimeException();
         }
 
-        if (m_tree == null || m_staging == null)
+        if (m_tree == null || m_staging == null) {
+            System.out.println("Something is wrong with .asd files, couldn't load a Revision tree stopping");
             throw new RevisionTreeLoadRuntimeException();
+        }
     }
 
     private void saveState() throws NotAnAsdFolderException {
@@ -84,6 +87,7 @@ public class AsdVersionControlSystem {
 
     /**
      * Init command is here to create the revision tree and staging
+     *
      * @throws IOException io
      */
     private void initCommand() throws IOException {
@@ -96,7 +100,7 @@ public class AsdVersionControlSystem {
 
     /**
      * Loops while we have input doing the git commands
-     *
+     * <p>
      * Loads the repo if it was initted
      * Finishes and saves the repo state if it was initted
      *
@@ -142,7 +146,7 @@ public class AsdVersionControlSystem {
         try {
             asd.saveState();
         } catch (NotAnAsdFolderException notAnAsdFolder) {
-            notAnAsdFolder.printStackTrace();
+            System.out.println("Not an asd folder, couldn't create it or it was deleted");
         }
     }
 

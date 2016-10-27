@@ -10,7 +10,7 @@ import ru.spbau.mit.AsdCommand.Exceptions.CommandCreationRuntimeException;
  * The Cli.
  * 
  * Because Jcommander is intended for single use at the start of the program
- * and not in the loop as used here I have a Setup method and I also return the instance
+ * and not in the loop as used here I have a setup method and I also return the instance
  * for usage printing -- JCommander's fault
  */
 public class Cli {
@@ -19,7 +19,7 @@ public class Cli {
     private Cli() {
     }
 
-    private static void Setup() throws CommandCreationRuntimeException {
+    private static void setup() throws CommandCreationRuntimeException {
         Cli cli = new Cli();
         jCommander = new JCommander(cli);
         AsdCommandFactory.getCommandNames().forEach(s ->
@@ -27,7 +27,7 @@ public class Cli {
     }
 
     public static AsdCommand parseAndDispatch(String... line) throws CommandCreationRuntimeException {
-        Setup();
+        setup();
         jCommander.parse(line);
 
         String parsedCommand = jCommander.getParsedCommand();
@@ -37,7 +37,7 @@ public class Cli {
 
     // Kostyl tk biblioteka zdes, for printing usage
     public static JCommander getParser() {
-        Setup();
+        setup();
         return jCommander;
     }
 

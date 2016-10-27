@@ -2,7 +2,7 @@ package ru.spbau.mit.AsdCommand;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
-import ru.spbau.mit.AsdCommand.Exceptions.TooLittleArgumentsException;
+import ru.spbau.mit.AsdCommand.Exceptions.TooFewArgumentsException;
 import ru.spbau.mit.Revisions.RevisionTree.RevisionTree;
 import ru.spbau.mit.Staging.Staging;
 
@@ -23,7 +23,7 @@ public class AddCommand implements AsdCommand {
     @Override
     public void run(RevisionTree tree, Staging staging, PrintStream writer) throws IOException {
         if (patterns == null)
-            throw new TooLittleArgumentsException("add needs some args");
+            throw new TooFewArgumentsException("add needs some args");
         for (String s : new HashSet<>(patterns)) {
             staging.add(Paths.get(s));
         }

@@ -2,7 +2,7 @@ package ru.spbau.mit.AsdCommand;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
-import ru.spbau.mit.AsdCommand.Exceptions.TooLittleArgumentsException;
+import ru.spbau.mit.AsdCommand.Exceptions.TooFewArgumentsException;
 import ru.spbau.mit.Revisions.RevisionTree.RevisionTree;
 import ru.spbau.mit.Staging.Staging;
 
@@ -23,7 +23,7 @@ public class ResetCommand implements AsdCommand {
     @Override
     public void run(RevisionTree tree, Staging staging, PrintStream writer) throws IOException {
         if (files == null)
-            throw new TooLittleArgumentsException("reset needs some args");
+            throw new TooFewArgumentsException("reset needs some args");
         for (String s : new HashSet<>(files)) {
             staging.reset(new File(s).getAbsoluteFile().toPath());
         }
