@@ -1,8 +1,8 @@
 package ru.spbau.mit.Client;
 
 import ru.spbau.mit.Protocol.RemoteFile;
-import ru.spbau.mit.Protocol.SimFTPProtocol;
-import ru.spbau.mit.Protocol.SimFTPProtocolImpl;
+import ru.spbau.mit.Protocol.TorrentProtocolClient;
+import ru.spbau.mit.Protocol.TorrentProtocolClientImpl;
 
 import java.io.*;
 import java.net.Socket;
@@ -13,7 +13,7 @@ public class ClientImpl implements Client {
     Socket clientSocket;
     DataOutputStream netOut;
     DataInputStream netIn;
-    SimFTPProtocol protocol = new SimFTPProtocolImpl();
+    TorrentProtocolClient protocol = new TorrentProtocolClientImpl();
 
     @Override
     public void connect(String hostName, int portNumber) throws IOException {
@@ -49,7 +49,7 @@ public class ClientImpl implements Client {
     public void executeGet(String path, OutputStream out) throws IOException {
         if (!connected)
             return;
-        protocol.formGetRequest(path, netOut);
+        protocol.sendGetRequest(path, netOut);
         protocol.readGetResponse(netIn, out);
     }
 
