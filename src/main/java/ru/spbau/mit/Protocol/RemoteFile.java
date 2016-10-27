@@ -1,11 +1,15 @@
 package ru.spbau.mit.Protocol;
 
 public class RemoteFile {
-    public final String path;
-    public final boolean isDir;
+    public final int id;
+    public final String name;
+    public final long size;
 
-    RemoteFile(String path, boolean isDir){
-        this.path = path;
-        this.isDir = isDir;
+    public static final int PART_SIZE = 1 << 22; // 4 Mb
+
+    RemoteFile(int fileId, String fileName, long size){
+        this.id = fileId;
+        this.name = fileName;
+        this.size = size;
     }
 }

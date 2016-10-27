@@ -1,8 +1,8 @@
 package ru.spbau.mit.Server;
 
 
-import ru.spbau.mit.Protocol.SimFTPProtocol;
-import ru.spbau.mit.Protocol.SimFTPProtocolImpl;
+import ru.spbau.mit.Protocol.TorrentProtocolClient;
+import ru.spbau.mit.Protocol.TorrentProtocolClientImpl;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -22,9 +22,9 @@ public class ServerImpl implements Server {
                 DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
                 DataInputStream in = new DataInputStream(clientSocket.getInputStream());
         ) {
-            SimFTPProtocol protocol = new SimFTPProtocolImpl();
+            TorrentProtocolClient protocol = new TorrentProtocolClientImpl();
             while (!Thread.interrupted()) {
-                protocol.formResponse(in, out);
+                protocol.clientFormResponse(in, out);
             }
         } catch (IOException e) {
             System.out.println("Exception caught when trying to listen on port "

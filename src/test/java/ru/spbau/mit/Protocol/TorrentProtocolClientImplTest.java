@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 
-public class SimFTPProtocolImplTest {
+public class TorrentProtocolClientImplTest {
     @Rule
     public final TemporaryFolder folder = new TemporaryFolder();
 
@@ -33,7 +33,7 @@ public class SimFTPProtocolImplTest {
     private ByteArrayOutputStream outContent;
     private DataInputStream inContent;
     private Socket sock;
-    private final SimFTPProtocol prot = new SimFTPProtocolImpl();
+    private final TorrentProtocolClient prot = new TorrentProtocolClientImpl();
 
     @Before
     public void setUpStreams() throws IOException {
@@ -60,7 +60,7 @@ public class SimFTPProtocolImplTest {
 
     @Test
     public void formGetRequest() throws Exception {
-        prot.formGetRequest("asd", new DataOutputStream(outContent));
+        prot.sendGetRequest("asd", new DataOutputStream(outContent));
 
         inContent = new DataInputStream(new ByteArrayInputStream(outContent.toByteArray()));
         int cmd = inContent.readInt();
@@ -113,7 +113,7 @@ public class SimFTPProtocolImplTest {
 
         ByteArrayOutputStream c1 = new ByteArrayOutputStream();
         ByteArrayOutputStream c2 = new ByteArrayOutputStream();
-        prot.formResponse(inContent, new DataOutputStream(c1));
+        prot.clientFormResponse(inContent, new DataOutputStream(c1));
 
         b = new DataOutputStream(c2);
         b.writeLong(f2.length());
@@ -132,7 +132,7 @@ public class SimFTPProtocolImplTest {
 
         ByteArrayOutputStream c1 = new ByteArrayOutputStream();
         ByteArrayOutputStream c2 = new ByteArrayOutputStream();
-        prot.formResponse(inContent, new DataOutputStream(c1));
+        prot.clientFormResponse(inContent, new DataOutputStream(c1));
 
         List<RemoteFile> lst = prot.readListResponse(new DataInputStream(
                 new ByteArrayInputStream(c1.toByteArray())));

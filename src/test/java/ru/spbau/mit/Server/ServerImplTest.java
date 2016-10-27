@@ -8,9 +8,8 @@ import org.junit.rules.TemporaryFolder;
 import ru.spbau.mit.Client.Client;
 import ru.spbau.mit.Client.ClientImpl;
 import ru.spbau.mit.Protocol.RemoteFile;
-import ru.spbau.mit.Protocol.SimFTPProtocol;
-import ru.spbau.mit.Protocol.SimFTPProtocolImpl;
-import ru.spbau.mit.Protocol.SimFTPProtocolImplTest;
+import ru.spbau.mit.Protocol.TorrentProtocolClient;
+import ru.spbau.mit.Protocol.TorrentProtocolClientImpl;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -40,7 +39,7 @@ public class ServerImplTest {
     private ByteArrayOutputStream outContent;
     private DataInputStream inContent;
     private Socket sock;
-    private final SimFTPProtocol prot = new SimFTPProtocolImpl();
+    private final TorrentProtocolClient prot = new TorrentProtocolClientImpl();
     private final int portNumber = 1234;
 
     @Before
