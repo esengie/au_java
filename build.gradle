@@ -1,9 +1,14 @@
-version '1.0-SNAPSHOT'
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.github.rholder:gradle-one-jar:1.0.4'
+    }
+}
 
 apply plugin: 'java'
-apply plugin: 'application'
-
-mainClassName = "ru.spbau.mit.App.AsdVersionControlSystem"
+apply plugin: 'gradle-one-jar'
 
 sourceCompatibility = 1.8
 
@@ -29,3 +34,9 @@ dependencies {
     compile group: 'org.organicdesign', name: 'UncleJim', version: '2.0.13'
 
 }
+
+task asd(type: OneJar) {
+    mainClass = 'ru.spbau.mit.App.AsdVersionControlSystem'
+    archiveName = 'asd.jar'
+}
+
