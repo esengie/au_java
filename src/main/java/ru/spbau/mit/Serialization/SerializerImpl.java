@@ -1,6 +1,5 @@
 package ru.spbau.mit.Serialization;
 
-import com.sun.istack.internal.NotNull;
 import ru.spbau.mit.Revisions.Exceptions.IncorrectFileRuntimeException;
 
 import java.io.*;
@@ -13,7 +12,6 @@ public class SerializerImpl<T> implements Serializer<T> {
         output.close();
     }
 
-    @NotNull
     @Override
     public T deserialize(InputStream in) throws IOException {
         ObjectInputStream input = new ObjectInputStream(in);

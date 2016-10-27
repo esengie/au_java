@@ -1,6 +1,5 @@
 package ru.spbau.mit.Staging;
 
-import com.sun.istack.internal.NotNull;
 import org.apache.commons.io.FileUtils;
 import org.organicdesign.fp.collections.PersistentTreeMap;
 import ru.spbau.mit.Paths.SaveDirLocation;
@@ -13,7 +12,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -164,7 +162,6 @@ public class PersistentStaging implements Staging, Serializable {
 
     }
 
-    @NotNull
     @Override
     public RepoStatus status() throws IOException {
         Set<String> allRemoved = formRemoved();

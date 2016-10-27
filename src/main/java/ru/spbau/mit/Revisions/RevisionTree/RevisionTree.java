@@ -1,6 +1,5 @@
 package ru.spbau.mit.Revisions.RevisionTree;
 
-import com.sun.istack.internal.NotNull;
 import ru.spbau.mit.Revisions.Branches.AsdBranch;
 import ru.spbau.mit.Revisions.CommitNodes.CommitNode;
 import ru.spbau.mit.Revisions.Exceptions.BranchAlreadyExistsException;
@@ -18,16 +17,12 @@ import java.util.Set;
  * Needs to provide equals and hashcode
  */
 public interface RevisionTree extends Serializable {
-    @NotNull
     List<CommitNode> getLogPath();
 
-    @NotNull
     AsdBranch getCurrentBranch();
 
-    @NotNull
     CommitNode getHeadOfBranch(AsdBranch branch) throws BranchDoesntExistException;
 
-    @NotNull
     Set<AsdBranch> getBranches();
 
     int getRevisionNumber();
@@ -67,7 +62,6 @@ public interface RevisionTree extends Serializable {
      * @return the node
      * @throws BranchDoesntExistException if it doesn't
      */
-    @NotNull
     CommitNode checkout(AsdBranch branch) throws BranchDoesntExistException;
 
     /**
@@ -77,7 +71,6 @@ public interface RevisionTree extends Serializable {
      * @return the node
      * @throws CommitDoesntExistException if it doesn't
      */
-    @NotNull
     CommitNode checkout(int revisionNumber) throws CommitDoesntExistException;
 
     /**

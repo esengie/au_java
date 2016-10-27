@@ -1,7 +1,5 @@
 package ru.spbau.mit.Paths;
 
-import com.sun.istack.internal.NotNull;
-
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,14 +12,12 @@ public class AsdFolderOperations {
     }
 
 
-    @NotNull
     public static String getSerializedTreePath() {
         return getRoot().toAbsolutePath() + "/" +
                 SaveDirLocation.getFolderName() + "/" +
                 RevisionTreeFileName.getFileName();
     }
 
-    @NotNull
     public static String getSerializedStagingPath() {
         return getRoot().toAbsolutePath() + "/" +
                 SaveDirLocation.getFolderName() + "/" +

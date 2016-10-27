@@ -9,7 +9,6 @@ import ru.spbau.mit.Revisions.Exceptions.BranchAlreadyExistsException;
 import ru.spbau.mit.Revisions.RevisionTree.RevisionTree;
 import ru.spbau.mit.Staging.Staging;
 
-import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
 

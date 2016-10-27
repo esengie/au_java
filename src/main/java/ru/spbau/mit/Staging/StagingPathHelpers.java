@@ -3,7 +3,6 @@ package ru.spbau.mit.Staging;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFileFilter;
 import org.apache.commons.io.filefilter.NotFileFilter;
-import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import ru.spbau.mit.Paths.SaveDirLocation;
 
