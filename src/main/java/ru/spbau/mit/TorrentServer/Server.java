@@ -1,6 +1,9 @@
 package ru.spbau.mit.TorrentServer;
 
+import java.io.File;
+import java.io.IOException;
+
 public interface Server {
-    void start(int portNumber);
-    void stop();
+    void start(File saveDir) throws IOException;
+    void stop() throws TorrentIOException;
 }

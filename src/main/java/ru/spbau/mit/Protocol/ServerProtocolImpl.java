@@ -1,10 +1,10 @@
-package ru.spbau.mit.Communication;
+package ru.spbau.mit.Protocol;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import ru.spbau.mit.Protocol.Exceptions.BadInputException;
+import ru.spbau.mit.Protocol.Exceptions.ServerDirectoryException;
+
+import java.io.*;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,16 +13,17 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 
-public class TorrentProtocolServerImpl implements TorrentProtocolServer {
+public class ServerProtocolImpl implements ServerProtocol {
     private Map<Integer, RemoteFile> idToFile = new ConcurrentHashMap<>();
     private Map<Integer, Set<InetAddress>> fileToSeedIPs = new ConcurrentHashMap<>();
     private Map<InetAddress, Integer> IPtoSeedPort = new ConcurrentHashMap<>();
     // Needs a way to disconnect guys
     private final Boolean writerLockIDToFile = false;
     private final Boolean writerLockIPs = false;
+    private File saveDir;
 
     @Override
-    public void formResponse(DataInputStream in, DataOutputStream out, InetSocketAddress client) throws IOException {
+    public void formResponse(DataInputStream in, DataOutputStream out, InetAddress client) throws IOException {
         int request = in.readInt();
         switch (request) {
             case 1:
@@ -39,6 +40,14 @@ public class TorrentProtocolServerImpl implements TorrentProtocolServer {
                 return;
         }
         throw new BadInputException(MessageFormat.format("Unknown Command {0}", request));
+    }
+
+    @Override
+    public void removeExtras(Set<InetAddress> removed) {
+        synchronized (writerLockIPs) {
+            IPtoSeedPort.keySet().removeIf(removed::contains);
+            fileToSeedIPs.forEach((id, set) -> set.removeIf(removed::contains));
+        }
     }
 
     private void formListResponse(DataOutputStream out) throws IOException {
@@ -64,7 +73,7 @@ public class TorrentProtocolServerImpl implements TorrentProtocolServer {
     }
 
     private void formSourcesResponse(int fileId, DataOutputStream out) throws IOException {
-        if (!fileToSeedIPs.containsKey(fileId)){
+        if (!fileToSeedIPs.containsKey(fileId)) {
             out.writeInt(0);
             return;
         }
@@ -75,32 +84,64 @@ public class TorrentProtocolServerImpl implements TorrentProtocolServer {
         Set<InetAddress> ips;
         Map<InetAddress, Integer> ipToPorts;
 
-        synchronized (writerLockIPs){
+        synchronized (writerLockIPs) {
             ips = new HashSet<>(fileToSeedIPs.get(fileId));
             ipToPorts = new HashMap<>(IPtoSeedPort);
         }
 
         out.writeInt(ips.size());
-        for (InetAddress ip : ips){
+        for (InetAddress ip : ips) {
             out.write(ip.getAddress(), 0, 4);
             out.writeShort(ipToPorts.get(ip));
         }
-
     }
 
-    private void formUpdateResponse(DataInputStream in, DataOutputStream out, InetSocketAddress client) throws IOException {
+    private void formUpdateResponse(DataInputStream in, DataOutputStream out, InetAddress ip) throws IOException {
         int port = in.readInt();
         int count = in.readInt();
-        InetAddress ip = client.getAddress();
-        IPtoSeedPort.put(ip, port);
-
-        for (int i = 0; i < count; ++i){
-            int fileId = in.readInt();
-            if (!fileToSeedIPs.get(fileId).contains(ip)) {
+        Set<Integer> fileIds = new HashSet<>();
+        for (int i = 0; i < count; ++i) {
+            fileIds.add(in.readInt());
+        }
+        synchronized (writerLockIPs) {
+            IPtoSeedPort.put(ip, port);
+            for (int fileId : fileIds) {
+                if (!fileToSeedIPs.containsKey(fileId)) {
+                    fileToSeedIPs.put(fileId, new ConcurrentSkipListSet<>());
+                }
                 fileToSeedIPs.get(fileId).add(ip);
             }
         }
-
         out.writeBoolean(true);
+    }
+
+    public ServerProtocolImpl(File saveDir) throws IOException {
+        if (!saveDir.exists() || !saveDir.isDirectory())
+            throw new ServerDirectoryException("Folder should exist");
+
+        this.saveDir = saveDir;
+
+        File outFile = new File(saveDir, idToFileSave);
+        if (!outFile.exists())
+            return;
+
+        loadState(outFile);
+    }
+
+    private static final String idToFileSave = "idToFile.sav";
+
+    public void saveState() throws IOException {
+        File outFile = new File(saveDir, idToFileSave);
+        ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(outFile));
+        out.writeObject(idToFile);
+    }
+
+    private void loadState(File outFile) throws IOException {
+        ObjectInputStream out = new ObjectInputStream(new FileInputStream(outFile));
+        try {
+            idToFile = (Map<Integer, RemoteFile>) out.readObject();
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Shouldn't happen here, serialization error");
+        }
     }
 }

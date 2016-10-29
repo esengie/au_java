@@ -5,9 +5,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import ru.spbau.mit.Communication.RemoteFile;
-import ru.spbau.mit.Communication.TorrentProtocolClient;
-import ru.spbau.mit.Communication.TorrentProtocolClientImpl;
+import ru.spbau.mit.Protocol.RemoteFile;
+import ru.spbau.mit.Protocol.ClientProtocol;
+import ru.spbau.mit.Protocol.ClientProtocolImpl;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -37,7 +37,7 @@ public class ServerImplTest {
     private ByteArrayOutputStream outContent;
     private DataInputStream inContent;
     private Socket sock;
-    private final TorrentProtocolClient prot = new TorrentProtocolClientImpl();
+    private final ClientProtocol prot = new ClientProtocolImpl();
     private final int portNumber = 1234;
 
     @Before

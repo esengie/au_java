@@ -1,4 +1,4 @@
-package ru.spbau.mit.Communication;
+package ru.spbau.mit.Protocol.Exceptions;
 
 import java.io.IOException;
 
