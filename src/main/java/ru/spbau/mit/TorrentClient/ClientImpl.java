@@ -1,56 +1,61 @@
 package ru.spbau.mit.TorrentClient;
 
-import ru.spbau.mit.Communication.RemoteFile;
-import ru.spbau.mit.Communication.TorrentProtocolClient;
-import ru.spbau.mit.Communication.TorrentProtocolClientImpl;
+import ru.spbau.mit.Protocol.Exceptions.ClientDirectoryException;
+import ru.spbau.mit.Protocol.RemoteFile;
+import ru.spbau.mit.TorrentClient.TorrentFile.FileManager;
 
 import java.io.*;
 import java.net.Socket;
 import java.util.List;
 
-public class ClientImpl implements ru.spbau.mit.TorrentClient.Client {
-    private boolean connected = false;
-    Socket clientSocket;
-    DataOutputStream netOut;
-    DataInputStream netIn;
-    TorrentProtocolClient protocol = new TorrentProtocolClientImpl();
+public class ClientImpl implements Client {
+    private volatile boolean isStopped = false;
+    private FileManager fileManager;
+
+    private Leech leech;
+    private Seed seed;
+
+    public ClientImpl(File saveDir) throws ClientDirectoryException {
+        fileManager = new FileManager(saveDir);
+    }
 
     @Override
     public void connect(String hostName, int portNumber) throws IOException {
-        if (connected)
+        if (isStopped)
             return;
 
         clientSocket = new Socket(hostName, portNumber);
-        netOut = new DataOutputStream(clientSocket.getOutputStream());
-        netIn = new DataInputStream(clientSocket.getInputStream());
+        serverNetOut = new DataOutputStream(clientSocket.getOutputStream());
+        serverNetIn = new DataInputStream(clientSocket.getInputStream());
 
-        connected = true;
+        // should launch a seed guy
+
+        isStopped = true;
     }
 
     @Override
     public void disconnect() throws IOException {
-        if (!connected)
+        if (!isStopped)
             return;
 
-        netIn.close();
-        netOut.close();
-        clientSocket.close();
+        seed.stop();
+        leech.stop();
     }
 
     @Override
-    public List<RemoteFile> executeList(String path) throws IOException {
-        if (!connected)
+    public List<RemoteFile> executeList() throws IOException {
+        if (!isStopped)
             return null;
-        protocol.formListRequest(path, netOut);
-        return protocol.readListResponse(netIn);
+        protocol.sendListRequest();
+        return protocol.readListResponse();
     }
 
     @Override
-    public void executeGet(String path, OutputStream out) throws IOException {
-        if (!connected)
+    public void executeGet(RemoteFile file, OutputStream out) throws IOException {
+        if (!isStopped)
             return;
-        protocol.sendGetRequest(path, netOut);
-        protocol.readGetResponse(netIn, out);
+        client.executeGet();
+        // implement
     }
 
 }

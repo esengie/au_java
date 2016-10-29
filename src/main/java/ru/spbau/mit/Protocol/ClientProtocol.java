@@ -1,11 +1,11 @@
-package ru.spbau.mit.Communication;
+package ru.spbau.mit.Protocol;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.util.List;
 
-public interface TorrentProtocolClient {
+public interface ClientProtocol {
     void sendListRequest() throws IOException;
     List<RemoteFile> readListResponse() throws IOException;
 

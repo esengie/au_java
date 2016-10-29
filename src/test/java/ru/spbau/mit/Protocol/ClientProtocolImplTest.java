@@ -1,4 +1,4 @@
-package ru.spbau.mit.Communication;
+package ru.spbau.mit.Protocol;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 
-public class TorrentProtocolClientImplTest {
+public class ClientProtocolImplTest {
     @Rule
     public final TemporaryFolder folder = new TemporaryFolder();
 
@@ -33,7 +33,7 @@ public class TorrentProtocolClientImplTest {
     private ByteArrayOutputStream outContent;
     private DataInputStream inContent;
     private Socket sock;
-    private final TorrentProtocolClient prot = new TorrentProtocolClientImpl();
+    private final ClientProtocol prot = new ClientProtocolImpl();
 
     @Before
     public void setUpStreams() throws IOException {

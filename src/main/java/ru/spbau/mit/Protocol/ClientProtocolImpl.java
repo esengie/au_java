@@ -1,4 +1,4 @@
-package ru.spbau.mit.Communication;
+package ru.spbau.mit.Protocol;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -9,11 +9,11 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TorrentProtocolClientImpl implements TorrentProtocolClient {
+public class ClientProtocolImpl implements ClientProtocol {
     private DataInputStream input;
     private DataOutputStream output;
 
-    public TorrentProtocolClientImpl(DataInputStream input, DataOutputStream output) {
+    public ClientProtocolImpl(DataInputStream input, DataOutputStream output) {
         this.input = input;
         this.output = output;
     }
