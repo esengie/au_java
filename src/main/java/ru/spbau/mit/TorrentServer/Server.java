@@ -1,4 +1,4 @@
-package ru.spbau.mit.Server;
+package ru.spbau.mit.TorrentServer;
 
 public interface Server {
     void start(int portNumber);

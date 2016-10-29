@@ -1,14 +1,14 @@
-package ru.spbau.mit.Client;
+package ru.spbau.mit.TorrentClient;
 
-import ru.spbau.mit.Protocol.RemoteFile;
-import ru.spbau.mit.Protocol.TorrentProtocolClient;
-import ru.spbau.mit.Protocol.TorrentProtocolClientImpl;
+import ru.spbau.mit.Communication.RemoteFile;
+import ru.spbau.mit.Communication.TorrentProtocolClient;
+import ru.spbau.mit.Communication.TorrentProtocolClientImpl;
 
 import java.io.*;
 import java.net.Socket;
 import java.util.List;
 
-public class ClientImpl implements Client {
+public class ClientImpl implements ru.spbau.mit.TorrentClient.Client {
     private boolean connected = false;
     Socket clientSocket;
     DataOutputStream netOut;

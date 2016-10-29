@@ -1,8 +1,6 @@
-package ru.spbau.mit.Client;
+package ru.spbau.mit.TorrentClient;
 
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by esengie on 10/13/16.
