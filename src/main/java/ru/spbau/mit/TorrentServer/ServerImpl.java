@@ -1,8 +1,8 @@
-package ru.spbau.mit.Server;
+package ru.spbau.mit.TorrentServer;
 
 
-import ru.spbau.mit.Protocol.TorrentProtocolClient;
-import ru.spbau.mit.Protocol.TorrentProtocolClientImpl;
+import ru.spbau.mit.Communication.TorrentProtocolClient;
+import ru.spbau.mit.Communication.TorrentProtocolClientImpl;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

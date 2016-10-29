@@ -1,15 +1,13 @@
-package ru.spbau.mit.Server;
+package ru.spbau.mit.TorrentServer;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import ru.spbau.mit.Client.Client;
-import ru.spbau.mit.Client.ClientImpl;
-import ru.spbau.mit.Protocol.RemoteFile;
-import ru.spbau.mit.Protocol.TorrentProtocolClient;
-import ru.spbau.mit.Protocol.TorrentProtocolClientImpl;
+import ru.spbau.mit.Communication.RemoteFile;
+import ru.spbau.mit.Communication.TorrentProtocolClient;
+import ru.spbau.mit.Communication.TorrentProtocolClientImpl;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -61,7 +59,7 @@ public class ServerImplTest {
         server.start(portNumber);
 
         Thread.sleep(200);
-        Client client = new ClientImpl();
+        ru.spbau.mit.TorrentClient.Client client = new ru.spbau.mit.TorrentClient.ClientImpl();
         client.connect("localhost", portNumber);
 
         List<RemoteFile> lst = client.executeList(dir.getAbsolutePath());

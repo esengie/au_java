@@ -1,6 +1,6 @@
-package ru.spbau.mit.Client;
+package ru.spbau.mit.TorrentClient;
 
-import ru.spbau.mit.Protocol.RemoteFile;
+import ru.spbau.mit.Communication.RemoteFile;
 
 import java.io.IOException;
 import java.io.OutputStream;

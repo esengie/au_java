@@ -1,4 +1,4 @@
-package ru.spbau.mit.Protocol;
+package ru.spbau.mit.Communication;
 
 public class RemoteFile {
     public final int id;

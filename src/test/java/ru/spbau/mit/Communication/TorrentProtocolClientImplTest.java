@@ -1,4 +1,4 @@
-package ru.spbau.mit.Protocol;
+package ru.spbau.mit.Communication;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;

@@ -1,4 +1,4 @@
-package ru.spbau.mit.Protocol;
+package ru.spbau.mit.Communication;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -14,9 +14,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 public class TorrentProtocolServerImpl implements TorrentProtocolServer {
-    Map<Integer, RemoteFile> idToFile = new ConcurrentHashMap<>();
-    Map<Integer, Set<InetAddress>> fileToSeedIPs = new ConcurrentHashMap<>();
-    Map<InetAddress, Integer> IPtoSeedPort = new ConcurrentHashMap<>();
+    private Map<Integer, RemoteFile> idToFile = new ConcurrentHashMap<>();
+    private Map<Integer, Set<InetAddress>> fileToSeedIPs = new ConcurrentHashMap<>();
+    private Map<InetAddress, Integer> IPtoSeedPort = new ConcurrentHashMap<>();
     // Needs a way to disconnect guys
     private final Boolean writerLockIDToFile = false;
     private final Boolean writerLockIPs = false;
