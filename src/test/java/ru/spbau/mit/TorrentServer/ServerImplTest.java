@@ -6,8 +6,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import ru.spbau.mit.Protocol.RemoteFile;
-import ru.spbau.mit.Protocol.ClientProtocol;
-import ru.spbau.mit.Protocol.ClientProtocolImpl;
+import ru.spbau.mit.Protocol.Client.ClientProtocol;
+import ru.spbau.mit.Protocol.Client.ClientProtocolImpl;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;

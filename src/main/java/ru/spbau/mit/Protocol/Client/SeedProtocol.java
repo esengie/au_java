@@ -1,4 +1,4 @@
-package ru.spbau.mit.Protocol;
+package ru.spbau.mit.Protocol.Client;
 
 import ru.spbau.mit.TorrentClient.TorrentFile.FileManager;
 

@@ -2,8 +2,10 @@ package ru.spbau.mit.TorrentClient;
 
 import ru.spbau.mit.Protocol.RemoteFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.InetSocketAddress;
 import java.util.List;
 
 public interface Client {
@@ -11,5 +13,7 @@ public interface Client {
     void disconnect() throws IOException;
 
     List<RemoteFile> executeList() throws IOException;
-    void executeGet(RemoteFile file, OutputStream out) throws IOException;
+    RemoteFile executeUpload(File file) throws IOException;
+    List<InetSocketAddress> executeSources(int fileId) throws IOException;
+    void executeGet(File location, RemoteFile file) throws IOException;
 }
