@@ -1,4 +1,6 @@
-package ru.spbau.mit.Protocol;
+package ru.spbau.mit.Protocol.Client;
+
+import ru.spbau.mit.Protocol.RemoteFile;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -10,21 +12,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ClientProtocolImpl implements ClientProtocol {
-    private DataInputStream input;
-    private DataOutputStream output;
-
-    public ClientProtocolImpl(DataInputStream input, DataOutputStream output) {
-        this.input = input;
-        this.output = output;
-    }
 
     @Override
-    public void sendListRequest() throws IOException {
+    public void sendListRequest(DataOutputStream output) throws IOException {
         output.writeByte(1);
     }
 
     @Override
-    public List<RemoteFile> readListResponse() throws IOException {
+    public List<RemoteFile> readListResponse(DataInputStream input) throws IOException {
         int size = input.readInt();
         List<RemoteFile> list = new ArrayList<>();
         for (int i = 0; i < size; ++i) {
@@ -34,25 +29,25 @@ public class ClientProtocolImpl implements ClientProtocol {
     }
 
     @Override
-    public void sendUploadRequest(String name, long size) throws IOException {
+    public void sendUploadRequest(DataOutputStream output, String name, long size) throws IOException {
         output.writeByte(2);
         output.writeUTF(name);
         output.writeLong(size);
     }
 
     @Override
-    public int readUploadResponse() throws IOException {
+    public int readUploadResponse(DataInputStream input) throws IOException {
         return input.readInt();
     }
 
     @Override
-    public void sendSourcesRequest(int fileId) throws IOException {
+    public void sendSourcesRequest(DataOutputStream output, int fileId) throws IOException {
         output.writeByte(3);
         output.writeInt(fileId);
     }
 
     @Override
-    public List<InetSocketAddress> readSourcesResponse() throws IOException {
+    public List<InetSocketAddress> readSourcesResponse(DataInputStream input) throws IOException {
         int size = input.readInt();
         List<InetSocketAddress> retVal = new ArrayList<>();
         for (int i = 0; i < size; ++i) {
@@ -67,7 +62,7 @@ public class ClientProtocolImpl implements ClientProtocol {
     }
 
     @Override
-    public void sendUpdateRequest(short port, List<Integer> seedingFileIds) throws IOException {
+    public void sendUpdateRequest(DataOutputStream output, short port, List<Integer> seedingFileIds) throws IOException {
         output.writeByte(4);
         output.writeShort(port);
         output.writeInt(seedingFileIds.size());
@@ -77,18 +72,18 @@ public class ClientProtocolImpl implements ClientProtocol {
     }
 
     @Override
-    public boolean readUpdateResponse() throws IOException {
+    public boolean readUpdateResponse(DataInputStream input) throws IOException {
         return input.readBoolean();
     }
 
     @Override
-    public void sendStatRequest(int fileId) throws IOException {
+    public void sendStatRequest(DataOutputStream output, int fileId) throws IOException {
         output.writeByte(1);
         output.writeInt(fileId);
     }
 
     @Override
-    public List<Integer> readStatResponse() throws IOException {
+    public List<Integer> readStatResponse(DataInputStream input) throws IOException {
         int count = input.readInt();
         List<Integer> retVal = new ArrayList<>();
         for (int i = 0; i < count; ++i){
@@ -98,17 +93,15 @@ public class ClientProtocolImpl implements ClientProtocol {
     }
 
     @Override
-    public void sendGetRequest(int fileId, int part) throws IOException {
+    public void sendGetRequest(DataOutputStream output, int fileId, int part) throws IOException {
         output.writeByte(2);
         output.writeInt(fileId);
         output.writeInt(part);
     }
 
     @Override
-    public void readGetResponse(OutputStream output) throws IOException {
-        byte[] buffer = new byte[RemoteFile.PART_SIZE];
+    public void readGetResponse(DataInputStream input, byte[] buffer) throws IOException {
         // Reads up to that size
-        int read = input.read(buffer, 0, RemoteFile.PART_SIZE);
-        output.write(buffer, 0, read);
+        input.readFully(buffer, 0, buffer.length);
     }
 }

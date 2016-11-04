@@ -1,14 +1,14 @@
-package ru.spbau.mit.Protocol;
+package ru.spbau.mit.Protocol.Client;
 
 import ru.spbau.mit.Protocol.Exceptions.BadInputException;
 import ru.spbau.mit.Protocol.Exceptions.ClientDirectoryException;
+import ru.spbau.mit.Protocol.RemoteFile;
 import ru.spbau.mit.TorrentClient.TorrentFile.FileManager;
 import ru.spbau.mit.TorrentClient.TorrentFile.TorrentFileLocal;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.text.MessageFormat;
 import java.util.Set;
 
@@ -53,8 +53,8 @@ public class SeedProtocolImpl implements SeedProtocol {
             throw new ClientDirectoryException("File doesn't exist");
         }
 
-        ByteBuffer buf = ByteBuffer.allocate(RemoteFile.PART_SIZE);
+        byte[] buf = new byte[RemoteFile.PART_SIZE];
         int size = tFile.read(buf, part);
-        out.write(buf.array(), 0, size);
+        out.write(buf, 0, size);
     }
 }

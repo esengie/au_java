@@ -1,4 +1,4 @@
-package ru.spbau.mit.Protocol;
+package ru.spbau.mit.Protocol.Server;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

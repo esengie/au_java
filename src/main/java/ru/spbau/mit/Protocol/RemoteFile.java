@@ -7,9 +7,13 @@ public class RemoteFile {
 
     public static final int PART_SIZE = 1 << 22; // 4 Mb
 
-    RemoteFile(int fileId, String fileName, long size){
+    public RemoteFile(int fileId, String fileName, long size){
         this.id = fileId;
         this.name = fileName;
         this.size = size;
+    }
+
+    public int parts() {
+        return (int) (size + RemoteFile.PART_SIZE - 1) / RemoteFile.PART_SIZE;
     }
 }

@@ -5,6 +5,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import ru.spbau.mit.Protocol.Client.ClientProtocol;
+import ru.spbau.mit.Protocol.Client.ClientProtocolImpl;
 
 import java.io.*;
 import java.net.Socket;

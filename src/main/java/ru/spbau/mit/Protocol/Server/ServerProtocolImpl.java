@@ -1,7 +1,8 @@
-package ru.spbau.mit.Protocol;
+package ru.spbau.mit.Protocol.Server;
 
 import ru.spbau.mit.Protocol.Exceptions.BadInputException;
 import ru.spbau.mit.Protocol.Exceptions.ServerDirectoryException;
+import ru.spbau.mit.Protocol.RemoteFile;
 
 import java.io.*;
 import java.net.InetAddress;

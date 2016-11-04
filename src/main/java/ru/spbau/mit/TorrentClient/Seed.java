@@ -1,0 +1,114 @@
+package ru.spbau.mit.TorrentClient;
+
+import ru.spbau.mit.Protocol.Client.SeedProtocol;
+import ru.spbau.mit.Protocol.Client.SeedProtocolImpl;
+import ru.spbau.mit.TorrentClient.TorrentFile.FileManager;
+import ru.spbau.mit.TorrentServer.TorrentIOException;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+public class Seed {
+    private static final Logger logger = Logger.getLogger(Seed.class.getName());
+
+    private ServerSocket serverSocket = null;
+    private volatile boolean isStopped = false;
+    private Thread serverThread = null;
+
+    private ExecutorService threadPool = Executors.newFixedThreadPool(10);
+
+    private SeedProtocol protocol;
+    private short seedPort;
+    private FileManager fileManager;
+
+    public Seed(short port, FileManager fileManager){
+        seedPort = port;
+        this.fileManager = fileManager;
+    }
+
+    private class SeedThread implements Runnable {
+        @Override
+        public void run() {
+            while (!isStopped()) {
+                Socket clientSocket = null;
+                try {
+                    clientSocket = serverSocket.accept();
+                } catch (IOException e) {
+                    if (isStopped()) {
+                        break;
+                    }
+                    logger.log(Level.SEVERE, "Couldn't accept a client", e);
+                }
+                threadPool.execute(new WorkerRunnable(clientSocket));
+            }
+            threadPool.shutdown();
+        }
+    }
+
+    private boolean isStopped() {
+        return isStopped;
+    }
+
+    public void start() throws TorrentIOException {
+        if (!isStopped())
+            return;
+        isStopped = false;
+        protocol = new SeedProtocolImpl();
+        openServerSocket();
+        serverThread = new Thread(new SeedThread());
+        serverThread.start();
+    }
+
+    public synchronized void stop() throws TorrentIOException {
+        if (isStopped())
+            return;
+        isStopped = true;
+        try {
+            serverSocket.close();
+        } catch (IOException e) {
+            throw new TorrentIOException("Error closing server", e);
+        }
+    }
+
+    private void openServerSocket() throws TorrentIOException {
+        try {
+            this.serverSocket = new ServerSocket(seedPort);
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, "Cannot open port " + String.valueOf(seedPort), e);
+        }
+    }
+
+    private class WorkerRunnable implements Runnable {
+        Logger logger = Logger.getLogger(Seed.class.getName());
+
+        private Socket clientSocket;
+        private DataOutputStream netOut;
+        private DataInputStream netIn;
+
+        WorkerRunnable(Socket clientSocket) {
+            this.clientSocket = clientSocket;
+        }
+
+        public void run() {
+            try {
+                netOut = new DataOutputStream(clientSocket.getOutputStream());
+                netIn = new DataInputStream(clientSocket.getInputStream());
+                protocol.formResponse(netIn, netOut, fileManager);
+                netOut.close();
+                netIn.close();
+            } catch (IOException e) {
+                logger.log(Level.SEVERE, "Client handler error", e);
+            }
+        }
+    }
+}
+
+
+
