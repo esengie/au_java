@@ -108,6 +108,7 @@ public class ClientImpl implements Client {
                         Thread.sleep(2000);
                         continue;
                     }
+                    // We get a seed from seed queue, it's empty in the beginning
                     InetSocketAddress seed = fp.seeds.poll();
                     Integer part = null;
                     try {
