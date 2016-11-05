@@ -18,20 +18,6 @@ import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-class FileToLeech {
-    public final int fileId;
-    public final TorrentFileLocal file;
-    public final Set<Integer> partsNeeded;
-    public final Map<InetSocketAddress, Set<Integer>> seedParts = new ConcurrentHashMap<>();
-    public volatile Queue<InetSocketAddress> seeds = new ConcurrentLinkedQueue<>();
-
-    FileToLeech(int fileId, Set<Integer> partIds, TorrentFileLocal file) {
-        this.fileId = fileId;
-        this.partsNeeded = partIds;
-        this.file = file;
-    }
-}
-
 public class ClientImpl implements Client {
     private static final Logger logger = Logger.getLogger(ClientImpl.class.getName());
 
@@ -122,35 +108,44 @@ public class ClientImpl implements Client {
                         Thread.sleep(2000);
                         continue;
                     }
-
                     InetSocketAddress seed = fp.seeds.poll();
-                    if (seed == null) {
-                        restat(fp);
-                    }
-
-                    Integer part = getPart(fp, seed);
-                    // If no seed can seed this right now
-                    if (part == null) {
-                        leechQueue.add(fp);
-                        continue;
-                    }
-
+                    Integer part = null;
                     try {
+                        // Round robin we went let's stat again!
+                        if (seed == null) {
+                            restat(fp);
+                        }
+
                         openLeechSocket(seed);
                         protocol.sendStatRequest(workerOut, fp.fileId);
                         List<Integer> parts = protocol.readStatResponse(workerIn);
                         fp.seedParts.put(seed, new ConcurrentSkipListSet<>(parts));
-
                         workerIn.close();
+
+                        part = getPart(fp, seed);
+                        // If the seed can't seed this right now
+                        if (part == null) {
+                            leechQueue.add(fp);
+                            continue;
+                        }
 
                         openLeechSocket(seed);
                         protocol.sendGetRequest(workerOut, fp.fileId, part);
                         byte[] buffer = new byte[fp.file.partSize(part)];
                         protocol.readGetResponse(workerIn, buffer);
                         workerIn.close();
+
                     } catch (IOException e) {
-                        fp.seedParts.remove(seed);
+                        // We are just overly cautious here
+                        if (seed != null) {
+                            fp.seedParts.remove(seed);
+                        }
+                        if (part != null){
+                            fp.partsNeeded.add(part);
+                        }
                         leechQueue.add(fp);
+
+                        logger.log(Level.FINE, "Seed dead againg", e);
                     }
                 } catch (InterruptedException e) {
                     logger.log(Level.WARNING, "Was interrupted", e);
@@ -158,7 +153,21 @@ public class ClientImpl implements Client {
             }
         }
 
-        private void restat(FileToLeech fp) {
+        private Integer getPart(FileToLeech fp, InetSocketAddress seed) {
+            synchronized (fp.partsNeeded) {
+                Set<Integer> pts = fp.seedParts.get(seed);
+                for (int pt : fp.partsNeeded) {
+                    if (pts.contains(pt)) {
+                        pts.remove(pt);
+                        return pt;
+                    }
+                }
+                return null;
+            }
+        }
+
+        private void restat(FileToLeech fp) throws IOException {
+            fp.seeds.addAll(executeSources(fp.fileId));
         }
 
     }
@@ -256,7 +265,7 @@ public class ClientImpl implements Client {
 
         partsNeeded = new ConcurrentSkipListSet<>(partsNeeded);
         FileToLeech fl = new FileToLeech(file.id, partsNeeded, f);
-        filesToSeeds.get(file.id).forEach(addr -> fl.seeds.add(addr));
+        filesToSeeds.get(file.id).forEach(fl.seeds::add);
         for (int i = 0; i < file.parts(); ++i) {
             if (!partsDone.contains(i)) {
                 leechQueue.add(fl);
