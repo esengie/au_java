@@ -3,6 +3,7 @@ package ru.spbau.mit.TorrentServer;
 import ru.spbau.mit.Protocol.ProtocolConstants;
 import ru.spbau.mit.Protocol.Server.ServerProtocol;
 import ru.spbau.mit.Protocol.Server.ServerProtocolImpl;
+import ru.spbau.mit.Protocol.ServiceState;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -22,19 +23,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-enum ServerState {
-    PREINIT,
-    STOPPED,
-    RUNNING
-}
-
 public class ServerImpl implements Server {
 
     private static final Logger logger = Logger.getLogger(ServerImpl.class.getName());
 
     public static final int PORT_NUMBER = 8081;
     private ServerSocket serverSocket = null;
-    private volatile ServerState serverState = ServerState.PREINIT;
+    private volatile ServiceState serverState = ServiceState.PREINIT;
     private Thread serverThread = null;
     private Thread garbageCollectorThread = null;
 
@@ -89,12 +84,12 @@ public class ServerImpl implements Server {
 
 
     public boolean isStopped() {
-        return serverState == ServerState.STOPPED;
+        return serverState == ServiceState.STOPPED;
     }
 
     @Override
     public void start(File saveDir) throws TorrentIOException {
-        if (serverState != ServerState.PREINIT)
+        if (serverState != ServiceState.PREINIT)
             return;
 
         try {
@@ -107,14 +102,14 @@ public class ServerImpl implements Server {
         serverThread.start();
         garbageCollectorThread = new Thread(new GarbageCollectorThread());
         garbageCollectorThread.start();
-        serverState = ServerState.RUNNING;
+        serverState = ServiceState.RUNNING;
     }
 
     public synchronized void stop() throws TorrentIOException {
         if (isStopped())
             return;
 
-        serverState = ServerState.STOPPED;
+        serverState = ServiceState.STOPPED;
         try {
             serverSocket.close();
             protocol.saveState();
