@@ -88,7 +88,7 @@ public class ClientApp {
                             }
                             int id = Integer.parseInt(cmdArg[1]);
                             List<InetSocketAddress> lst = client.executeSources(id);
-                            System.out.println(lst.size());
+                            lst.forEach(it -> System.out.println(it));
                             break;
                         }
                         case "upload": {

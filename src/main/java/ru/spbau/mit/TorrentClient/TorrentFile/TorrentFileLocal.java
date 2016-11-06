@@ -54,6 +54,26 @@ public class TorrentFileLocal {
         localFile = filepath;
     }
 
+    /**
+     * Creates a file from a local one
+     *
+     * @param filepath path to file
+     */
+    TorrentFileLocal(File filepath) {
+
+        int totalParts = 0;
+        try {
+            descriptor = new RandomAccessFile(filepath, mode);
+            totalParts = totalParts(descriptor.length());
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, "TorrentFile was passed a nonexistent file");
+        }
+        for (int i = 0; i < totalParts; ++i) {
+            this.parts.add(i);
+        }
+        localFile = filepath;
+    }
+
     public Set<Integer> getParts() {
         return new HashSet<>(parts);
     }
@@ -61,6 +81,10 @@ public class TorrentFileLocal {
     public void write(byte[] buf, int part) throws IOException {
         descriptor.write(buf, part * RemoteFile.PART_SIZE, buf.length);
         parts.add(part);
+    }
+
+    public static int totalParts(long size){
+        return (int)(((size - 1) + (long)RemoteFile.PART_SIZE) / (long)RemoteFile.PART_SIZE);
     }
 
     public int partSize(int part) throws IOException {

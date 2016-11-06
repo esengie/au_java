@@ -25,7 +25,7 @@ public class ClientImpl implements Client {
 
     private volatile ServiceState clientState = ServiceState.PREINIT;
     private Socket socketToServer = null;
-    public static final int NUM_THREADS = 1;
+    public static final int NUM_THREADS = 10;
 
     private FileManager fileManager = null;
     private ClientProtocol protocol = new ClientProtocolImpl();
@@ -132,6 +132,7 @@ public class ClientImpl implements Client {
                         // Round robin we went let's stat again!
                         if (seed == null) {
                             reloadSources(fp);
+                            continue;
                         }
 
                         openLeechSocket(seed);
@@ -241,8 +242,10 @@ public class ClientImpl implements Client {
             return null;
         openClientSocket();
         protocol.sendUploadRequest(netOut, file.getName(), file.length());
-        return new RemoteFile(protocol.readUploadResponse(netIn),
+        RemoteFile f = new RemoteFile(protocol.readUploadResponse(netIn),
                 file.getName(), file.length());
+        fileManager.addTorrentFile(file, f);
+        return f;
     }
 
     @Override
