@@ -22,13 +22,19 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+enum ServerState {
+    PREINIT,
+    STOPPED,
+    RUNNING
+}
+
 public class ServerImpl implements Server {
 
     private static final Logger logger = Logger.getLogger(ServerImpl.class.getName());
 
     public static final int PORT_NUMBER = 8081;
     private ServerSocket serverSocket = null;
-    private volatile boolean isStopped = false;
+    private volatile ServerState serverState = ServerState.PREINIT;
     private Thread serverThread = null;
     private Thread garbageCollectorThread = null;
 
@@ -36,7 +42,6 @@ public class ServerImpl implements Server {
 
     private ServerProtocol protocol;
     private Map<Socket, Timestamp> timeToLive = new ConcurrentHashMap<>();
-
 
     private class ServerThread implements Runnable {
 
@@ -83,15 +88,15 @@ public class ServerImpl implements Server {
     }
 
 
-    private boolean isStopped() {
-        return isStopped;
+    public boolean isStopped() {
+        return serverState == ServerState.STOPPED;
     }
 
     @Override
     public void start(File saveDir) throws TorrentIOException {
-        if (!isStopped())
+        if (serverState != ServerState.PREINIT)
             return;
-        isStopped = false;
+
         try {
             protocol = new ServerProtocolImpl(saveDir);
         } catch (IOException e) {
@@ -102,12 +107,14 @@ public class ServerImpl implements Server {
         serverThread.start();
         garbageCollectorThread = new Thread(new GarbageCollectorThread());
         garbageCollectorThread.start();
+        serverState = ServerState.RUNNING;
     }
 
     public synchronized void stop() throws TorrentIOException {
         if (isStopped())
             return;
-        isStopped = true;
+
+        serverState = ServerState.STOPPED;
         try {
             serverSocket.close();
             protocol.saveState();
@@ -118,7 +125,7 @@ public class ServerImpl implements Server {
 
     private void openServerSocket() throws TorrentIOException {
         try {
-            this.serverSocket = new ServerSocket(ServerImpl.PORT_NUMBER);
+            serverSocket = new ServerSocket(ServerImpl.PORT_NUMBER);
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Cannot open port 8081", e);
             throw new TorrentIOException("Cannot open port 8081", e);
