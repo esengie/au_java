@@ -30,7 +30,7 @@ public class ServerImpl implements Server {
     private ServerSocket serverSocket = null;
     private volatile boolean isStopped = false;
     private Thread serverThread = null;
-    private Thread garbadgeCollectorThread = null;
+    private Thread garbageCollectorThread = null;
 
     private ExecutorService threadPool = Executors.newFixedThreadPool(10);
 
@@ -100,8 +100,8 @@ public class ServerImpl implements Server {
         openServerSocket();
         serverThread = new Thread(new ServerThread());
         serverThread.start();
-        garbadgeCollectorThread = new Thread(new GarbageCollectorThread());
-        garbadgeCollectorThread.start();
+        garbageCollectorThread = new Thread(new GarbageCollectorThread());
+        garbageCollectorThread.start();
     }
 
     public synchronized void stop() throws TorrentIOException {

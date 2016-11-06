@@ -199,6 +199,7 @@ public class ClientImpl implements Client {
             return;
 
         seed.stop();
+        fileManager.saveToDisk();
         isStopped = true;
     }
 
