@@ -77,7 +77,7 @@ public class ServerProtocolImpl implements ServerProtocol {
         synchronized (writerLockIDToFile) {
             id = idToFile.size();
             idToFile.put(id, new RemoteFile(id, fileName, size));
-            fileToSeedIPs.put(id, new ConcurrentSkipListSet<>());
+            fileToSeedIPs.put(id, new ConcurrentSkipListSet<>(InetSocketAddressComparator::compare));
         }
 
         out.writeInt(id);
@@ -109,7 +109,8 @@ public class ServerProtocolImpl implements ServerProtocol {
         synchronized (writerLockIPs) {
             for (int fileId : fileIds) {
                 if (!fileToSeedIPs.containsKey(fileId)) {
-                    fileToSeedIPs.put(fileId, new ConcurrentSkipListSet<>());
+                    fileToSeedIPs.put(fileId, new ConcurrentSkipListSet<>(
+                            InetSocketAddressComparator::compare));
                 }
                 fileToSeedIPs.get(fileId).add(new InetSocketAddress(ip, port));
             }
@@ -143,6 +144,16 @@ public class ServerProtocolImpl implements ServerProtocol {
             idToFile = new ConcurrentHashMap<>((HashMap<Integer, RemoteFile>) in.readObject());
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("Shouldn't happen here, serialization error");
+        }
+    }
+}
+
+class InetSocketAddressComparator {
+    public static int compare(InetSocketAddress o1, InetSocketAddress o2) {
+        if (o1 == o2) {
+            return 0;
+        } else {
+            return o1.toString().compareTo(o2.toString());
         }
     }
 }
