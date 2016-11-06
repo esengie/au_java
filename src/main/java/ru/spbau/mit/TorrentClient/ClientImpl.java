@@ -4,7 +4,7 @@ import ru.spbau.mit.Protocol.Client.ClientProtocol;
 import ru.spbau.mit.Protocol.Client.ClientProtocolImpl;
 import ru.spbau.mit.Protocol.ProtocolConstants;
 import ru.spbau.mit.Protocol.RemoteFile;
-import ru.spbau.mit.Protocol.Server.ServerProtocol;
+import ru.spbau.mit.Protocol.ServiceState;
 import ru.spbau.mit.TorrentClient.TorrentFile.FileManager;
 import ru.spbau.mit.TorrentClient.TorrentFile.TorrentFileLocal;
 import ru.spbau.mit.TorrentServer.ServerImpl;
@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 public class ClientImpl implements Client {
     private static final Logger logger = Logger.getLogger(ClientImpl.class.getName());
 
-    private volatile boolean isStopped = false;
+    private volatile ServiceState clientState = ServiceState.PREINIT;
     private Socket socketToServer = null;
     public static final int NUM_THREADS = 10;
 
@@ -53,9 +53,8 @@ public class ClientImpl implements Client {
         fileManager = fm;
     }
 
-    @Override
     public boolean isStopped() {
-        return isStopped;
+        return clientState == ServiceState.STOPPED;
     }
 
     private class KeepAliveThread implements Runnable {
@@ -192,11 +191,11 @@ public class ClientImpl implements Client {
 
     @Override
     public void connect(String hostName) throws IOException {
-        if (!isStopped)
+        if (clientState != ServiceState.PREINIT)
             return;
         host = hostName;
         hostPort = ServerImpl.PORT_NUMBER;
-        isStopped = false;
+        clientState = ServiceState.RUNNING;
         // should launch a seed guy
         keepAliveThread = new Thread(new KeepAliveThread());
         keepAliveThread.start();
@@ -215,9 +214,9 @@ public class ClientImpl implements Client {
 
     @Override
     public void disconnect() throws IOException {
-        if (isStopped)
+        if (isStopped())
             return;
-        isStopped = true;
+        clientState = ServiceState.STOPPED;
         seed.stop();
         try {
             leeches.awaitTermination(5, TimeUnit.SECONDS);
@@ -228,7 +227,7 @@ public class ClientImpl implements Client {
 
     @Override
     public List<RemoteFile> executeList() throws IOException {
-        if (isStopped)
+        if (isStopped())
             return null;
         openClientSocket();
         protocol.sendListRequest(netOut);
@@ -237,7 +236,7 @@ public class ClientImpl implements Client {
 
     @Override
     public RemoteFile executeUpload(File file) throws IOException {
-        if (isStopped)
+        if (isStopped())
             return null;
         openClientSocket();
         protocol.sendUploadRequest(netOut, file.getName(), file.length());
@@ -247,7 +246,7 @@ public class ClientImpl implements Client {
 
     @Override
     public List<InetSocketAddress> executeSources(int fileId) throws IOException {
-        if (isStopped)
+        if (isStopped())
             return null;
         openClientSocket();
         protocol.sendSourcesRequest(netOut, fileId);
@@ -265,7 +264,7 @@ public class ClientImpl implements Client {
      */
     @Override
     public void executeGet(File location, RemoteFile file) throws IOException {
-        if (isStopped)
+        if (isStopped())
             return;
         TorrentFileLocal f = fileManager.getTorrentFile(file.id);
         if (f == null) {
