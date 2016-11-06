@@ -11,17 +11,21 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SeedProtocolImpl implements SeedProtocol {
-
+    private static  final Logger logger = Logger.getLogger(SeedProtocol.class.getName());
     @Override
     public void formResponse(DataInputStream in, DataOutputStream out, FileManager manager) throws IOException {
         int request = in.readInt();
         switch (request) {
             case 1:
+                logger.log(Level.FINE, "Serving stat request");
                 formStatResponse(in.readInt(), out, manager);
                 return;
             case 2:
+                logger.log(Level.FINE, "Serving get request");
                 formGetResponse(in.readInt(), in.readInt(), out, manager);
                 return;
         }

@@ -51,6 +51,7 @@ public class ClientImpl implements Client {
     public ClientImpl(FileManager fm, short port) throws IOException {
         seedPort = port;
         fileManager = fm;
+        seed = new Seed(port, fm);
     }
 
     public boolean isStopped() {

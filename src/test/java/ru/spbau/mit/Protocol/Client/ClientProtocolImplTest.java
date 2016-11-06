@@ -1,4 +1,4 @@
-package ru.spbau.mit.Protocol;
+package ru.spbau.mit.Protocol.Client;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import ru.spbau.mit.Protocol.Client.ClientProtocol;
 import ru.spbau.mit.Protocol.Client.ClientProtocolImpl;
+import ru.spbau.mit.Protocol.RemoteFile;
 
 import java.io.*;
 import java.net.Socket;

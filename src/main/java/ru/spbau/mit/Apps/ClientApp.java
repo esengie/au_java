@@ -12,25 +12,30 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 public class ClientApp {
     private static final String PORT_ARG_NAME = "port";
-    private static final String STATE_ARG_NAME = "stateDir";
+    private static final String STATE_DIR_ARG_NAME = "stateDir";
     private static final String TRACKER_ADDR_ARG_NAME = "tracker";
     private static final Options OPTIONS = new Options();
     static {
         OPTIONS.addOption(PORT_ARG_NAME, true, "local port to start seeding");
-        OPTIONS.addOption(STATE_ARG_NAME, true, "directory for state");
+        OPTIONS.addOption(STATE_DIR_ARG_NAME, true, "directory for state");
         OPTIONS.addOption(TRACKER_ADDR_ARG_NAME, true, "tracker location");
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args2) {
+        LogManager.getLogManager().getLogger(Logger.GLOBAL_LOGGER_NAME).setLevel(Level.FINE);
         try {
+            String[] args = {"-port", "8082", "-stateDir", ".", "-tracker", "localhost"};
             CommandLine cmd = parseArgs(args);
 
             Short port = Short.parseShort(cmd.getOptionValue(PORT_ARG_NAME));
 
-            FileManager fileManager = new FileManager(new File(cmd.getOptionValue(STATE_ARG_NAME)));
+            FileManager fileManager = new FileManager(new File(cmd.getOptionValue(STATE_DIR_ARG_NAME)));
             Client client = new ClientImpl(fileManager, port);
 
             client.connect(cmd.getOptionValue(TRACKER_ADDR_ARG_NAME));
@@ -39,6 +44,8 @@ public class ClientApp {
             while (!client.isStopped()) {
                 try {
                     String[] cmdArg = getUserInput().split(" ");
+                    if (cmdArg.length == 0)
+                        continue;
                     switch (cmdArg[0]) {
                         case "list": {
                             lastList = client.executeList();
@@ -46,6 +53,10 @@ public class ClientApp {
                             break;
                         }
                         case "get": {
+                            if (cmdArg.length < 2) {
+                                System.out.println("get needs more args");
+                                continue;
+                            }
                             int id = Integer.parseInt(cmdArg[1]);
                             if (id >= lastList.size())
                                 throw new IndexOutOfBoundsException();
@@ -55,6 +66,10 @@ public class ClientApp {
                             break;
                         }
                         case "upload": {
+                            if (cmdArg.length < 2) {
+                                System.out.println("upload needs more args");
+                                continue;
+                            }
                             File f = new File(cmdArg[1]);
                             if (!f.exists() || f.isDirectory())
                                 throw new FileNotFoundException("There is no such file");
@@ -72,11 +87,11 @@ public class ClientApp {
                             System.out.println("Unknown command, supported: q, upload filepath, get id, list ...");
                     }
                 } catch (Exception e) {
-                    System.out.println(String.format("error: %s", e.toString()));
+                    System.out.println(String.format("error: %s", e.getMessage()));
                 }
             }
         } catch (ParseException | IOException e) {
-            System.out.println(e.toString());
+            System.out.println(e.getMessage());
         }
     }
 
@@ -104,7 +119,7 @@ public class ClientApp {
         if (!cmdLine.hasOption(TRACKER_ADDR_ARG_NAME)) {
             throw new ParseException("didn't specify tracker address");
         }
-        if (!cmdLine.hasOption(STATE_ARG_NAME)) {
+        if (!cmdLine.hasOption(STATE_DIR_ARG_NAME)) {
             throw new ParseException("didn't specify directory to save/load state");
         }
 

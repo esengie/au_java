@@ -13,8 +13,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ServerProtocolImpl implements ServerProtocol {
+
+    private static  final Logger logger = Logger.getLogger(ServerProtocol.class.getName());
+
     private Map<Integer, RemoteFile> idToFile = new ConcurrentHashMap<>();
     private Map<Integer, Set<InetAddress>> fileToSeedIPs = new ConcurrentHashMap<>();
     private Map<InetAddress, Integer> IPtoSeedPort = new ConcurrentHashMap<>();
@@ -25,18 +30,22 @@ public class ServerProtocolImpl implements ServerProtocol {
 
     @Override
     public void formResponse(DataInputStream in, DataOutputStream out, InetAddress client) throws IOException {
-        int request = in.readInt();
+        int request = in.readByte();
         switch (request) {
             case 1:
+                logger.log(Level.FINE, "Serving list request");
                 formListResponse(out);
                 return;
             case 2:
+                logger.log(Level.FINE, "Serving upload request");
                 formUploadResponse(in.readUTF(), in.readLong(), out);
                 return;
             case 3:
+                logger.log(Level.FINE, "Serving sources request");
                 formSourcesResponse(in.readInt(), out);
                 return;
             case 4:
+                logger.log(Level.FINE, "Serving update request");
                 formUpdateResponse(in, out, client);
                 return;
         }
