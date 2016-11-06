@@ -76,7 +76,7 @@ public class ServerImpl implements Server {
                     protocol.removeExtras(removed);
                     Thread.sleep(ProtocolConstants.TIMEOUT);
                 } catch (InterruptedException e) {
-                    logger.log(Level.SEVERE, "Interrupted the garbage collector", e);
+                    logger.log(Level.WARNING, "Interrupted the garbage collector", e);
                 }
             }
         }
@@ -121,6 +121,7 @@ public class ServerImpl implements Server {
             this.serverSocket = new ServerSocket(ServerImpl.PORT_NUMBER);
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Cannot open port 8081", e);
+            throw new TorrentIOException("Cannot open port 8081", e);
         }
     }
 

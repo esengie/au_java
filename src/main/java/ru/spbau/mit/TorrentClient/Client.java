@@ -9,8 +9,10 @@ import java.net.InetSocketAddress;
 import java.util.List;
 
 public interface Client {
-    void connect(String hostName, int port) throws IOException;
+    void connect(String hostName) throws IOException;
     void disconnect() throws IOException;
+
+    boolean isStopped();
 
     List<RemoteFile> executeList() throws IOException;
     RemoteFile executeUpload(File file) throws IOException;

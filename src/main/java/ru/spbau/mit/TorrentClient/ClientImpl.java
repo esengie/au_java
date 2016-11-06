@@ -4,8 +4,10 @@ import ru.spbau.mit.Protocol.Client.ClientProtocol;
 import ru.spbau.mit.Protocol.Client.ClientProtocolImpl;
 import ru.spbau.mit.Protocol.ProtocolConstants;
 import ru.spbau.mit.Protocol.RemoteFile;
+import ru.spbau.mit.Protocol.Server.ServerProtocol;
 import ru.spbau.mit.TorrentClient.TorrentFile.FileManager;
 import ru.spbau.mit.TorrentClient.TorrentFile.TorrentFileLocal;
+import ru.spbau.mit.TorrentServer.ServerImpl;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -23,7 +25,8 @@ public class ClientImpl implements Client {
 
     private volatile boolean isStopped = false;
     private Socket socketToServer = null;
-    private short seedPort;
+    public static final int NUM_THREADS = 10;
+
     private FileManager fileManager = null;
     private ClientProtocol protocol = new ClientProtocolImpl();
     private DataOutputStream netOut = null;
@@ -35,28 +38,42 @@ public class ClientImpl implements Client {
     // get, start on part and put back
     private BlockingQueue<FileToLeech> leechQueue =
             new LinkedBlockingQueue<>();
-    private ExecutorService leeches = Executors.newFixedThreadPool(10);
+
+    private ExecutorService leeches = Executors.newFixedThreadPool(NUM_THREADS);
 
     private Thread keepAliveThread = null;
     private Seed seed = null;
     private String host;
-    private int hostPort;
+    private short hostPort;
+    private short seedPort;
 
-    public ClientImpl(File saveDir, short port) throws IOException {
+
+    public ClientImpl(FileManager fm, short port) throws IOException {
         seedPort = port;
-        fileManager = new FileManager(saveDir);
+        fileManager = fm;
     }
 
-    private boolean isStopped() {
+    @Override
+    public boolean isStopped() {
         return isStopped;
     }
 
     private class KeepAliveThread implements Runnable {
+        private DataOutputStream aliveOut;
+        private DataInputStream aliveIn;
+        private Socket socket;
         @Override
         public void run() {
             try {
                 while (!isStopped()) {
-                    protocol.sendUpdateRequest(netOut, seedPort, fileManager.getFileIds());
+                    socket = new Socket(host, hostPort);
+                    aliveOut = new DataOutputStream(socket.getOutputStream());
+                    aliveIn = new DataInputStream(socket.getInputStream());
+
+                    protocol.sendUpdateRequest(aliveOut, seedPort, fileManager.getFileIds());
+                    protocol.readUpdateResponse(aliveIn);
+
+                    aliveIn.close();
                     Thread.sleep(Math.abs(ProtocolConstants.TIMEOUT - 1000));
                 }
             } catch (InterruptedException | IOException e) {
@@ -87,15 +104,15 @@ public class ClientImpl implements Client {
      * maybe I should improve this(?).
      */
     private class WorkerRunnable implements Runnable {
-        DataInputStream workerIn;
-        DataOutputStream workerOut;
+        private DataInputStream workerIn;
+        private DataOutputStream workerOut;
+        private Socket leechSocket;
 
         private void openLeechSocket(InetSocketAddress address) throws IOException {
-            Socket leechSocket = new Socket(address.getHostName(), address.getPort());
+            leechSocket = new Socket(address.getHostName(), address.getPort());
             workerOut = new DataOutputStream(leechSocket.getOutputStream());
             workerIn = new DataInputStream(leechSocket.getInputStream());
         }
-
 
         /**
          * Taking out a seed at random and get his parts whenever he has anything to offer
@@ -174,17 +191,20 @@ public class ClientImpl implements Client {
     }
 
     @Override
-    public void connect(String hostName, int portNumber) throws IOException {
+    public void connect(String hostName) throws IOException {
         if (!isStopped)
             return;
-
         host = hostName;
-        hostPort = portNumber;
+        hostPort = ServerImpl.PORT_NUMBER;
+        isStopped = false;
         // should launch a seed guy
         keepAliveThread = new Thread(new KeepAliveThread());
         keepAliveThread.start();
         seed.start();
-        isStopped = false;
+
+        for (int i = 0; i < NUM_THREADS; ++i) {
+            leeches.submit(new WorkerRunnable());
+        }
     }
 
     private void openClientSocket() throws IOException {
@@ -197,15 +217,18 @@ public class ClientImpl implements Client {
     public void disconnect() throws IOException {
         if (isStopped)
             return;
-
-        seed.stop();
-        fileManager.saveToDisk();
         isStopped = true;
+        seed.stop();
+        try {
+            leeches.awaitTermination(5, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            logger.log(Level.SEVERE, "Interrupted disconnect", e);
+        }
     }
 
     @Override
     public List<RemoteFile> executeList() throws IOException {
-        if (!isStopped)
+        if (isStopped)
             return null;
         openClientSocket();
         protocol.sendListRequest(netOut);
@@ -214,6 +237,8 @@ public class ClientImpl implements Client {
 
     @Override
     public RemoteFile executeUpload(File file) throws IOException {
+        if (isStopped)
+            return null;
         openClientSocket();
         protocol.sendUploadRequest(netOut, file.getName(), file.length());
         return new RemoteFile(protocol.readUploadResponse(netIn),
@@ -222,6 +247,8 @@ public class ClientImpl implements Client {
 
     @Override
     public List<InetSocketAddress> executeSources(int fileId) throws IOException {
+        if (isStopped)
+            return null;
         openClientSocket();
         protocol.sendSourcesRequest(netOut, fileId);
         filesToSeeds.put(fileId, protocol.readSourcesResponse(netIn));
@@ -238,9 +265,8 @@ public class ClientImpl implements Client {
      */
     @Override
     public void executeGet(File location, RemoteFile file) throws IOException {
-        if (!isStopped)
+        if (isStopped)
             return;
-
         TorrentFileLocal f = fileManager.getTorrentFile(file.id);
         if (f == null) {
             fileManager.createTorrentFile(location, file);
