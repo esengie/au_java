@@ -6,6 +6,7 @@ import ru.spbau.mit.Protocol.RemoteFile;
 
 import java.io.*;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,7 +22,7 @@ public class ServerProtocolImpl implements ServerProtocol {
     private static  final Logger logger = Logger.getLogger(ServerProtocol.class.getName());
 
     private Map<Integer, RemoteFile> idToFile = new ConcurrentHashMap<>();
-    private Map<Integer, Set<InetAddress>> fileToSeedIPs = new ConcurrentHashMap<>();
+    private Map<Integer, Set<InetSocketAddress>> fileToSeedIPs = new ConcurrentHashMap<>();
     private Map<InetAddress, Integer> IPtoSeedPort = new ConcurrentHashMap<>();
     // Needs a way to disconnect guys
     private final Boolean writerLockIDToFile = false;
@@ -88,21 +89,13 @@ public class ServerProtocolImpl implements ServerProtocol {
             return;
         }
 
-        // We care if the set gets updated during iteration
-        // (main reason being the client expects the exact number of ips)
-        // so we use "copy on write"
-        Set<InetAddress> ips;
-        Map<InetAddress, Integer> ipToPorts;
-
-        synchronized (writerLockIPs) {
-            ips = new HashSet<>(fileToSeedIPs.get(fileId));
-            ipToPorts = new HashMap<>(IPtoSeedPort);
-        }
+        Set<InetSocketAddress> ips;
+        ips = new HashSet<>(fileToSeedIPs.get(fileId));
 
         out.writeInt(ips.size());
-        for (InetAddress ip : ips) {
-            out.write(ip.getAddress(), 0, 4);
-            out.writeShort(ipToPorts.get(ip));
+        for (InetSocketAddress ip : ips) {
+            out.write(ip.getAddress().getAddress(), 0, 4);
+            out.writeShort(ip.getPort());
         }
     }
 
@@ -114,12 +107,11 @@ public class ServerProtocolImpl implements ServerProtocol {
             fileIds.add(in.readInt());
         }
         synchronized (writerLockIPs) {
-            IPtoSeedPort.put(ip, port);
             for (int fileId : fileIds) {
                 if (!fileToSeedIPs.containsKey(fileId)) {
                     fileToSeedIPs.put(fileId, new ConcurrentSkipListSet<>());
                 }
-                fileToSeedIPs.get(fileId).add(ip);
+                fileToSeedIPs.get(fileId).add(new InetSocketAddress(ip, port));
             }
         }
         out.writeBoolean(true);
