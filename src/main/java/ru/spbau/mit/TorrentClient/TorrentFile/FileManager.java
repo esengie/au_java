@@ -48,6 +48,12 @@ public class FileManager {
         return f;
     }
 
+    public synchronized TorrentFileLocal addTorrentFile(File filePath, RemoteFile file) throws IOException {
+        TorrentFileLocal f = new TorrentFileLocal(filePath);
+        files.put(file.id, f);
+        return f;
+    }
+
     private static void checkDir(File location) throws NotDirectoryException {
         if (!location.exists() || !location.isDirectory())
             throw new NotDirectoryException(location.getAbsolutePath());
