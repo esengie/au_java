@@ -25,7 +25,7 @@ public class ClientImpl implements Client {
 
     private volatile ServiceState clientState = ServiceState.PREINIT;
     private Socket socketToServer = null;
-    public static final int NUM_THREADS = 10;
+    public static final int NUM_THREADS = 1;
 
     private FileManager fileManager = null;
     private ClientProtocol protocol = new ClientProtocolImpl();
@@ -131,7 +131,7 @@ public class ClientImpl implements Client {
                     try {
                         // Round robin we went let's stat again!
                         if (seed == null) {
-                            restat(fp);
+                            reloadSources(fp);
                         }
 
                         openLeechSocket(seed);
@@ -184,7 +184,7 @@ public class ClientImpl implements Client {
             }
         }
 
-        private void restat(FileToLeech fp) throws IOException {
+        private void reloadSources(FileToLeech fp) throws IOException {
             fp.seeds.addAll(executeSources(fp.fileId));
         }
 
@@ -293,6 +293,7 @@ public class ClientImpl implements Client {
 
         partsNeeded = new ConcurrentSkipListSet<>(partsNeeded);
         FileToLeech fl = new FileToLeech(file.id, partsNeeded, f);
+        executeSources(file.id);
         filesToSeeds.get(file.id).forEach(fl.seeds::add);
         for (int i = 0; i < file.parts(); ++i) {
             if (!partsDone.contains(i)) {

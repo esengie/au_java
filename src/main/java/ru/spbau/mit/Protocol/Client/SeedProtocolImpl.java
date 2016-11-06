@@ -18,7 +18,7 @@ public class SeedProtocolImpl implements SeedProtocol {
     private static  final Logger logger = Logger.getLogger(SeedProtocol.class.getName());
     @Override
     public void formResponse(DataInputStream in, DataOutputStream out, FileManager manager) throws IOException {
-        int request = in.readInt();
+        int request = in.readByte();
         switch (request) {
             case 1:
                 logger.log(Level.FINE, "Serving stat request");
@@ -46,6 +46,7 @@ public class SeedProtocolImpl implements SeedProtocol {
             return;
         }
         Set<Integer> parts = f.getParts();
+        out.writeInt(parts.size());
         for (int part : parts) {
             out.writeInt(part);
         }

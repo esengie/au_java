@@ -9,9 +9,11 @@ import ru.spbau.mit.TorrentClient.TorrentFile.FileManager;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -28,7 +30,13 @@ public class ClientApp {
     }
 
     public static void main(String[] args2) {
-        LogManager.getLogManager().getLogger(Logger.GLOBAL_LOGGER_NAME).setLevel(Level.FINE);
+        // For debugging purposes only
+        Logger log = LogManager.getLogManager().getLogger("");
+        for (Handler h : log.getHandlers()) {
+            h.setLevel(Level.INFO);
+        }
+        log.setLevel(Level.FINE);
+
         try {
             String[] args = {"-port", "8082", "-stateDir", ".", "-tracker", "localhost"};
             CommandLine cmd = parseArgs(args);
@@ -58,11 +66,29 @@ public class ClientApp {
                                 continue;
                             }
                             int id = Integer.parseInt(cmdArg[1]);
-                            if (id >= lastList.size())
-                                throw new IndexOutOfBoundsException();
+                            if (id >= lastList.size()){
+                                System.out.println("you need to list first " +
+                                        "and choose the id among listed files");
+                                continue;
+                            }
+                            String dir = ".";
+                            // by default download here
+                            if (cmdArg.length > 2)
+                                dir = cmdArg[2];
+
                             RemoteFile f = lastList.get(id);
-                            client.executeGet(new File("."), f);
+                            client.executeGet(new File(dir), f);
                             System.out.println("File enqueued");
+                            break;
+                        }
+                        case "sources": {
+                            if (cmdArg.length < 2) {
+                                System.out.println("sources needs more args");
+                                continue;
+                            }
+                            int id = Integer.parseInt(cmdArg[1]);
+                            List<InetSocketAddress> lst = client.executeSources(id);
+                            System.out.println(lst.size());
                             break;
                         }
                         case "upload": {

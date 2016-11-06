@@ -1,6 +1,8 @@
 package ru.spbau.mit.Protocol;
 
-public class RemoteFile {
+import java.io.Serializable;
+
+public class RemoteFile implements Serializable {
     public final int id;
     public final String name;
     public final long size;
