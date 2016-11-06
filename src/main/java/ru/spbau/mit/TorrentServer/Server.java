@@ -6,4 +6,5 @@ import java.io.IOException;
 public interface Server {
     void start(File saveDir) throws IOException;
     void stop() throws TorrentIOException;
+    boolean isStopped();
 }
