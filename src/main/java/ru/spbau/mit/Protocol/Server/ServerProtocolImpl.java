@@ -107,7 +107,7 @@ public class ServerProtocolImpl implements ServerProtocol {
     }
 
     private void formUpdateResponse(DataInputStream in, DataOutputStream out, InetAddress ip) throws IOException {
-        int port = in.readInt();
+        int port = in.readShort();
         int count = in.readInt();
         Set<Integer> fileIds = new HashSet<>();
         for (int i = 0; i < count; ++i) {
@@ -130,26 +130,25 @@ public class ServerProtocolImpl implements ServerProtocol {
             throw new ServerDirectoryException("Folder should exist");
 
         this.saveDir = saveDir;
-
-        File outFile = new File(saveDir, idToFileSave);
-        if (!outFile.exists())
-            return;
-
-        loadState(outFile);
+        loadState();
     }
 
     private static final String idToFileSave = "idToFile.sav";
 
     public void saveState() throws IOException {
         File outFile = new File(saveDir, idToFileSave);
+        outFile.createNewFile();
         ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(outFile));
-        out.writeObject(idToFile);
+        out.writeObject(new HashMap<>(idToFile));
     }
 
-    private void loadState(File outFile) throws IOException {
-        ObjectInputStream out = new ObjectInputStream(new FileInputStream(outFile));
+    private void loadState() throws IOException {
+        File inFile = new File(saveDir, idToFileSave);
+        if (!inFile.exists())
+            return;
+        ObjectInputStream in = new ObjectInputStream(new FileInputStream(inFile));
         try {
-            idToFile = (Map<Integer, RemoteFile>) out.readObject();
+            idToFile = new ConcurrentHashMap<>((HashMap<Integer, RemoteFile>) in.readObject());
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("Shouldn't happen here, serialization error");
         }
