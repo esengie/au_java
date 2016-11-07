@@ -1,5 +1,6 @@
 package ru.spbau.mit.Protocol.Client;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -59,7 +60,7 @@ public class SeedProtocolImplTest {
         byte [] realBuf = new byte[fm.getTorrentFile(1).partSize(0)];
         int resSize = fm.getTorrentFile(1).read(realBuf, 0);
         client.readGetResponse(outIn, bufRes);
-        assertEquals(realBuf, bufRes);
+        Assert.assertArrayEquals(realBuf, bufRes);
     }
 
 }
