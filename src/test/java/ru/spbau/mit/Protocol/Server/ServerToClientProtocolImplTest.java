@@ -17,7 +17,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class ServerProtocolImplTest {
+public class ServerToClientProtocolImplTest {
     private ByteArrayOutputStream outContent;
     private ByteArrayOutputStream inContent;
     private DataInputStream outIn;

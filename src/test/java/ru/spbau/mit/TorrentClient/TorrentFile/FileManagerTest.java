@@ -13,8 +13,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.net.Socket;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.Arrays;
 
@@ -70,6 +68,18 @@ public class FileManagerTest {
     public void addSameID() throws Exception {
         fm.createTorrentFile(f2.getParentFile(), new RemoteFile(0, f2.getName() + "23", f2.length()));
         fm.addTorrentFile(f2.getAbsoluteFile(), new RemoteFile(0, f2.getName(), f2.length()));
+    }
+
+    @Test
+    public void readWrite() throws Exception {
+        fm.addTorrentFile(f2.getAbsoluteFile(), new RemoteFile(0, f2.getName(), f2.length()));
+        fm.createTorrentFile(f2.getParentFile(), new RemoteFile(1, f2.getName() + "23", f2.length()));
+        byte [] buf = new byte[RemoteFile.PART_SIZE];
+        fm.getTorrentFile(0).read(buf, 0);
+        fm.getTorrentFile(1).write(buf, 0);
+        assertTrue("The files differ!",
+                FileUtils.contentEquals(fm.getTorrentFile(0).getFile(),
+                        fm.getTorrentFile(1).getFile()));
     }
 
     @Test
