@@ -2,17 +2,16 @@ package ru.spbau.mit.TorrentClient.TorrentFile;
 
 
 import ru.spbau.mit.Protocol.RemoteFile;
-import ru.spbau.mit.TorrentServer.Server;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,6 +22,7 @@ public class TorrentFileLocal {
     private Set<Integer> parts = new ConcurrentSkipListSet<>();
     private RandomAccessFile descriptor;
     private File localFile;
+    private ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
 
     /**
      * Creates a remote file locally
@@ -81,27 +81,38 @@ public class TorrentFileLocal {
     }
 
     public void write(byte[] buf, int part) throws IOException {
-        descriptor.write(buf, part * RemoteFile.PART_SIZE, buf.length);
-        parts.add(part);
+        rwl.writeLock().lock();
+        try {
+            descriptor.seek(part * RemoteFile.PART_SIZE);
+            descriptor.write(buf, 0, partSize(part));
+            parts.add(part);
+        } finally {
+            rwl.writeLock().unlock();
+        }
     }
 
-    public static int totalParts(long size){
-        return (int)(((size - 1) + (long)RemoteFile.PART_SIZE) / (long)RemoteFile.PART_SIZE);
+    public static int totalParts(long size) {
+        return (int) (((size - 1) + (long) RemoteFile.PART_SIZE) / (long) RemoteFile.PART_SIZE);
     }
 
     public int partSize(int part) throws IOException {
         long fileLength = descriptor.length();
-        if ((part + 1) * RemoteFile.PART_SIZE > fileLength){
-            return (int)(fileLength - part * RemoteFile.PART_SIZE);
+        if ((part + 1) * RemoteFile.PART_SIZE > fileLength) {
+            return (int) (fileLength - part * RemoteFile.PART_SIZE);
         }
         return RemoteFile.PART_SIZE;
     }
 
     public int read(byte[] buf, int part) throws IOException {
-        int bytesToRead = partSize(part);
-
-        descriptor.readFully(buf, part * RemoteFile.PART_SIZE, bytesToRead);
-        return bytesToRead;
+        rwl.readLock().lock();
+        try {
+            int bytesToRead = partSize(part);
+            descriptor.seek(part * RemoteFile.PART_SIZE);
+            descriptor.readFully(buf, 0, bytesToRead);
+            return bytesToRead;
+        } finally {
+            rwl.readLock().unlock();
+        }
     }
 
     /**

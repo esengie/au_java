@@ -1,37 +1,42 @@
 package ru.spbau.mit.Common;
 
+import org.apache.commons.io.FileUtils;
+import org.junit.rules.TemporaryFolder;
 import ru.spbau.mit.Protocol.RemoteFile;
 import ru.spbau.mit.TorrentClient.TorrentFile.FileManager;
 import ru.spbau.mit.TorrentClient.TorrentFile.TorrentFileLocal;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+public class WithFileManager extends TemporaryFolder {
+    FileManager fm;
+    File resources;
+    File curDir;
 
-public class WithFileManager {
+    public WithFileManager(File resources){
+        this.resources = resources;
+    }
 
-    public static FileManager getFileManager() throws IOException {
-        FileManager fm = mock(FileManager.class);
+    @Override
+    protected void before() throws Throwable {
+        super.before();
+        File tmp = newFolder();
+        curDir = tmp.getParentFile();
+        FileUtils.deleteDirectory(tmp);
+        fm = new FileManager(curDir);
+        FileUtils.copyDirectory(resources, curDir);
+        int i = 0;
+        for (File f : curDir.listFiles()){
+            fm.addTorrentFile(f, new RemoteFile(i, f.getName(), f.length()));
+            ++i;
+        }
+    }
 
-        when(fm.getFileIds()).thenReturn(Arrays.asList(0, 1));
-        when(fm.getTorrentFile(0)).thenReturn(getTorrentFileLocal(0));
-        when(fm.getTorrentFile(1)).thenReturn(getTorrentFileLocal(1));
-
-        when(fm.getTorrentFile(0)).thenReturn(getTorrentFileLocal(0));
-        when(fm.createTorrentFile(any(), any())).thenReturn(getTorrentFileLocal(0))
-                .thenReturn(getTorrentFileLocal(1));
+    public FileManager getFileManager(){
         return fm;
     }
 
-    public static TorrentFileLocal getTorrentFileLocal(int id) throws IOException {
-        TorrentFileLocal fl = mock(TorrentFileLocal.class);
-        when(fl.partSize(0)).thenReturn(RemoteFile.PART_SIZE);
-        when(fl.partSize(1)).thenReturn(334);
-        when(fl.getParts()).thenReturn(new HashSet<>(Arrays.asList(0,1)));
-        return fl;
-    }
 }
