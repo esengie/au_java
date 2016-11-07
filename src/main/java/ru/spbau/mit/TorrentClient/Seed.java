@@ -2,6 +2,7 @@ package ru.spbau.mit.TorrentClient;
 
 import ru.spbau.mit.Protocol.Client.SeedProtocol;
 import ru.spbau.mit.Protocol.Client.SeedProtocolImpl;
+import ru.spbau.mit.Protocol.ServiceState;
 import ru.spbau.mit.TorrentClient.TorrentFile.FileManager;
 import ru.spbau.mit.TorrentServer.TorrentIOException;
 
@@ -19,7 +20,7 @@ public class Seed {
     private static final Logger logger = Logger.getLogger(Seed.class.getName());
 
     private ServerSocket serverSocket = null;
-    private volatile boolean isStopped = false;
+    private volatile ServiceState clientState = ServiceState.PREINIT;
     private Thread serverThread = null;
 
     private ExecutorService threadPool = Executors.newFixedThreadPool(10);
@@ -42,7 +43,7 @@ public class Seed {
                     clientSocket = serverSocket.accept();
                 } catch (IOException e) {
                     if (isStopped()) {
-                        break;
+                        continue;
                     }
                     logger.log(Level.SEVERE, "Couldn't accept a client", e);
                 }
@@ -53,13 +54,13 @@ public class Seed {
     }
 
     private boolean isStopped() {
-        return isStopped;
+        return clientState == ServiceState.STOPPED;
     }
 
     public void start() throws TorrentIOException {
-        if (!isStopped())
+        if (clientState != ServiceState.PREINIT)
             return;
-        isStopped = false;
+        clientState = ServiceState.RUNNING;
         protocol = new SeedProtocolImpl();
         openServerSocket();
         serverThread = new Thread(new SeedThread());
@@ -69,7 +70,7 @@ public class Seed {
     public synchronized void stop() throws TorrentIOException {
         if (isStopped())
             return;
-        isStopped = true;
+        clientState = ServiceState.STOPPED;
         try {
             serverSocket.close();
         } catch (IOException e) {

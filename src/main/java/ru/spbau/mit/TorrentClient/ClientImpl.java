@@ -25,7 +25,7 @@ public class ClientImpl implements Client {
 
     private volatile ServiceState clientState = ServiceState.PREINIT;
     private Socket socketToServer = null;
-    public static final int NUM_THREADS = 10;
+    public static final int NUM_THREADS = 1;
 
     private FileManager fileManager = null;
     private ClientProtocol protocol = new ClientProtocolImpl();
@@ -153,6 +153,8 @@ public class ClientImpl implements Client {
                         byte[] buffer = new byte[fp.file.partSize(part)];
                         protocol.readGetResponse(workerIn, buffer);
                         workerIn.close();
+
+                        fileManager.getTorrentFile(fp.fileId).write(buffer, part);
 
                     } catch (IOException e) {
                         // We are just overly cautious here
