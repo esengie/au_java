@@ -9,6 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
+import java.nio.file.FileAlreadyExistsException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -32,8 +33,8 @@ public class TorrentFileLocal {
     TorrentFileLocal(File dir, RemoteFile file) throws IOException {
         localFile = new File(dir, file.name);
         if (!localFile.createNewFile()) {
-            logger.log(Level.WARNING, "Possibly file with the same name exists, couldn't create the file");
-            return;
+            logger.log(Level.FINE, "Possibly file with the same name exists, couldn't create the file");
+            throw new FileAlreadyExistsException("FileManager can't overwrite files");
         }
         descriptor = new RandomAccessFile(localFile, mode);
         descriptor.setLength(file.size);
@@ -59,7 +60,7 @@ public class TorrentFileLocal {
      *
      * @param filepath path to file
      */
-    TorrentFileLocal(File filepath) {
+    TorrentFileLocal(File filepath) throws IOException {
 
         int totalParts = 0;
         try {
@@ -67,6 +68,7 @@ public class TorrentFileLocal {
             totalParts = totalParts(descriptor.length());
         } catch (IOException e) {
             logger.log(Level.SEVERE, "TorrentFile was passed a nonexistent file");
+            throw e;
         }
         for (int i = 0; i < totalParts; ++i) {
             this.parts.add(i);
