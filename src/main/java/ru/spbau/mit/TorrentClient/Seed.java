@@ -53,7 +53,7 @@ public class Seed {
                     if (isStopped()) {
                         continue;
                     }
-                    logger.log(Level.SEVERE, "Couldn't accept a client", e);
+                    logger.log(Level.SEVERE, "Couldn't accept a leech", e);
                 }
                 threadPool.execute(new WorkerRunnable(clientSocket));
             }
