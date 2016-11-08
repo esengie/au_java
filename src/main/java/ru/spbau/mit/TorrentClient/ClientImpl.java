@@ -15,11 +15,13 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 public class ClientImpl implements Client {
@@ -27,7 +29,7 @@ public class ClientImpl implements Client {
 
     private volatile ServiceState clientState = ServiceState.PREINIT;
     private Socket socketToServer = null;
-    public static final int NUM_THREADS = 1;
+    public static final int NUM_THREADS = 10;
 
     private FileManager fileManager = null;
     private ClientProtocol protocol = new ClientProtocolImpl();
@@ -64,10 +66,11 @@ public class ClientImpl implements Client {
         private DataOutputStream aliveOut;
         private DataInputStream aliveIn;
         private Socket socket;
+
         @Override
         public void run() {
-            try {
-                while (!isStopped()) {
+            while (!isStopped()) {
+                try {
                     socket = new Socket(host, hostPort);
                     aliveOut = new DataOutputStream(socket.getOutputStream());
                     aliveIn = new DataInputStream(socket.getInputStream());
@@ -76,10 +79,10 @@ public class ClientImpl implements Client {
                     protocol.readUpdateResponse(aliveIn);
 
                     aliveIn.close();
-                    Thread.sleep(Math.abs(ProtocolConstants.TIMEOUT - 1000));
+                    Thread.sleep(ProtocolConstants.SEED_UPDATER_FREQUENCY_MILLIS);
+                } catch (InterruptedException | IOException e) {
+                    logger.log(Level.SEVERE, "Keep alive thread is dead", e);
                 }
-            } catch (InterruptedException | IOException e) {
-                // do nothing?
             }
         }
     }
@@ -124,7 +127,7 @@ public class ClientImpl implements Client {
                 try {
                     FileToLeech fp = leechQueue.poll(100, TimeUnit.MILLISECONDS);
                     if (fp == null) {
-                        Thread.sleep(2000);
+                        Thread.sleep(ProtocolConstants.LEECH_WAIT_FOR_SEEDS_MILLIS);
                         continue;
                     }
                     // We get a seed from seed queue, it's empty in the beginning
@@ -163,7 +166,7 @@ public class ClientImpl implements Client {
                         if (seed != null) {
                             fp.seedParts.remove(seed);
                         }
-                        if (part != null){
+                        if (part != null) {
                             fp.partsNeeded.add(part);
                         }
                         leechQueue.add(fp);
@@ -306,10 +309,6 @@ public class ClientImpl implements Client {
 
         partsNeeded = new ConcurrentSkipListSet<>(partsNeeded);
         FileToLeech fl = new FileToLeech(file.id, partsNeeded, f);
-//        executeSources(file.id);
-//        filesToSeeds.get(file.id).forEach(fl.seeds::add);
-        for (int i : partsNeeded) {
-            leechQueue.add(fl);
-        }
+        partsNeeded.forEach(s -> leechQueue.add(fl));
     }
 }

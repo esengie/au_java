@@ -18,47 +18,41 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ServerProtocolImpl implements ServerProtocol {
-
-    private static  final Logger logger = Logger.getLogger(ServerProtocol.class.getName());
+    private static final Logger logger = Logger.getLogger(ServerProtocol.class.getName());
 
     private Map<Integer, RemoteFile> idToFile = new ConcurrentHashMap<>();
     private Map<Integer, Set<InetSocketAddress>> fileToSeedIPs = new ConcurrentHashMap<>();
-    private Map<InetAddress, Integer> IPtoSeedPort = new ConcurrentHashMap<>();
     // Needs a way to disconnect guys
     private final Boolean writerLockIDToFile = false;
     private final Boolean writerLockIPs = false;
     private File saveDir;
 
     @Override
-    public void formResponse(DataInputStream in, DataOutputStream out, InetAddress client) throws IOException {
+    public int formResponse(DataInputStream in, DataOutputStream out, InetAddress client) throws IOException {
         int request = in.readByte();
         switch (request) {
             case 1:
                 logger.log(Level.FINE, "Serving list request");
                 formListResponse(out);
-                return;
+                return -1;
             case 2:
                 logger.log(Level.FINE, "Serving upload request");
                 formUploadResponse(in.readUTF(), in.readLong(), out);
-                return;
+                return -1;
             case 3:
                 logger.log(Level.FINE, "Serving sources request");
                 formSourcesResponse(in.readInt(), out);
-                return;
+                return -1;
             case 4:
                 logger.log(Level.FINE, "Serving update request");
-                formUpdateResponse(in, out, client);
-                return;
+                return formUpdateResponse(in, out, client);
         }
         throw new BadInputException(MessageFormat.format("Unknown Command {0}", request));
     }
 
     @Override
-    public void removeExtras(Set<InetAddress> removed) {
-        synchronized (writerLockIPs) {
-            IPtoSeedPort.keySet().removeIf(removed::contains);
-            fileToSeedIPs.forEach((id, set) -> set.removeIf(removed::contains));
-        }
+    public void removeExtras(Set<InetSocketAddress> removed) {
+        fileToSeedIPs.forEach((id, set) -> set.removeIf(removed::contains));
     }
 
     private void formListResponse(DataOutputStream out) throws IOException {
@@ -99,7 +93,7 @@ public class ServerProtocolImpl implements ServerProtocol {
         }
     }
 
-    private void formUpdateResponse(DataInputStream in, DataOutputStream out, InetAddress ip) throws IOException {
+    private int formUpdateResponse(DataInputStream in, DataOutputStream out, InetAddress ip) throws IOException {
         int port = in.readShort();
         int count = in.readInt();
         Set<Integer> fileIds = new HashSet<>();
@@ -116,6 +110,7 @@ public class ServerProtocolImpl implements ServerProtocol {
             }
         }
         out.writeBoolean(true);
+        return port;
     }
 
     public ServerProtocolImpl(File saveDir) throws IOException {
@@ -144,16 +139,6 @@ public class ServerProtocolImpl implements ServerProtocol {
             idToFile = new ConcurrentHashMap<>((HashMap<Integer, RemoteFile>) in.readObject());
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("Shouldn't happen here, serialization error");
-        }
-    }
-}
-
-class InetSocketAddressComparator {
-    public static int compare(InetSocketAddress o1, InetSocketAddress o2) {
-        if (o1 == o2) {
-            return 0;
-        } else {
-            return o1.toString().compareTo(o2.toString());
         }
     }
 }
