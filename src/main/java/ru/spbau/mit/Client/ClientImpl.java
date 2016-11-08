@@ -10,47 +10,56 @@ import java.util.List;
 
 public class ClientImpl implements Client {
     private boolean connected = false;
-    Socket clientSocket;
-    DataOutputStream netOut;
-    DataInputStream netIn;
-    SimFTPProtocol protocol = new SimFTPProtocolImpl();
+    private Socket clientSocket;
+    private DataOutputStream netOut;
+    private DataInputStream netIn;
+    private String host;
+    private short port;
+
+    private SimFTPProtocol protocol = new SimFTPProtocolImpl();
 
     @Override
-    public void connect(String hostName, int portNumber) throws IOException {
+    public void connect(String hostName, short portNumber) throws IOException {
         if (connected)
             return;
+        host = hostName;
+        port = portNumber;
+        connected = true;
+    }
 
-        clientSocket = new Socket(hostName, portNumber);
+    private void connect() throws IOException {
+        clientSocket = new Socket(host, port);
         netOut = new DataOutputStream(clientSocket.getOutputStream());
         netIn = new DataInputStream(clientSocket.getInputStream());
-
-        connected = true;
     }
 
     @Override
     public void disconnect() throws IOException {
         if (!connected)
             return;
-
+        connected = false;
         netIn.close();
-        netOut.close();
-        clientSocket.close();
     }
 
     @Override
     public List<RemoteFile> executeList(String path) throws IOException {
         if (!connected)
             return null;
+        connect();
         protocol.formListRequest(path, netOut);
-        return protocol.readListResponse(netIn);
+        List<RemoteFile> res = protocol.readListResponse(netIn);
+        netIn.close();
+        return res;
     }
 
     @Override
     public void executeGet(String path, OutputStream out) throws IOException {
         if (!connected)
             return;
+        connect();
         protocol.formGetRequest(path, netOut);
         protocol.readGetResponse(netIn, out);
+        disconnect();
     }
 
 }

@@ -1,6 +1,8 @@
 package ru.spbau.mit.Server;
 
+import java.io.IOException;
+
 public interface Server {
-    void start(int portNumber);
-    void stop();
+    void start(short portNumber) throws IOException;
+    void stop() throws IOException;
 }

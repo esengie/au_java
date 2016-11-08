@@ -41,7 +41,7 @@ public class ServerImplTest {
     private DataInputStream inContent;
     private Socket sock;
     private final SimFTPProtocol prot = new SimFTPProtocolImpl();
-    private final int portNumber = 1234;
+    private final short portNumber = 1234;
 
     @Before
     public void setUpStreams() throws IOException {
