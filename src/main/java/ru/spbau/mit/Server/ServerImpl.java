@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 public class ServerImpl implements Server {
     private static final Logger logger = Logger.getLogger(Server.class.getName());
 
-    private final ExecutorService executor = Executors.newFixedThreadPool(2);
+    private final ExecutorService executor = Executors.newFixedThreadPool(10);
     private final SimFTPProtocol protocol = new SimFTPProtocolImpl();
     private volatile boolean isStopped = true;
     private ServerSocket serverSocket;
@@ -28,7 +28,6 @@ public class ServerImpl implements Server {
         public void run() {
             try {
                 while (!isStopped) {
-
                     Socket socket = serverSocket.accept();
                     executor.execute(() -> {
                         try {

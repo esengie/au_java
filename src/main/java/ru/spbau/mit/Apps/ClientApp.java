@@ -48,11 +48,12 @@ public class ClientApp {
                             break;
                         }
                         case "get": {
-                            if (cmdArg.length < 2) {
-                                client.executeGet(cmdArg[1], new FileOutputStream(new File(".")));
-                                continue;
+                            File dir = new File(".");
+                            if (cmdArg.length > 2) {
+                                dir = new File(cmdArg[2]);
                             }
-                            File to = new File(new File(cmdArg[2]), cmdArg[1]);
+                            File f = new File(cmdArg[1]);
+                            File to = new File(dir, f.getName());
                             if (to.createNewFile()) {
                                 client.executeGet(cmdArg[1], new FileOutputStream(to));
                             } else {
@@ -68,7 +69,7 @@ public class ClientApp {
                         default:
                             System.out.println("Unknown command, supported: q, get path dirToSave, list path");
                     }
-                } catch (Exception e) {
+                } catch (IOException e) {
                     System.out.println(String.format("error: %s", e.getMessage()));
                 }
             }
@@ -82,10 +83,10 @@ public class ClientApp {
     }
 
     private static void printFiles(List<RemoteFile> files) {
-        System.out.println(String.format("%6s|%20s", "ISDIR", "PATH"));
+        System.out.println(String.format("%1s|%20s", " ", "Name"));
         System.out.println("------------------------------------");
         for (RemoteFile file: files) {
-            System.out.println(String.format("%6s|%20s",
+            System.out.println(String.format("%1s|%20s",
                     file.isDir ? "d" : " ", file.path));
         }
         System.out.println("------------------------------------");

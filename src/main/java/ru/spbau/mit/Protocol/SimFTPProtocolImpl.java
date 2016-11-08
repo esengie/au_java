@@ -75,7 +75,7 @@ public class SimFTPProtocolImpl implements SimFTPProtocol {
         File[] dir = f.listFiles();
         out.writeInt(dir.length);
         for (File fin : dir){
-            out.writeUTF(fin.getAbsolutePath());
+            out.writeUTF(fin.getName());
             out.writeBoolean(fin.isDirectory());
         }
     }
