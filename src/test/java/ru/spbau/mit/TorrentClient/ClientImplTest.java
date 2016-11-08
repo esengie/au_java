@@ -2,9 +2,6 @@ package ru.spbau.mit.TorrentClient;
 
 import org.junit.Test;
 
-/**
- * Created by esengie on 10/13/16.
- */
 public class ClientImplTest {
     @Test
     public void executeList() throws Exception {

@@ -112,7 +112,7 @@ public class FileManager {
     }
 
 
-    private static final String appFolderName = ".asd";
+    private static final String appFolderName = "torrentSeedState";
     private static final String idToParts = "idToParts";
     private static final String idToNames = "idToNames";
 }

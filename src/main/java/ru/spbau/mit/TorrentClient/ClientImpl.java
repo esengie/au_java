@@ -120,13 +120,13 @@ public class ClientImpl implements Client {
         public void run() {
             while (!isStopped()) {
                 try {
-                    FileToLeech fp = leechQueue.poll(1, TimeUnit.SECONDS);
+                    FileToLeech fp = leechQueue.poll(100, TimeUnit.MILLISECONDS);
                     if (fp == null) {
                         Thread.sleep(2000);
                         continue;
                     }
                     // We get a seed from seed queue, it's empty in the beginning
-                    InetSocketAddress seed = fp.seeds.poll();
+                    InetSocketAddress seed = fp.seeds.poll(100, TimeUnit.MILLISECONDS);
                     Integer part = null;
                     try {
                         // Round robin we went let's stat again!
@@ -166,7 +166,7 @@ public class ClientImpl implements Client {
                         }
                         leechQueue.add(fp);
 
-                        logger.log(Level.FINE, "Seed dead againg", e);
+                        logger.log(Level.FINE, "Seed dead again", e);
                     }
                 } catch (InterruptedException e) {
                     logger.log(Level.WARNING, "Was interrupted", e);
@@ -224,6 +224,7 @@ public class ClientImpl implements Client {
         seed.stop();
         try {
             leeches.awaitTermination(5, TimeUnit.SECONDS);
+            leeches.shutdownNow();
         } catch (InterruptedException e) {
             logger.log(Level.SEVERE, "Interrupted disconnect", e);
         }
