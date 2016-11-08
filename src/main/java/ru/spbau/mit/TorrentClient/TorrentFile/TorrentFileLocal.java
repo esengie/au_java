@@ -11,7 +11,6 @@ import java.nio.file.FileAlreadyExistsException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,7 +21,6 @@ public class TorrentFileLocal {
     private Set<Integer> parts = new ConcurrentSkipListSet<>();
     private RandomAccessFile descriptor;
     private File localFile;
-    private ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
 
     /**
      * Creates a remote file locally
@@ -65,7 +63,7 @@ public class TorrentFileLocal {
         int totalParts = 0;
         try {
             descriptor = new RandomAccessFile(filepath, mode);
-            totalParts = totalParts(descriptor.length());
+            totalParts = totalParts();
         } catch (IOException e) {
             logger.log(Level.SEVERE, "TorrentFile was passed a nonexistent file");
             throw e;
@@ -80,19 +78,20 @@ public class TorrentFileLocal {
         return new HashSet<>(parts);
     }
 
-    public void write(byte[] buf, int part) throws IOException {
-        rwl.writeLock().lock();
-        try {
-            descriptor.seek(part * RemoteFile.PART_SIZE);
-            descriptor.write(buf, 0, partSize(part));
-            parts.add(part);
-        } finally {
-            rwl.writeLock().unlock();
-        }
+    /**
+     * Could it be faster? Potentially, just curious.
+     * @param buf buffer
+     * @param part part number to read
+     * @throws IOException if writes are throwing
+     */
+    public synchronized void write(byte[] buf, int part) throws IOException {
+        descriptor.seek(part * RemoteFile.PART_SIZE);
+        descriptor.write(buf, 0, partSize(part));
+        parts.add(part);
     }
 
-    public static int totalParts(long size) {
-        return (int) (((size - 1) + (long) RemoteFile.PART_SIZE) / (long) RemoteFile.PART_SIZE);
+    public int totalParts() throws IOException {
+        return (int) (((descriptor.length() - 1) + (long) RemoteFile.PART_SIZE) / (long) RemoteFile.PART_SIZE);
     }
 
     public int partSize(int part) throws IOException {
@@ -103,16 +102,11 @@ public class TorrentFileLocal {
         return RemoteFile.PART_SIZE;
     }
 
-    public int read(byte[] buf, int part) throws IOException {
-        rwl.readLock().lock();
-        try {
-            int bytesToRead = partSize(part);
-            descriptor.seek(part * RemoteFile.PART_SIZE);
-            descriptor.readFully(buf, 0, bytesToRead);
-            return bytesToRead;
-        } finally {
-            rwl.readLock().unlock();
-        }
+    public synchronized int read(byte[] buf, int part) throws IOException {
+        int bytesToRead = partSize(part);
+        descriptor.seek(part * RemoteFile.PART_SIZE);
+        descriptor.readFully(buf, 0, bytesToRead);
+        return bytesToRead;
     }
 
     /**

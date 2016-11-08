@@ -4,17 +4,13 @@ import org.apache.commons.io.FileUtils;
 import org.junit.rules.TemporaryFolder;
 import ru.spbau.mit.Protocol.RemoteFile;
 import ru.spbau.mit.TorrentClient.TorrentFile.FileManager;
-import ru.spbau.mit.TorrentClient.TorrentFile.TorrentFileLocal;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
 
 public class WithFileManager extends TemporaryFolder {
     FileManager fm;
     File resources;
-    File curDir;
+    public File curDir;
 
     public WithFileManager(File resources){
         this.resources = resources;
