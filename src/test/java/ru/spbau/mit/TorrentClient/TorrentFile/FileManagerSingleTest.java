@@ -5,12 +5,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import ru.spbau.mit.Protocol.Client.ClientProtocol;
-import ru.spbau.mit.Protocol.Client.ClientProtocolImpl;
 import ru.spbau.mit.Protocol.RemoteFile;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
@@ -18,7 +14,7 @@ import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
-public class FileManagerTest {
+public class FileManagerSingleTest {
     @Rule
     public final TemporaryFolder folder = new TemporaryFolder();
 

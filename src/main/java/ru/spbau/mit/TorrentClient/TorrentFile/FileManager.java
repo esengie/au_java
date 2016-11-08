@@ -18,10 +18,6 @@ public class FileManager {
     private Map<Integer, TorrentFileLocal> files = new ConcurrentHashMap<>();
     private final File saveDir;
 
-    public int size() {
-        return files.size();
-    }
-
     public List<Integer> getFileIds() {
         return new ArrayList<>(files.keySet());
     }
