@@ -20,7 +20,7 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
-public class SeedProtocolImplTest {
+public class SeedToClientProtocolImplTest {
     private ByteArrayOutputStream outContent;
     private ByteArrayOutputStream inContent;
     private DataInputStream outIn;

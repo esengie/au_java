@@ -38,7 +38,7 @@ public class ClientApp {
         log.setLevel(Level.FINE);
 
         try {
-            String[] args = {"-port", "8092", "-stateDir", ".", "-tracker", "localhost"};
+            String[] args = {"-port", "8082", "-stateDir", ".", "-tracker", "localhost"};
             CommandLine cmd = parseArgs(args);
 
             Short port = Short.parseShort(cmd.getOptionValue(PORT_ARG_NAME));
