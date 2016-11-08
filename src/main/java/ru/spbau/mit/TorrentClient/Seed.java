@@ -9,6 +9,8 @@ import ru.spbau.mit.TorrentServer.TorrentIOException;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.NotActiveException;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
@@ -28,10 +30,16 @@ public class Seed {
     private SeedProtocol protocol;
     private short seedPort;
     private FileManager fileManager;
+    private InetSocketAddress mySocketAddress;
 
     public Seed(short port, FileManager fileManager){
         seedPort = port;
         this.fileManager = fileManager;
+        mySocketAddress = new InetSocketAddress("127.0.0.1", seedPort);
+    }
+
+    public InetSocketAddress getMySocketAddress() {
+        return mySocketAddress;
     }
 
     private class SeedThread implements Runnable {

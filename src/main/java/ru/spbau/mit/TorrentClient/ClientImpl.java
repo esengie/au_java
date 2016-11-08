@@ -19,6 +19,8 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 public class ClientImpl implements Client {
     private static final Logger logger = Logger.getLogger(ClientImpl.class.getName());
@@ -131,6 +133,7 @@ public class ClientImpl implements Client {
                     try {
                         // Round robin we went let's stat again!
                         if (seed == null) {
+                            leechQueue.add(fp);
                             reloadSources(fp);
                             continue;
                         }
@@ -155,7 +158,6 @@ public class ClientImpl implements Client {
                         workerIn.close();
 
                         fileManager.getTorrentFile(fp.fileId).write(buffer, part);
-
                     } catch (IOException e) {
                         // We are just overly cautious here
                         if (seed != null) {
@@ -179,7 +181,7 @@ public class ClientImpl implements Client {
                 Set<Integer> pts = fp.seedParts.get(seed);
                 for (int pt : fp.partsNeeded) {
                     if (pts.contains(pt)) {
-                        pts.remove(pt);
+                        fp.partsNeeded.remove(pt);
                         return pt;
                     }
                 }
@@ -188,7 +190,12 @@ public class ClientImpl implements Client {
         }
 
         private void reloadSources(FileToLeech fp) throws IOException {
-            fp.seeds.addAll(executeSources(fp.fileId));
+            InetSocketAddress myAddress = seed.getMySocketAddress();
+            List<InetSocketAddress> lst = executeSources(fp.fileId)
+                    .stream()
+                    .filter(it -> !it.equals(myAddress))
+                    .collect(Collectors.toList());
+            fp.seeds.addAll(lst);
         }
 
     }
@@ -299,12 +306,10 @@ public class ClientImpl implements Client {
 
         partsNeeded = new ConcurrentSkipListSet<>(partsNeeded);
         FileToLeech fl = new FileToLeech(file.id, partsNeeded, f);
-        executeSources(file.id);
-        filesToSeeds.get(file.id).forEach(fl.seeds::add);
-        for (int i = 0; i < file.parts(); ++i) {
-            if (!partsDone.contains(i)) {
-                leechQueue.add(fl);
-            }
+//        executeSources(file.id);
+//        filesToSeeds.get(file.id).forEach(fl.seeds::add);
+        for (int i : partsNeeded) {
+            leechQueue.add(fl);
         }
     }
 }
