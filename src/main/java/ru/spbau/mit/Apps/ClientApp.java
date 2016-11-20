@@ -20,9 +20,8 @@ public class ClientApp {
         OPTIONS.addOption(SERVER_ADDR_ARG_NAME, true, "server location");
     }
 
-    public static void main(String[] args2) {
+    public static void main(String[] args) {
         try {
-            String[] args = {"-port", "8002", "-server", "localhost"};
             CommandLine cmd = parseArgs(args);
 
             Short port = Short.parseShort(cmd.getOptionValue(PORT_ARG_NAME));
@@ -32,6 +31,7 @@ public class ClientApp {
             client.connect(cmd.getOptionValue(SERVER_ADDR_ARG_NAME), port);
 
             boolean runnin = true;
+            usage();
             while (runnin) {
                 try {
                     String[] cmdArg = getUserInput().split(" ");
@@ -41,6 +41,7 @@ public class ClientApp {
                         case "list": {
                             if (cmdArg.length < 2) {
                                 System.out.println("list needs more args");
+                                usage();
                                 continue;
                             }
                             List<RemoteFile> lastList = client.executeList(cmdArg[1]);
@@ -49,6 +50,11 @@ public class ClientApp {
                         }
                         case "get": {
                             File dir = new File(".");
+                            if (cmdArg.length < 2) {
+                                System.out.println("get needs more args");
+                                usage();
+                                continue;
+                            }
                             if (cmdArg.length > 2) {
                                 dir = new File(cmdArg[2]);
                             }
@@ -67,7 +73,8 @@ public class ClientApp {
                             break;
                         }
                         default:
-                            System.out.println("Unknown command, supported: q, get path dirToSave, list path");
+                            System.out.println("Unknown command, supported: q, get path dirToSave, list dir");
+                            usage();
                     }
                 } catch (IOException e) {
                     System.out.println(String.format("error: %s", e.getMessage()));
@@ -75,7 +82,16 @@ public class ClientApp {
             }
         } catch (ParseException | IOException e) {
             System.out.println(e.getMessage());
+            launchUsage();
         }
+    }
+
+    private static void usage() {
+        System.out.println("Usage:\n get path [dirToSave], list dir, q");
+    }
+
+    private static void launchUsage() {
+        System.out.println("Usage during launch:\n -port num -server hostname");
     }
 
     private static String getUserInput() {

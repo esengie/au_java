@@ -10,9 +10,8 @@ import java.util.logging.Logger;
 public class ServerApp {
     private static final Logger logger = Logger.getLogger(ServerApp.class.getName());
 
-    public static void main(String[] args2) {
+    public static void main(String[] args) {
         try {
-            String[] args = {"8002"};
             Server s = new ServerImpl();
             if (args.length < 1) {
                 System.out.println("Need a port to run on");
