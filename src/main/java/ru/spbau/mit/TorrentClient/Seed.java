@@ -9,7 +9,6 @@ import ru.spbau.mit.TorrentServer.TorrentIOException;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.NotActiveException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -18,27 +17,29 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Seed {
+/**
+ * Does the job of a seed, basically implements the SeedProtocol
+ */
+class Seed {
     private static final Logger logger = Logger.getLogger(Seed.class.getName());
 
     private ServerSocket serverSocket = null;
     private volatile ServiceState clientState = ServiceState.PREINIT;
-    private Thread serverThread = null;
 
-    private ExecutorService threadPool = Executors.newFixedThreadPool(10);
+    private final ExecutorService threadPool = Executors.newFixedThreadPool(10);
 
     private SeedProtocol protocol;
     private short seedPort;
-    private FileManager fileManager;
+    private final FileManager fileManager;
     private InetSocketAddress mySocketAddress;
 
-    public Seed(short port, FileManager fileManager){
+    Seed(short port, FileManager fileManager) {
         seedPort = port;
         this.fileManager = fileManager;
         mySocketAddress = new InetSocketAddress("127.0.0.1", seedPort);
     }
 
-    public InetSocketAddress getMySocketAddress() {
+    InetSocketAddress getMySocketAddress() {
         return mySocketAddress;
     }
 
@@ -65,17 +66,17 @@ public class Seed {
         return clientState == ServiceState.STOPPED;
     }
 
-    public void start() throws TorrentIOException {
+    void start() throws TorrentIOException {
         if (clientState != ServiceState.PREINIT)
             return;
         clientState = ServiceState.RUNNING;
         protocol = new SeedProtocolImpl();
         openServerSocket();
-        serverThread = new Thread(new SeedThread());
+        Thread serverThread = new Thread(new SeedThread());
         serverThread.start();
     }
 
-    public synchronized void stop() throws TorrentIOException {
+    synchronized void stop() throws TorrentIOException {
         if (isStopped())
             return;
         clientState = ServiceState.STOPPED;

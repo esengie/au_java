@@ -12,14 +12,15 @@ import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.Arrays;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class FileManagerSingleTest {
     @Rule
     public final TemporaryFolder folder = new TemporaryFolder();
 
-    private final  String s1 = "adm";
-    private final  String DIR = "adm/adm";
+    private final String s1 = "adm";
+    private final String DIR = "adm/adm";
 
     private final String F1 = "long.txt";
     private final String F2 = "short.txt";
@@ -70,7 +71,7 @@ public class FileManagerSingleTest {
     public void readWrite() throws Exception {
         fm.addTorrentFile(f2.getAbsoluteFile(), new RemoteFile(0, f2.getName(), f2.length()));
         fm.createTorrentFile(f2.getParentFile(), new RemoteFile(1, f2.getName() + "23", f2.length()));
-        byte [] buf = new byte[RemoteFile.PART_SIZE];
+        byte[] buf = new byte[RemoteFile.PART_SIZE];
         fm.getTorrentFile(0).read(buf, 0);
         fm.getTorrentFile(1).write(buf, 0);
         assertTrue("The files differ!",
@@ -84,7 +85,7 @@ public class FileManagerSingleTest {
         fm.addTorrentFile(f2.getAbsoluteFile(), new RemoteFile(1, f2.getName(), f2.length()));
         fm.saveToDisk();
         fm = new FileManager(folder.getRoot().getAbsoluteFile());
-        assertEquals(Arrays.asList(0 , 1), fm.getFileIds());
+        assertEquals(Arrays.asList(0, 1), fm.getFileIds());
         assertEquals(f2, fm.getTorrentFile(1).getFile());
     }
 

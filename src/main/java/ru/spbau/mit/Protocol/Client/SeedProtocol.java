@@ -8,7 +8,7 @@ import java.io.IOException;
 
 /**
  * Handles the client requests from here: http://hwproj.me/tasks/5785
- *
+ * <p>
  * Basucally stat requests (list parts of a file that I have) and get requests (get part of a file)
  */
 public interface SeedProtocol {

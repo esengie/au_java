@@ -16,11 +16,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The class that manages all the files and their parts stored on a client
- *
+ * <p>
  * Multithreaded access to parts of files and serialization of state
  */
 public class FileManager {
-    private Map<Integer, TorrentFileLocal> files = new ConcurrentHashMap<>();
+    private final Map<Integer, TorrentFileLocal> files = new ConcurrentHashMap<>();
     private final File saveDir;
 
     public List<Integer> getFileIds() {
@@ -46,7 +46,7 @@ public class FileManager {
     public synchronized TorrentFileLocal createTorrentFile(File location, RemoteFile file) throws IOException {
         checkDir(location);
         TorrentFileLocal f = new TorrentFileLocal(location, file);
-        if (files.containsKey(file.id)){
+        if (files.containsKey(file.id)) {
             throw new FileAlreadyExistsException("Can't add another file wih the same ID");
         }
         files.put(file.id, f);
@@ -55,7 +55,7 @@ public class FileManager {
 
     public synchronized TorrentFileLocal addTorrentFile(File filePath, RemoteFile file) throws IOException {
         TorrentFileLocal f = new TorrentFileLocal(filePath);
-        if (files.containsKey(file.id)){
+        if (files.containsKey(file.id)) {
             throw new FileAlreadyExistsException("Can't add another file wih the same ID");
         }
         files.put(file.id, f);

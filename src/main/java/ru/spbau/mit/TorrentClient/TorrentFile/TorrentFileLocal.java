@@ -17,10 +17,10 @@ import java.util.logging.Logger;
 public class TorrentFileLocal {
     private static final Logger logger = Logger.getLogger(FileManager.class.getName());
 
-    private String mode = "rwd";
-    private Set<Integer> parts = new ConcurrentSkipListSet<>();
+    private final String mode = "rwd";
+    private final Set<Integer> parts = new ConcurrentSkipListSet<>();
     private RandomAccessFile descriptor;
-    private File localFile;
+    private final File localFile;
 
     /**
      * Creates a remote file locally
@@ -80,7 +80,8 @@ public class TorrentFileLocal {
 
     /**
      * Could it be faster? Potentially, just curious.
-     * @param buf buffer
+     *
+     * @param buf  buffer
      * @param part part number to read
      * @throws IOException if writes are throwing
      */

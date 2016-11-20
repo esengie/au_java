@@ -23,6 +23,7 @@ public class ClientApp {
     private static final String STATE_DIR_ARG_NAME = "stateDir";
     private static final String TRACKER_ADDR_ARG_NAME = "tracker";
     private static final Options OPTIONS = new Options();
+
     static {
         OPTIONS.addOption(PORT_ARG_NAME, true, "local port to start seeding");
         OPTIONS.addOption(STATE_DIR_ARG_NAME, true, "directory for state");
@@ -68,7 +69,7 @@ public class ClientApp {
                                 continue;
                             }
                             int id = Integer.parseInt(cmdArg[1]);
-                            if (id >= lastList.size()){
+                            if (id >= lastList.size()) {
                                 System.out.println("you need to list first " +
                                         "and choose the id among listed files");
                                 continue;
@@ -127,11 +128,11 @@ public class ClientApp {
         }
     }
 
-    private static void usage(){
+    private static void usage() {
         System.out.println("Usage:\n list, get fileID [dirToSave], source fileID, upload filePath, q");
     }
 
-    private static void launchUsage(){
+    private static void launchUsage() {
         System.out.println("Usage for launching:\n -port mySeedPort\n -stateDir whereToSaveState\n -tracker hostName");
     }
 
@@ -142,7 +143,7 @@ public class ClientApp {
     private static void printFiles(List<RemoteFile> files) {
         System.out.println(String.format("%4s|%20s|%8s", "ID", "NAME", "SIZE"));
         System.out.println("------------------------------------");
-        for (RemoteFile file: files) {
+        for (RemoteFile file : files) {
             System.out.println(String.format("%4d|%20s|%8d",
                     file.id, file.name, file.size));
         }

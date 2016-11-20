@@ -1,7 +1,6 @@
 package ru.spbau.mit.Protocol.Server;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -9,13 +8,12 @@ import ru.spbau.mit.Protocol.Client.ClientProtocol;
 import ru.spbau.mit.Protocol.Client.ClientProtocolImpl;
 
 import java.io.*;
-import java.lang.reflect.Array;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class ServerToClientProtocolImplTest {
     private ByteArrayOutputStream outContent;
@@ -38,12 +36,13 @@ public class ServerToClientProtocolImplTest {
 
         outContent = new ByteArrayOutputStream();
         inContent = new ByteArrayOutputStream();
-        client.sendUpdateRequest(new DataOutputStream(outContent), (short)1233, Arrays.asList(1,2));
+        client.sendUpdateRequest(new DataOutputStream(outContent), (short) 1233, Arrays.asList(1, 2));
         outIn = new DataInputStream(new ByteArrayInputStream(outContent.toByteArray()));
         server.formResponse(outIn, new DataOutputStream(inContent), InetAddress.getByName("127.0.0.1"));
         outContent = new ByteArrayOutputStream();
         inContent = new ByteArrayOutputStream();
     }
+
     @Test
     public void formResponseSources() throws Exception {
         client.sendSourcesRequest(new DataOutputStream(outContent), 1);

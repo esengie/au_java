@@ -28,28 +28,26 @@ public class ClientImpl implements Client {
     private static final Logger logger = Logger.getLogger(ClientImpl.class.getName());
 
     private volatile ServiceState clientState = ServiceState.PREINIT;
-    private Socket socketToServer = null;
-    public static final int NUM_THREADS = 10;
+    private static final int NUM_THREADS = 10;
 
-    private FileManager fileManager = null;
-    private ClientProtocol protocol = new ClientProtocolImpl();
+    private final FileManager fileManager;
+    private final ClientProtocol protocol = new ClientProtocolImpl();
     private DataOutputStream netOut = null;
     private DataInputStream netIn = null;
 
     // files and parts mapped to seeds
-    private Map<Integer, List<InetSocketAddress>> filesToSeeds = new ConcurrentHashMap<>();
+    private final Map<Integer, List<InetSocketAddress>> filesToSeeds = new ConcurrentHashMap<>();
     // FileIds we have to get
     // get, start on part and put back
-    private BlockingQueue<FileToLeech> leechQueue =
+    private final BlockingQueue<FileToLeech> leechQueue =
             new LinkedBlockingQueue<>();
 
-    private ExecutorService leeches = Executors.newFixedThreadPool(NUM_THREADS);
+    private final ExecutorService leeches = Executors.newFixedThreadPool(NUM_THREADS);
 
-    private Thread keepAliveThread = null;
-    private Seed seed = null;
+    private final Seed seed;
     private String host;
     private short hostPort;
-    private short seedPort;
+    private final short seedPort;
 
 
     public ClientImpl(FileManager fm, short port) throws IOException {
@@ -211,7 +209,7 @@ public class ClientImpl implements Client {
         hostPort = ServerImpl.PORT_NUMBER;
         clientState = ServiceState.RUNNING;
         // should launch a seed guy
-        keepAliveThread = new Thread(new KeepAliveThread());
+        Thread keepAliveThread = new Thread(new KeepAliveThread());
         keepAliveThread.start();
         seed.start();
 
@@ -221,7 +219,7 @@ public class ClientImpl implements Client {
     }
 
     private void openClientSocket() throws IOException {
-        socketToServer = new Socket(host, hostPort);
+        Socket socketToServer = new Socket(host, hostPort);
         netOut = new DataOutputStream(socketToServer.getOutputStream());
         netIn = new DataInputStream(socketToServer.getInputStream());
     }

@@ -85,7 +85,7 @@ public class ClientProtocolImpl implements ClientProtocol {
     public List<Integer> readStatResponse(DataInputStream input) throws IOException {
         int count = input.readInt();
         List<Integer> retVal = new ArrayList<>();
-        for (int i = 0; i < count; ++i){
+        for (int i = 0; i < count; ++i) {
             retVal.add(input.readInt());
         }
         return retVal;

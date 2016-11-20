@@ -1,23 +1,16 @@
 package ru.spbau.mit.TorrentClient.TorrentFile;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.*;
-import org.junit.rules.TemporaryFolder;
 import ru.spbau.mit.Common.WithFileManager;
 import ru.spbau.mit.Protocol.RemoteFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class FileManagerMultiStressTest {
 
@@ -35,7 +28,8 @@ public class FileManagerMultiStressTest {
         int part;
         byte[] res;
         int length;
-        Reads(int part, byte[] res, int length){
+
+        Reads(int part, byte[] res, int length) {
             this.part = part;
             this.res = res;
             this.length = length;
@@ -64,7 +58,7 @@ public class FileManagerMultiStressTest {
         reference.add(new Reads(i, buf, length));
     }
 
-    public class Reader implements Runnable{
+    public class Reader implements Runnable {
 
         CountDownLatch latch = null;
         int id = 0;
@@ -131,12 +125,12 @@ public class FileManagerMultiStressTest {
         exec.shutdownNow();
 
         int i = 0;
-        for (List<Reads> lst : threadResults.values()){
+        for (List<Reads> lst : threadResults.values()) {
             System.out.print(i);
             System.out.print(": ");
             i++;
             int j = 0;
-            for (Reads r : lst){
+            for (Reads r : lst) {
                 j++;
                 Assert.assertArrayEquals(reference.get(r.part).res, r.res);
             }
@@ -145,7 +139,7 @@ public class FileManagerMultiStressTest {
     }
 
     private void populateQueue() {
-        for (int i : fm.getTorrentFile(fileId).getParts()){
+        for (int i : fm.getTorrentFile(fileId).getParts()) {
             for (int j = 0; j < 20; ++j) {
                 queue.add(i);
             }

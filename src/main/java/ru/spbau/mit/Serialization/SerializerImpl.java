@@ -1,7 +1,5 @@
 package ru.spbau.mit.Serialization;
 
-import ru.spbau.mit.TorrentClient.TorrentFile.FileManager;
-
 import java.io.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;

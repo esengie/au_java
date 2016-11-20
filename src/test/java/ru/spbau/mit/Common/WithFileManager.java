@@ -12,7 +12,7 @@ public class WithFileManager extends TemporaryFolder {
     File resources;
     public File curDir;
 
-    public WithFileManager(File resources){
+    public WithFileManager(File resources) {
         this.resources = resources;
     }
 
@@ -25,13 +25,13 @@ public class WithFileManager extends TemporaryFolder {
         fm = new FileManager(curDir);
         FileUtils.copyDirectory(resources, curDir);
         int i = 0;
-        for (File f : curDir.listFiles()){
+        for (File f : curDir.listFiles()) {
             fm.addTorrentFile(f, new RemoteFile(i, f.getName(), f.length()));
             ++i;
         }
     }
 
-    public FileManager getFileManager(){
+    public FileManager getFileManager() {
         return fm;
     }
 

@@ -15,7 +15,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class SeedProtocolImpl implements SeedProtocol {
-    private static  final Logger logger = Logger.getLogger(SeedProtocol.class.getName());
+    private static final Logger logger = Logger.getLogger(SeedProtocol.class.getName());
+
     @Override
     public void formResponse(DataInputStream in, DataOutputStream out, FileManager manager) throws IOException {
         int request = in.readByte();
@@ -36,12 +37,12 @@ public class SeedProtocolImpl implements SeedProtocol {
      * Parts are stored using the TorrentFileLocal classes
      *
      * @param fileId - the id given by server
-     * @param out - output stream
+     * @param out    - output stream
      * @throws IOException - if the stream provided throws the function throws
      */
     private void formStatResponse(int fileId, DataOutputStream out, FileManager manager) throws IOException {
         TorrentFileLocal f = manager.getTorrentFile(fileId);
-        if (f == null){
+        if (f == null) {
             out.writeInt(0);
             return;
         }

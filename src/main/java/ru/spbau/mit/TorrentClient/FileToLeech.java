@@ -4,11 +4,9 @@ import ru.spbau.mit.TorrentClient.TorrentFile.TorrentFileLocal;
 
 import java.net.InetSocketAddress;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 class FileToLeech {
