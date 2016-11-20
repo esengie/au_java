@@ -14,6 +14,11 @@ import java.nio.file.NotDirectoryException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * The class that manages all the files and their parts stored on a client
+ *
+ * Multithreaded access to parts of files and serialization of state
+ */
 public class FileManager {
     private Map<Integer, TorrentFileLocal> files = new ConcurrentHashMap<>();
     private final File saveDir;

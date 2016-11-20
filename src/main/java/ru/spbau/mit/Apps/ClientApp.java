@@ -49,6 +49,7 @@ public class ClientApp {
             client.connect(cmd.getOptionValue(TRACKER_ADDR_ARG_NAME));
 
             List<RemoteFile> lastList = new ArrayList<>();
+            usage();
             while (!client.isStopped()) {
                 try {
                     String[] cmdArg = getUserInput().split(" ");
@@ -63,6 +64,7 @@ public class ClientApp {
                         case "get": {
                             if (cmdArg.length < 2) {
                                 System.out.println("get needs more args");
+                                usage();
                                 continue;
                             }
                             int id = Integer.parseInt(cmdArg[1]);
@@ -84,16 +86,18 @@ public class ClientApp {
                         case "sources": {
                             if (cmdArg.length < 2) {
                                 System.out.println("sources needs more args");
+                                usage();
                                 continue;
                             }
                             int id = Integer.parseInt(cmdArg[1]);
                             List<InetSocketAddress> lst = client.executeSources(id);
-                            lst.forEach(it -> System.out.println(it));
+                            lst.forEach(System.out::println);
                             break;
                         }
                         case "upload": {
                             if (cmdArg.length < 2) {
                                 System.out.println("upload needs more args");
+                                usage();
                                 continue;
                             }
                             File f = new File(cmdArg[1]);
@@ -110,15 +114,25 @@ public class ClientApp {
                             break;
                         }
                         default:
-                            System.out.println("Unknown command, supported: q, upload filepath, get id, list ...");
+                            System.out.println("Unknown command");
+                            usage();
                     }
-                } catch (Exception e) {
+                } catch (NumberFormatException | IOException e) {
                     System.out.println(String.format("error: %s", e.getMessage()));
                 }
             }
         } catch (ParseException | IOException e) {
             System.out.println(e.getMessage());
+            launchUsage();
         }
+    }
+
+    private static void usage(){
+        System.out.println("Usage:\n list, get fileID [dirToSave], source fileID, upload filePath, q");
+    }
+
+    private static void launchUsage(){
+        System.out.println("Usage for launching:\n -port mySeedPort\n -stateDir whereToSaveState\n -tracker hostName");
     }
 
     private static String getUserInput() {

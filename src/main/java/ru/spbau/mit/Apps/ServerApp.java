@@ -7,9 +7,7 @@ import ru.spbau.mit.TorrentServer.TorrentIOException;
 import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
-import java.util.logging.Handler;
 import java.util.logging.Level;
-import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 public class ServerApp {
@@ -25,17 +23,20 @@ public class ServerApp {
                 return;
             }
             if (args.length > 1)
-                throw new IOException("Too many args specified");
+                throw new IllegalArgumentException("Too many args specified");
             File config = new File(args[0]);
             s.start(config);
             runServer(s);
+        } catch (IllegalArgumentException e) {
+            logger.log(Level.INFO, e.getMessage());
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            logger.log(Level.SEVERE, e.getMessage());
         }
     }
 
     private static void runServer(Server s) throws TorrentIOException {
-        while (!getUserInput().equals("q")){ }
+        while (!getUserInput().equals("q")) {
+        }
         s.stop();
     }
 

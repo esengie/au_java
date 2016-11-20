@@ -29,8 +29,6 @@ public class ServerImpl implements Server {
     public static final int PORT_NUMBER = 8081;
     private ServerSocket serverSocket = null;
     private volatile ServiceState serverState = ServiceState.PREINIT;
-    private Thread serverThread = null;
-    private Thread garbageCollectorThread = null;
 
     private ExecutorService threadPool = Executors.newFixedThreadPool(10);
 
@@ -95,9 +93,9 @@ public class ServerImpl implements Server {
             throw new TorrentIOException("Couldn't load the state of the server", e);
         }
         openServerSocket();
-        serverThread = new Thread(new ServerThread());
+        Thread serverThread = new Thread(new ServerThread());
         serverThread.start();
-        garbageCollectorThread = new Thread(new GarbageCollectorThread());
+        Thread garbageCollectorThread = new Thread(new GarbageCollectorThread());
         garbageCollectorThread.start();
         serverState = ServiceState.RUNNING;
     }

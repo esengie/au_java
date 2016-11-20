@@ -9,6 +9,10 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.util.List;
 
+/**
+ * Perform all the client protocol requests from here:
+ * http://hwproj.me/tasks/5785
+ */
 public interface ClientProtocol {
     void sendListRequest(DataOutputStream output) throws IOException;
     List<RemoteFile> readListResponse(DataInputStream input) throws IOException;
