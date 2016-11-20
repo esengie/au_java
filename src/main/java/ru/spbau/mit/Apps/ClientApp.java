@@ -30,16 +30,9 @@ public class ClientApp {
         OPTIONS.addOption(TRACKER_ADDR_ARG_NAME, true, "tracker location");
     }
 
-    public static void main(String[] args2) {
-        // For debugging purposes only
-        Logger log = LogManager.getLogManager().getLogger("");
-        for (Handler h : log.getHandlers()) {
-            h.setLevel(Level.FINE);
-        }
-        log.setLevel(Level.FINE);
-
+    public static void main(String[] args) {
         try {
-            String[] args = {"-port", "8002", "-stateDir", ".", "-tracker", "localhost"};
+//            String[] args = {"-port", "8002", "-stateDir", ".", "-tracker", "localhost"};
             CommandLine cmd = parseArgs(args);
 
             Short port = Short.parseShort(cmd.getOptionValue(PORT_ARG_NAME));
