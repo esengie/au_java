@@ -3,6 +3,7 @@ package ru.spbau.mit.Protocol.Client;
 import ru.spbau.mit.Protocol.Exceptions.BadInputException;
 import ru.spbau.mit.Protocol.Exceptions.ClientDirectoryException;
 import ru.spbau.mit.Protocol.RemoteFile;
+import ru.spbau.mit.Protocol.SeedRequestID;
 import ru.spbau.mit.TorrentClient.TorrentFile.FileManager;
 import ru.spbau.mit.TorrentClient.TorrentFile.TorrentFileLocal;
 
@@ -19,18 +20,22 @@ public class SeedProtocolImpl implements SeedProtocol {
 
     @Override
     public void formResponse(DataInputStream in, DataOutputStream out, FileManager manager) throws IOException {
-        int request = in.readByte();
+        int requestID = in.readByte();
+        SeedRequestID request = SeedRequestID.fromInt(requestID);
         switch (request) {
-            case 1:
+            case STAT:
                 logger.log(Level.FINE, "Serving stat request");
                 formStatResponse(in.readInt(), out, manager);
                 return;
-            case 2:
+            case GET:
                 logger.log(Level.FINE, "Serving get request");
                 formGetResponse(in.readInt(), in.readInt(), out, manager);
                 return;
+            case ERROR:
+                logger.log(Level.SEVERE, MessageFormat.format("Unknown Command {0}", requestID));
+                throw new BadInputException(MessageFormat.format("Unknown Command {0}", requestID));
         }
-        throw new BadInputException(MessageFormat.format("Unknown Command {0}", request));
+        throw new BadInputException(MessageFormat.format("Unknown Command {0}", requestID));
     }
 
     /**

@@ -1,6 +1,8 @@
 package ru.spbau.mit.Protocol.Client;
 
 import ru.spbau.mit.Protocol.RemoteFile;
+import ru.spbau.mit.Protocol.SeedRequestID;
+import ru.spbau.mit.Protocol.ServerRequestID;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -14,7 +16,7 @@ public class ClientProtocolImpl implements ClientProtocol {
 
     @Override
     public void sendListRequest(DataOutputStream output) throws IOException {
-        output.writeByte(1);
+        output.writeByte(ServerRequestID.LIST.getValue());
     }
 
     @Override
@@ -29,7 +31,7 @@ public class ClientProtocolImpl implements ClientProtocol {
 
     @Override
     public void sendUploadRequest(DataOutputStream output, String name, long size) throws IOException {
-        output.writeByte(2);
+        output.writeByte(ServerRequestID.UPLOAD.getValue());
         output.writeUTF(name);
         output.writeLong(size);
     }
@@ -41,7 +43,7 @@ public class ClientProtocolImpl implements ClientProtocol {
 
     @Override
     public void sendSourcesRequest(DataOutputStream output, int fileId) throws IOException {
-        output.writeByte(3);
+        output.writeByte(ServerRequestID.SOURCES.getValue());
         output.writeInt(fileId);
     }
 
@@ -62,7 +64,7 @@ public class ClientProtocolImpl implements ClientProtocol {
 
     @Override
     public void sendUpdateRequest(DataOutputStream output, short port, List<Integer> seedingFileIds) throws IOException {
-        output.writeByte(4);
+        output.writeByte(ServerRequestID.UPDATE.getValue());
         output.writeShort(port);
         output.writeInt(seedingFileIds.size());
         for (int id : seedingFileIds) {
@@ -77,7 +79,7 @@ public class ClientProtocolImpl implements ClientProtocol {
 
     @Override
     public void sendStatRequest(DataOutputStream output, int fileId) throws IOException {
-        output.writeByte(1);
+        output.writeByte(SeedRequestID.STAT.getValue());
         output.writeInt(fileId);
     }
 
@@ -93,7 +95,7 @@ public class ClientProtocolImpl implements ClientProtocol {
 
     @Override
     public void sendGetRequest(DataOutputStream output, int fileId, int part) throws IOException {
-        output.writeByte(2);
+        output.writeByte(SeedRequestID.GET.getValue());
         output.writeInt(fileId);
         output.writeInt(part);
     }
