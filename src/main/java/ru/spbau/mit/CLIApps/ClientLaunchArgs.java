@@ -1,11 +1,11 @@
-package ru.spbau.mit.Apps;
+package ru.spbau.mit.CLIApps;
 
 import org.apache.commons.cli.*;
 
-class ClientLaunchArgs {
-    static final String PORT_ARG_NAME = "port";
-    static final String STATE_DIR_ARG_NAME = "stateDir";
-    static final String TRACKER_ADDR_ARG_NAME = "tracker";
+public class ClientLaunchArgs {
+    public static final String PORT_ARG_NAME = "port";
+    public static final String STATE_DIR_ARG_NAME = "stateDir";
+    public static final String TRACKER_ADDR_ARG_NAME = "tracker";
     private static final Options OPTIONS = new Options();
 
     static {
@@ -14,11 +14,11 @@ class ClientLaunchArgs {
         OPTIONS.addOption(TRACKER_ADDR_ARG_NAME, true, "tracker location");
     }
 
-    static void launchUsage() {
+    public static void launchUsage() {
         System.out.println("Usage for launching:\n -port mySeedPort\n -stateDir whereToSaveState\n -tracker hostName");
     }
 
-    static CommandLine parseArgs(String[] args) throws ParseException {
+    public static CommandLine parseArgs(String[] args) throws ParseException {
         CommandLineParser parser = new DefaultParser();
         CommandLine cmdLine = parser.parse(OPTIONS, args);
 

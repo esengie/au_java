@@ -1,4 +1,4 @@
-package ru.spbau.mit.Apps;
+package ru.spbau.mit.CLIApps;
 
 import ru.spbau.mit.TorrentServer.TorrentServer;
 import ru.spbau.mit.TorrentServer.TorrentServerImpl;

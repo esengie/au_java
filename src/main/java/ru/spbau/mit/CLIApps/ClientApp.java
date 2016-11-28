@@ -1,4 +1,4 @@
-package ru.spbau.mit.Apps;
+package ru.spbau.mit.CLIApps;
 
 import org.apache.commons.cli.*;
 import ru.spbau.mit.Protocol.RemoteFile;

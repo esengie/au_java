@@ -10,20 +10,17 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<SplitPane dividerPositions="0.33444816053511706" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.76-ea" xmlns:fx="http://javafx.com/fxml/1">
+<SplitPane dividerPositions="0.33444816053511706" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.76-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.spbau.mit.GUI.ClientAppG">
   <items>
     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
          <children>
             <VBox layoutX="-5.0" layoutY="-2.0" prefHeight="398.0" prefWidth="295.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
-                  <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="29.0" prefWidth="205.0" text="Upload" VBox.vgrow="NEVER" />
+                  <Button fx:id="uploadBtn" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="29.0" prefWidth="205.0" text="Upload" VBox.vgrow="NEVER" />
                   <TextField editable="false" text="On server:" />
                   <ScrollPane fitToHeight="true" fitToWidth="true" maxWidth="1.7976931348623157E308" prefHeight="389.0" prefWidth="196.0" VBox.vgrow="ALWAYS">
                      <content>
-                        <VBox maxWidth="1.7976931348623157E308" prefHeight="362.0" prefWidth="193.0">
-                           <children>
-                              <TextField editable="false" maxWidth="1.7976931348623157E308" />
-                           </children></VBox>
+                        <VBox fx:id="serverFiles" maxWidth="1.7976931348623157E308" prefHeight="362.0" prefWidth="193.0" />
                      </content>
                   </ScrollPane>
                </children>
@@ -36,9 +33,9 @@
                   <TextField editable="false" text="Downloading and seeding:" />
                   <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" VBox.vgrow="ALWAYS">
                      <content>
-                        <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="398.0" prefWidth="377.0">
+                        <VBox fx:id="downloading" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="398.0" prefWidth="377.0">
                            <children>
-                              <HBox maxWidth="1.7976931348623157E308" prefHeight="26.0" prefWidth="295.0" VBox.vgrow="NEVER">
+                              <HBox fx:id="downloadingHBox" maxWidth="1.7976931348623157E308" prefHeight="26.0" prefWidth="295.0" VBox.vgrow="NEVER">
                                  <children>
                                     <TextField editable="false" maxWidth="1.7976931348623157E308" prefHeight="26.0" prefWidth="220.0" HBox.hgrow="ALWAYS" />
                                     <ProgressBar prefHeight="26.0" prefWidth="159.0" progress="0.0" HBox.hgrow="ALWAYS" />
