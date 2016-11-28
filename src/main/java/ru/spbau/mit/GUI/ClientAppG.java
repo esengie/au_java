@@ -31,9 +31,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class ClientAppG extends Application {
+    private static final Logger logger = Logger.getLogger(ClientAppG.class.getName());
     private static FileManager fileManager;
     private static TorrentClient client;
     private static Thread lister;
@@ -80,6 +83,7 @@ public class ClientAppG extends Application {
             primaryStage.setTitle("Torrent Client");
             primaryStage.show();
         } catch (IOException e) {
+            logger.log(Level.WARNING, e.toString());
             showException(e);
         }
     }
@@ -100,6 +104,7 @@ public class ClientAppG extends Application {
                 addToDownloadingList(rf, fileManager.getTorrentFile(rf.id));
             } catch (IOException e) {
                 showException(e);
+                logger.log(Level.SEVERE, e.toString());
                 break;
             }
         }
@@ -118,6 +123,7 @@ public class ClientAppG extends Application {
             }
             return remoteLst;
         } catch (IOException e) {
+            logger.log(Level.WARNING, e.toString());
             showException(e);
         }
         return new ArrayList<>();
@@ -144,8 +150,10 @@ public class ClientAppG extends Application {
 
     private void getFile(RemoteFile remote, File dir) {
         try {
-            addToDownloadingList(remote, client.executeGet(dir, remote));
+            if (fileManager.getTorrentFile(remote.id) == null)
+                addToDownloadingList(remote, client.executeGet(dir, remote));
         } catch (IOException e) {
+            logger.log(Level.SEVERE, e.toString());
             showException(e);
         }
     }
