@@ -129,7 +129,7 @@ public class TorrentFileLocal extends Observable {
 
     public double percent() {
         try {
-            return parts.size() * 100 / totalParts();
+            return parts.size() * 1.0 / totalParts();
         } catch (IOException e) {
             throw new IllegalStateException("Shouldn't be here");
         }
