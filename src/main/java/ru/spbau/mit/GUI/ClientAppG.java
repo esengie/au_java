@@ -150,8 +150,13 @@ public class ClientAppG extends Application {
 
     private void getFile(RemoteFile remote, File dir) {
         try {
-            if (fileManager.getTorrentFile(remote.id) == null)
+            TorrentFileLocal tf = fileManager.getTorrentFile(remote.id);
+            if (tf == null) {
                 addToDownloadingList(remote, client.executeGet(dir, remote));
+            }
+            if (tf != null && tf.getParts().size() != tf.totalParts()) {
+                client.executeGet(dir, remote);
+            }
         } catch (IOException e) {
             logger.log(Level.SEVERE, e.toString());
             showException(e);

@@ -93,7 +93,7 @@ public class TorrentFileLocal extends Observable {
         notifyObservers(percent());
     }
 
-    int totalParts() throws IOException {
+    public int totalParts() throws IOException {
         return (int) (((descriptor.length() - 1) + (long) RemoteFile.PART_SIZE) / (long) RemoteFile.PART_SIZE);
     }
 
