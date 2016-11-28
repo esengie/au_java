@@ -1,7 +1,7 @@
 package ru.spbau.mit.Apps;
 
-import ru.spbau.mit.TorrentServer.Server;
-import ru.spbau.mit.TorrentServer.ServerImpl;
+import ru.spbau.mit.TorrentServer.TorrentServer;
+import ru.spbau.mit.TorrentServer.TorrentServerImpl;
 import ru.spbau.mit.TorrentServer.TorrentIOException;
 
 import java.io.File;
@@ -15,7 +15,7 @@ public class ServerApp {
 
     public static void main(String[] args) {
         logger.log(Level.FINE, "Starting the server on port 8081");
-        Server s = new ServerImpl();
+        TorrentServer s = new TorrentServerImpl();
         try {
             if (args.length < 1) {
                 s.start(new File(".").getAbsoluteFile());
@@ -34,7 +34,7 @@ public class ServerApp {
         }
     }
 
-    private static void runServer(Server s) throws TorrentIOException {
+    private static void runServer(TorrentServer s) throws TorrentIOException {
         while (!getUserInput().equals("q")) {
         }
         s.stop();

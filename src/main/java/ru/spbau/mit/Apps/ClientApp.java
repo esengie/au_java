@@ -2,8 +2,8 @@ package ru.spbau.mit.Apps;
 
 import org.apache.commons.cli.*;
 import ru.spbau.mit.Protocol.RemoteFile;
-import ru.spbau.mit.TorrentClient.Client;
-import ru.spbau.mit.TorrentClient.ClientImpl;
+import ru.spbau.mit.TorrentClient.TorrentClient;
+import ru.spbau.mit.TorrentClient.TorrentClientImpl;
 import ru.spbau.mit.TorrentClient.TorrentFile.FileManager;
 
 import java.io.File;
@@ -13,22 +13,19 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
 
 public class ClientApp {
 
-    public static void main(String[] args) {
+    public static void main(String[] args2) {
         try {
+            String[] args = {"-port", "8012", "-stateDir", ".", "-tracker", "localhost"};
             CommandLine cmd = ClientLaunchArgs.parseArgs(args);
 
             Short port = Short.parseShort(cmd.getOptionValue(ClientLaunchArgs.PORT_ARG_NAME));
 
             FileManager fileManager = new FileManager(new File(
                     cmd.getOptionValue(ClientLaunchArgs.STATE_DIR_ARG_NAME)));
-            Client client = new ClientImpl(fileManager, port);
+            TorrentClient client = new TorrentClientImpl(fileManager, port);
 
             client.connect(cmd.getOptionValue(ClientLaunchArgs.TRACKER_ADDR_ARG_NAME));
 

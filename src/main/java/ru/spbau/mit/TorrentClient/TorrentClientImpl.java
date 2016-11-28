@@ -7,7 +7,7 @@ import ru.spbau.mit.Protocol.RemoteFile;
 import ru.spbau.mit.Protocol.ServiceState;
 import ru.spbau.mit.TorrentClient.TorrentFile.FileManager;
 import ru.spbau.mit.TorrentClient.TorrentFile.TorrentFileLocal;
-import ru.spbau.mit.TorrentServer.ServerImpl;
+import ru.spbau.mit.TorrentServer.TorrentServerImpl;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -24,13 +24,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public class ClientImpl implements Client {
-    private static final Logger logger = Logger.getLogger(ClientImpl.class.getName());
+public class TorrentClientImpl implements TorrentClient {
+    private static final Logger logger = Logger.getLogger(TorrentClientImpl.class.getName());
 
     private volatile ServiceState clientState = ServiceState.PREINIT;
     private static final int NUM_THREADS = 10;
 
     private final FileManager fileManager;
+    private Thread keepAliveThread = new Thread(new KeepAliveThread());
     private final ClientProtocol protocol = new ClientProtocolImpl();
     private DataOutputStream netOut = null;
     private DataInputStream netIn = null;
@@ -44,16 +45,16 @@ public class ClientImpl implements Client {
 
     private final ExecutorService leeches = Executors.newFixedThreadPool(NUM_THREADS);
 
-    private final Seed seed;
+    private final TorrentSeed seed;
     private String host;
     private short hostPort;
     private final short seedPort;
 
 
-    public ClientImpl(FileManager fm, short port) throws IOException {
+    public TorrentClientImpl(FileManager fm, short port) throws IOException {
         seedPort = port;
         fileManager = fm;
-        seed = new Seed(port, fm);
+        seed = new TorrentSeed(port, fm);
     }
 
     public boolean isStopped() {
@@ -78,8 +79,10 @@ public class ClientImpl implements Client {
 
                     aliveIn.close();
                     Thread.sleep(ProtocolConstants.SEED_UPDATER_FREQUENCY_MILLIS);
-                } catch (InterruptedException | IOException e) {
+                } catch (IOException e) {
                     logger.log(Level.SEVERE, "Keep alive thread is dead", e);
+                } catch (InterruptedException e){
+                    // this is okay
                 }
             }
         }
@@ -169,10 +172,10 @@ public class ClientImpl implements Client {
                         }
                         leechQueue.add(fp);
 
-                        logger.log(Level.FINE, "Seed dead again", e);
+                        logger.log(Level.WARNING, "TorrentSeed dead again", e);
                     }
                 } catch (InterruptedException e) {
-                    logger.log(Level.WARNING, "Was interrupted", e);
+                    logger.log(Level.FINE, "Was interrupted", e);
                 }
             }
         }
@@ -206,10 +209,9 @@ public class ClientImpl implements Client {
         if (clientState != ServiceState.PREINIT)
             return;
         host = hostName;
-        hostPort = ServerImpl.PORT_NUMBER;
+        hostPort = TorrentServerImpl.PORT_NUMBER;
         clientState = ServiceState.RUNNING;
         // should launch a seed guy
-        Thread keepAliveThread = new Thread(new KeepAliveThread());
         keepAliveThread.start();
         seed.start();
 
@@ -229,13 +231,9 @@ public class ClientImpl implements Client {
         if (isStopped())
             return;
         clientState = ServiceState.STOPPED;
+        keepAliveThread.interrupt();
         seed.stop();
-        try {
-            leeches.awaitTermination(5, TimeUnit.SECONDS);
-            leeches.shutdownNow();
-        } catch (InterruptedException e) {
-            logger.log(Level.SEVERE, "Interrupted disconnect", e);
-        }
+        leeches.shutdownNow();
     }
 
     @Override
@@ -244,7 +242,9 @@ public class ClientImpl implements Client {
             return null;
         openClientSocket();
         protocol.sendListRequest(netOut);
-        return protocol.readListResponse(netIn);
+        List<RemoteFile> lst = protocol.readListResponse(netIn);
+        netIn.close();
+        return lst;
     }
 
     @Override
@@ -255,6 +255,7 @@ public class ClientImpl implements Client {
         protocol.sendUploadRequest(netOut, file.getName(), file.length());
         RemoteFile f = new RemoteFile(protocol.readUploadResponse(netIn),
                 file.getName(), file.length());
+        netIn.close();
         fileManager.addTorrentFile(file, f);
         return f;
     }
@@ -263,9 +264,12 @@ public class ClientImpl implements Client {
     public List<InetSocketAddress> executeSources(int fileId) throws IOException {
         if (isStopped())
             return null;
-        openClientSocket();
-        protocol.sendSourcesRequest(netOut, fileId);
-        filesToSeeds.put(fileId, protocol.readSourcesResponse(netIn));
+        Socket socketToServer = new Socket(host, hostPort);
+        DataOutputStream out = new DataOutputStream(socketToServer.getOutputStream());
+        DataInputStream in = new DataInputStream(socketToServer.getInputStream());
+        protocol.sendSourcesRequest(out, fileId);
+        filesToSeeds.put(fileId, protocol.readSourcesResponse(in));
+        in.close();
         return filesToSeeds.get(fileId);
     }
 

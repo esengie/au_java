@@ -9,7 +9,7 @@ import java.io.IOException;
  * <p>
  * Also needs to be able to save the file ids between launches
  */
-public interface Server {
+public interface TorrentServer {
     void start(File saveDir) throws IOException;
 
     void stop() throws TorrentIOException;

@@ -1,19 +1,30 @@
 package ru.spbau.mit.Common;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.junit.rules.TemporaryFolder;
 import ru.spbau.mit.Protocol.RemoteFile;
 import ru.spbau.mit.TorrentClient.TorrentFile.FileManager;
 
 import java.io.File;
 
+/**
+ * Creates a directory under the filemanager
+ */
 public class WithFileManager extends TemporaryFolder {
-    FileManager fm;
-    File resources;
+    private final boolean populate;
+    private FileManager fm;
+    private File resources;
     public File curDir;
 
     public WithFileManager(File resources) {
         this.resources = resources;
+        populate = true;
+    }
+
+    public WithFileManager(File resources, boolean populate) {
+        this.resources = resources;
+        this.populate = populate;
     }
 
     @Override
@@ -24,10 +35,12 @@ public class WithFileManager extends TemporaryFolder {
         FileUtils.deleteDirectory(tmp);
         fm = new FileManager(curDir);
         FileUtils.copyDirectory(resources, curDir);
-        int i = 0;
-        for (File f : curDir.listFiles()) {
-            fm.addTorrentFile(f, new RemoteFile(i, f.getName(), f.length()));
-            ++i;
+        if (populate) {
+            int i = 0;
+            for (File f : curDir.listFiles()) {
+                fm.addTorrentFile(f, new RemoteFile(i, f.getName(), f.length()));
+                ++i;
+            }
         }
     }
 

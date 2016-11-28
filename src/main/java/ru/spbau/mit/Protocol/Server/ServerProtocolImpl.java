@@ -3,6 +3,7 @@ package ru.spbau.mit.Protocol.Server;
 import ru.spbau.mit.Protocol.Exceptions.BadInputException;
 import ru.spbau.mit.Protocol.Exceptions.ServerDirectoryException;
 import ru.spbau.mit.Protocol.RemoteFile;
+import ru.spbau.mit.Protocol.ServerRequestID;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -29,23 +30,26 @@ public class ServerProtocolImpl implements ServerProtocol {
 
     @Override
     public int formResponse(DataInputStream in, DataOutputStream out, InetAddress client) throws IOException {
-        int request = in.readByte();
+        ServerRequestID request = ServerRequestID.fromInt(in.readByte());
         switch (request) {
-            case 1:
+            case LIST:
                 logger.log(Level.FINE, "Serving list request");
                 formListResponse(out);
                 return -1;
-            case 2:
+            case UPLOAD:
                 logger.log(Level.FINE, "Serving upload request");
                 formUploadResponse(in.readUTF(), in.readLong(), out);
                 return -1;
-            case 3:
+            case SOURCES:
                 logger.log(Level.FINE, "Serving sources request");
                 formSourcesResponse(in.readInt(), out);
                 return -1;
-            case 4:
+            case UPDATE:
                 logger.log(Level.FINE, "Serving update request");
                 return formUpdateResponse(in, out, client);
+            case ERROR:
+                logger.log(Level.SEVERE, "Unknown request");
+                throw new BadInputException(MessageFormat.format("Unknown Command {0}", request));
         }
         throw new BadInputException(MessageFormat.format("Unknown Command {0}", request));
     }
@@ -78,13 +82,8 @@ public class ServerProtocolImpl implements ServerProtocol {
     }
 
     private void formSourcesResponse(int fileId, DataOutputStream out) throws IOException {
-        if (!fileToSeedIPs.containsKey(fileId)) {
-            out.writeInt(0);
-            return;
-        }
-
         Set<InetSocketAddress> ips;
-        ips = new HashSet<>(fileToSeedIPs.get(fileId));
+        ips = new HashSet<>(fileToSeedIPs.getOrDefault(fileId, new HashSet<>()));
 
         out.writeInt(ips.size());
         for (InetSocketAddress ip : ips) {
