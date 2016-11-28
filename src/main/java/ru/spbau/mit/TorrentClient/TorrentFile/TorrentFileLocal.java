@@ -9,12 +9,13 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.HashSet;
+import java.util.Observable;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class TorrentFileLocal {
+public class TorrentFileLocal extends Observable {
     private static final Logger logger = Logger.getLogger(FileManager.class.getName());
 
     private final String mode = "rwd";
@@ -59,8 +60,7 @@ public class TorrentFileLocal {
      * @param filepath path to file
      */
     TorrentFileLocal(File filepath) throws IOException {
-
-        int totalParts = 0;
+        int totalParts;
         try {
             descriptor = new RandomAccessFile(filepath, mode);
             totalParts = totalParts();
@@ -89,9 +89,11 @@ public class TorrentFileLocal {
         descriptor.seek(part * RemoteFile.PART_SIZE);
         descriptor.write(buf, 0, partSize(part));
         parts.add(part);
+        setChanged();
+        notifyObservers(percent());
     }
 
-    public int totalParts() throws IOException {
+    int totalParts() throws IOException {
         return (int) (((descriptor.length() - 1) + (long) RemoteFile.PART_SIZE) / (long) RemoteFile.PART_SIZE);
     }
 
@@ -123,5 +125,13 @@ public class TorrentFileLocal {
 
     public File getFile() {
         return localFile;
+    }
+
+    public double percent() {
+        try {
+            return parts.size() * 100 / totalParts();
+        } catch (IOException e) {
+            throw new IllegalStateException("Shouldn't be here");
+        }
     }
 }
