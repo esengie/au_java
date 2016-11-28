@@ -82,13 +82,8 @@ public class ServerProtocolImpl implements ServerProtocol {
     }
 
     private void formSourcesResponse(int fileId, DataOutputStream out) throws IOException {
-        if (!fileToSeedIPs.containsKey(fileId)) {
-            out.writeInt(0);
-            return;
-        }
-
         Set<InetSocketAddress> ips;
-        ips = new HashSet<>(fileToSeedIPs.get(fileId));
+        ips = new HashSet<>(fileToSeedIPs.getOrDefault(fileId, new HashSet<>()));
 
         out.writeInt(ips.size());
         for (InetSocketAddress ip : ips) {
