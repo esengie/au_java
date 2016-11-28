@@ -20,8 +20,8 @@ import java.util.logging.Logger;
 /**
  * Does the job of a seed, basically implements the SeedProtocol
  */
-class Seed {
-    private static final Logger logger = Logger.getLogger(Seed.class.getName());
+class TorrentSeed {
+    private static final Logger logger = Logger.getLogger(TorrentSeed.class.getName());
 
     private ServerSocket serverSocket = null;
     private volatile ServiceState clientState = ServiceState.PREINIT;
@@ -33,7 +33,7 @@ class Seed {
     private final FileManager fileManager;
     private InetSocketAddress mySocketAddress;
 
-    Seed(short port, FileManager fileManager) {
+    TorrentSeed(short port, FileManager fileManager) {
         seedPort = port;
         this.fileManager = fileManager;
         mySocketAddress = new InetSocketAddress("127.0.0.1", seedPort);
@@ -47,16 +47,15 @@ class Seed {
         @Override
         public void run() {
             while (!isStopped()) {
-                Socket clientSocket = null;
                 try {
-                    clientSocket = serverSocket.accept();
+                    Socket clientSocket = serverSocket.accept();
+                    threadPool.execute(new WorkerRunnable(clientSocket));
                 } catch (IOException e) {
                     if (isStopped()) {
                         continue;
                     }
                     logger.log(Level.SEVERE, "Couldn't accept a leech", e);
                 }
-                threadPool.execute(new WorkerRunnable(clientSocket));
             }
             threadPool.shutdown();
         }
@@ -96,7 +95,7 @@ class Seed {
     }
 
     private class WorkerRunnable implements Runnable {
-        Logger logger = Logger.getLogger(Seed.class.getName());
+        Logger logger = Logger.getLogger(TorrentSeed.class.getName());
 
         private Socket clientSocket;
         private DataOutputStream netOut;
@@ -114,7 +113,7 @@ class Seed {
                 netOut.close();
                 netIn.close();
             } catch (IOException e) {
-                logger.log(Level.SEVERE, "Client handler error", e);
+                logger.log(Level.SEVERE, "TorrentClient handler error", e);
             }
         }
     }

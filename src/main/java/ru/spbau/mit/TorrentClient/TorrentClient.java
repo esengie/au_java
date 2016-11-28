@@ -13,12 +13,12 @@ import java.util.List;
  * Peer: can poll the server using the ClientProtocol,
  * can poll the seed using SeedProtocol part of the ClientProtocol.
  * <p>
- * Seed: updates the server each 5 minutes, can handle qet requests and stat requests
+ * TorrentSeed: updates the server each 5 minutes, can handle qet requests and stat requests
  * - return number of parts it has.
  * <p>
  * The class serializes self (remembers the state of files downloaded)
  */
-public interface Client {
+public interface TorrentClient {
     void connect(String hostName) throws IOException;
 
     void disconnect() throws IOException;

@@ -22,9 +22,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public class ServerImpl implements Server {
+public class TorrentServerImpl implements TorrentServer {
 
-    private static final Logger logger = Logger.getLogger(ServerImpl.class.getName());
+    private static final Logger logger = Logger.getLogger(TorrentServerImpl.class.getName());
 
     public static final int PORT_NUMBER = 8081;
     private ServerSocket serverSocket = null;
@@ -116,7 +116,7 @@ public class ServerImpl implements Server {
 
     private void openServerSocket() throws TorrentIOException {
         try {
-            serverSocket = new ServerSocket(ServerImpl.PORT_NUMBER);
+            serverSocket = new ServerSocket(TorrentServerImpl.PORT_NUMBER);
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Cannot open port 8081", e);
             throw new TorrentIOException("Cannot open port 8081", e);
@@ -157,7 +157,7 @@ public class ServerImpl implements Server {
                             time);
                 }
             } catch (IOException e) {
-                logger.log(Level.SEVERE, "Client handler error", e);
+                logger.log(Level.SEVERE, "TorrentClient handler error", e);
             }
         }
     }
