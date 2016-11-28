@@ -70,13 +70,13 @@ public class TorrentClientImplTest {
         assertEquals(1, cl2.executeList().size());
     }
 
-    @Test
+    @Test(timeout = 20000)
     public void executeGet() throws Exception {
         cl1.executeUpload(new File(cDir1.curDir, largeBin));
         cl2.executeGet(cDir2.curDir, cl2.executeList().get(0));
-        Thread.sleep(10000);
-
-        TestCase.assertEquals(fm1.getTorrentFile(0).getParts(), fm2.getTorrentFile(0).getParts());
+        while(!fm1.getTorrentFile(0).getParts().equals(fm2.getTorrentFile(0).getParts())){
+            ;
+        }
         assertTrue(FileUtils.contentEquals(new File(cDir1.curDir, largeBin),
                 new File(cDir2.curDir, largeBin)));
     }
