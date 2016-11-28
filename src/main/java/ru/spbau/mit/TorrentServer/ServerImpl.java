@@ -31,6 +31,9 @@ public class ServerImpl implements Server {
     private volatile ServiceState serverState = ServiceState.PREINIT;
 
     private ExecutorService threadPool = Executors.newFixedThreadPool(10);
+    private Thread serverThread = new Thread(new ServerThread());
+    private Thread garbageCollectorThread = new Thread(new GarbageCollectorThread());
+
 
     private ServerProtocol protocol;
     private SortedMap<InetSocketAddress, Timestamp> timeToLive =
@@ -40,18 +43,17 @@ public class ServerImpl implements Server {
         @Override
         public void run() {
             while (!isStopped()) {
-                Socket clientSocket = null;
                 try {
-                    clientSocket = serverSocket.accept();
+                    Socket clientSocket = serverSocket.accept();
+                    threadPool.execute(new WorkerRunnable(clientSocket, getNow()));
                 } catch (IOException e) {
                     if (isStopped()) {
                         break;
                     }
                     logger.log(Level.SEVERE, "Couldn't accept a client", e);
                 }
-                threadPool.execute(new WorkerRunnable(clientSocket, getNow()));
             }
-            threadPool.shutdown();
+            threadPool.shutdownNow();
         }
     }
 
@@ -71,7 +73,7 @@ public class ServerImpl implements Server {
                     protocol.removeExtras(removed);
                     Thread.sleep(ProtocolConstants.SERVER_TIMEOUT_MILLIS);
                 } catch (InterruptedException e) {
-                    logger.log(Level.WARNING, "Interrupted the garbage collector", e);
+                    logger.log(Level.FINE, "Interrupted the garbage collector", e);
                 }
             }
         }
@@ -93,9 +95,7 @@ public class ServerImpl implements Server {
             throw new TorrentIOException("Couldn't load the state of the server", e);
         }
         openServerSocket();
-        Thread serverThread = new Thread(new ServerThread());
         serverThread.start();
-        Thread garbageCollectorThread = new Thread(new GarbageCollectorThread());
         garbageCollectorThread.start();
         serverState = ServiceState.RUNNING;
     }
@@ -107,6 +107,7 @@ public class ServerImpl implements Server {
         serverState = ServiceState.STOPPED;
         try {
             serverSocket.close();
+            garbageCollectorThread.interrupt();
             protocol.saveState();
         } catch (IOException e) {
             throw new TorrentIOException("Error closing server", e);

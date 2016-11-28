@@ -31,6 +31,7 @@ public class ClientImpl implements Client {
     private static final int NUM_THREADS = 10;
 
     private final FileManager fileManager;
+    private Thread keepAliveThread = new Thread(new KeepAliveThread());
     private final ClientProtocol protocol = new ClientProtocolImpl();
     private DataOutputStream netOut = null;
     private DataInputStream netIn = null;
@@ -78,8 +79,10 @@ public class ClientImpl implements Client {
 
                     aliveIn.close();
                     Thread.sleep(ProtocolConstants.SEED_UPDATER_FREQUENCY_MILLIS);
-                } catch (InterruptedException | IOException e) {
+                } catch (IOException e) {
                     logger.log(Level.SEVERE, "Keep alive thread is dead", e);
+                } catch (InterruptedException e){
+                    // this is okay
                 }
             }
         }
@@ -172,7 +175,7 @@ public class ClientImpl implements Client {
                         logger.log(Level.FINE, "Seed dead again", e);
                     }
                 } catch (InterruptedException e) {
-                    logger.log(Level.WARNING, "Was interrupted", e);
+                    logger.log(Level.FINE, "Was interrupted", e);
                 }
             }
         }
@@ -209,7 +212,6 @@ public class ClientImpl implements Client {
         hostPort = ServerImpl.PORT_NUMBER;
         clientState = ServiceState.RUNNING;
         // should launch a seed guy
-        Thread keepAliveThread = new Thread(new KeepAliveThread());
         keepAliveThread.start();
         seed.start();
 
@@ -229,13 +231,9 @@ public class ClientImpl implements Client {
         if (isStopped())
             return;
         clientState = ServiceState.STOPPED;
+        keepAliveThread.interrupt();
         seed.stop();
-        try {
-            leeches.awaitTermination(5, TimeUnit.SECONDS);
-            leeches.shutdownNow();
-        } catch (InterruptedException e) {
-            logger.log(Level.SEVERE, "Interrupted disconnect", e);
-        }
+        leeches.shutdownNow();
     }
 
     @Override
