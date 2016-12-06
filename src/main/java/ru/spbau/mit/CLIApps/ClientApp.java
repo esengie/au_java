@@ -16,9 +16,9 @@ import java.util.Scanner;
 
 public class ClientApp {
 
-    public static void main(String[] args2) {
+    public static void main(String[] args) {
         try {
-            String[] args = {"-port", "8012", "-stateDir", ".", "-tracker", "localhost"};
+//            String[] args = {"-port", "8012", "-stateDir", ".", "-tracker", "localhost"};
             CommandLine cmd = ClientLaunchArgs.parseArgs(args);
 
             Short port = Short.parseShort(cmd.getOptionValue(ClientLaunchArgs.PORT_ARG_NAME));
