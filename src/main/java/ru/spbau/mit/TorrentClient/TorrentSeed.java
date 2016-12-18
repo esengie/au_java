@@ -36,7 +36,7 @@ class TorrentSeed {
     TorrentSeed(short port, FileManager fileManager) {
         seedPort = port;
         this.fileManager = fileManager;
-        mySocketAddress = new InetSocketAddress("127.0.0.1", seedPort);
+        mySocketAddress = new InetSocketAddress(seedPort);
     }
 
     InetSocketAddress getMySocketAddress() {

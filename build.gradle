@@ -38,6 +38,11 @@ task gui(type: OneJar) {
     archiveName = 'gui.jar'
 }
 
+task localGui(type: Copy) {
+    from gui
+    into '.'
+}
+
 task server(type: OneJar) {
     mainClass = 'ru.spbau.mit.CLIApps.ServerApp'
     archiveName = 'server.jar'
