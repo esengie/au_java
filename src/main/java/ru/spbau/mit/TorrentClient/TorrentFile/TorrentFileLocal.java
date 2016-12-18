@@ -89,7 +89,7 @@ public class TorrentFileLocal extends Observable {
      * @param part part number to read
      * @throws IOException if writes are throwing
      */
-    public void write(byte[] buf, int part) throws IOException {
+    public synchronized void write(byte[] buf, int part) throws IOException {
         try (RandomAccessFile descriptor = new RandomAccessFile(localFile, mode)) {
             descriptor.seek(part * RemoteFile.PART_SIZE);
             descriptor.write(buf, 0, partSize(part));
@@ -110,7 +110,7 @@ public class TorrentFileLocal extends Observable {
         return RemoteFile.PART_SIZE;
     }
 
-    public int read(byte[] buf, int part) throws IOException {
+    public synchronized int read(byte[] buf, int part) throws IOException {
         int bytesToRead = partSize(part);
         try (RandomAccessFile descriptor = new RandomAccessFile(localFile, mode)) {
             descriptor.seek(part * RemoteFile.PART_SIZE);

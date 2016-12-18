@@ -113,7 +113,7 @@ class TorrentSeed {
                 netOut.close();
                 netIn.close();
             } catch (IOException e) {
-                logger.log(Level.SEVERE, "TorrentClient handler error", e);
+                logger.log(Level.FINE, "TorrentClient handler error", e);
             }
         }
     }
