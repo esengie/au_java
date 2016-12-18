@@ -36,7 +36,7 @@ class TorrentSeed {
     TorrentSeed(short port, FileManager fileManager) {
         seedPort = port;
         this.fileManager = fileManager;
-        mySocketAddress = new InetSocketAddress("127.0.0.1", seedPort);
+        mySocketAddress = new InetSocketAddress(seedPort);
     }
 
     InetSocketAddress getMySocketAddress() {
@@ -113,7 +113,7 @@ class TorrentSeed {
                 netOut.close();
                 netIn.close();
             } catch (IOException e) {
-                logger.log(Level.SEVERE, "TorrentClient handler error", e);
+                logger.log(Level.FINE, "TorrentClient handler error", e);
             }
         }
     }

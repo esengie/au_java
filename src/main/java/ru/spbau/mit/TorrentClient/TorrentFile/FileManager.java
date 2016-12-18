@@ -78,7 +78,6 @@ public class FileManager {
             TorrentFileLocal f = files.get(id);
             parts.put(id, f.getParts());
             fileNames.put(id, f.getFile());
-            f.close();
         }
 
         File folder = new File(saveDir, appFolderName);

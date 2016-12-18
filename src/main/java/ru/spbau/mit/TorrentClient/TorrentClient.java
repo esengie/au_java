@@ -1,11 +1,13 @@
 package ru.spbau.mit.TorrentClient;
 
 import ru.spbau.mit.Protocol.RemoteFile;
+import ru.spbau.mit.TorrentClient.TorrentFile.TorrentFileLocal;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
+import java.util.Observable;
 
 /**
  * Quite a heavy class - implements the peer and the seed functionality of a client.
@@ -31,5 +33,5 @@ public interface TorrentClient {
 
     List<InetSocketAddress> executeSources(int fileId) throws IOException;
 
-    void executeGet(File location, RemoteFile file) throws IOException;
+    TorrentFileLocal executeGet(File location, RemoteFile file) throws IOException;
 }

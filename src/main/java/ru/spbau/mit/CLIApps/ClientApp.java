@@ -1,4 +1,4 @@
-package ru.spbau.mit.Apps;
+package ru.spbau.mit.CLIApps;
 
 import org.apache.commons.cli.*;
 import ru.spbau.mit.Protocol.RemoteFile;
@@ -15,28 +15,19 @@ import java.util.List;
 import java.util.Scanner;
 
 public class ClientApp {
-    private static final String PORT_ARG_NAME = "port";
-    private static final String STATE_DIR_ARG_NAME = "stateDir";
-    private static final String TRACKER_ADDR_ARG_NAME = "tracker";
-    private static final Options OPTIONS = new Options();
 
-    static {
-        OPTIONS.addOption(PORT_ARG_NAME, true, "local port to start seeding");
-        OPTIONS.addOption(STATE_DIR_ARG_NAME, true, "directory for state");
-        OPTIONS.addOption(TRACKER_ADDR_ARG_NAME, true, "tracker location");
-    }
-
-    public static void main(String[] args2) {
+    public static void main(String[] args) {
         try {
-            String[] args = {"-port", "8012", "-stateDir", ".", "-tracker", "localhost"};
-            CommandLine cmd = parseArgs(args);
+//            String[] args = {"-port", "8012", "-stateDir", ".", "-tracker", "localhost"};
+            CommandLine cmd = ClientLaunchArgs.parseArgs(args);
 
-            Short port = Short.parseShort(cmd.getOptionValue(PORT_ARG_NAME));
+            Short port = Short.parseShort(cmd.getOptionValue(ClientLaunchArgs.PORT_ARG_NAME));
 
-            FileManager fileManager = new FileManager(new File(cmd.getOptionValue(STATE_DIR_ARG_NAME)));
+            FileManager fileManager = new FileManager(new File(
+                    cmd.getOptionValue(ClientLaunchArgs.STATE_DIR_ARG_NAME)));
             TorrentClient client = new TorrentClientImpl(fileManager, port);
 
-            client.connect(cmd.getOptionValue(TRACKER_ADDR_ARG_NAME));
+            client.connect(cmd.getOptionValue(ClientLaunchArgs.TRACKER_ADDR_ARG_NAME));
 
             List<RemoteFile> lastList = new ArrayList<>();
             usage();
@@ -113,7 +104,7 @@ public class ClientApp {
             }
         } catch (ParseException | IOException e) {
             System.out.println(e.getMessage());
-            launchUsage();
+            ClientLaunchArgs.launchUsage();
         }
     }
 
@@ -121,11 +112,8 @@ public class ClientApp {
         System.out.println("Usage:\n list, get fileID [dirToSave], source fileID, upload filePath, q");
     }
 
-    private static void launchUsage() {
-        System.out.println("Usage for launching:\n -port mySeedPort\n -stateDir whereToSaveState\n -tracker hostName");
-    }
 
-    private static String getUserInput() {
+    static String getUserInput() {
         return new Scanner(System.in).nextLine();
     }
 
@@ -137,22 +125,5 @@ public class ClientApp {
                     file.id, file.name, file.size));
         }
         System.out.println("------------------------------------");
-    }
-
-    private static CommandLine parseArgs(String[] args) throws ParseException {
-        CommandLineParser parser = new DefaultParser();
-        CommandLine cmdLine = parser.parse(OPTIONS, args);
-
-        if (!cmdLine.hasOption(PORT_ARG_NAME)) {
-            throw new ParseException("didn't specify port");
-        }
-        if (!cmdLine.hasOption(TRACKER_ADDR_ARG_NAME)) {
-            throw new ParseException("didn't specify tracker address");
-        }
-        if (!cmdLine.hasOption(STATE_DIR_ARG_NAME)) {
-            throw new ParseException("didn't specify directory to save/load state");
-        }
-
-        return cmdLine;
     }
 }

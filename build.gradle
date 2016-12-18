@@ -29,11 +29,21 @@ buildscript {
 }
 
 task client(type: OneJar) {
-    mainClass = 'ru.spbau.mit.Apps.ClientApp'
-    archiveName = 'client.jar'
+    mainClass = 'ru.spbau.mit.CLIApps.ClientApp'
+    archiveName = 'CLIclient.jar'
+}
+
+task gui(type: OneJar) {
+    mainClass = 'ru.spbau.mit.GUI.ClientAppG'
+    archiveName = 'gui.jar'
+}
+
+task localGui(type: Copy) {
+    from gui
+    into '.'
 }
 
 task server(type: OneJar) {
-    mainClass = 'ru.spbau.mit.Apps.ServerApp'
+    mainClass = 'ru.spbau.mit.CLIApps.ServerApp'
     archiveName = 'server.jar'
 }

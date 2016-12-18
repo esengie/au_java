@@ -15,10 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -282,9 +279,9 @@ public class TorrentClientImpl implements TorrentClient {
      * @throws IOException -- could throw on a network error, or file creation error
      */
     @Override
-    public void executeGet(File location, RemoteFile file) throws IOException {
+    public TorrentFileLocal executeGet(File location, RemoteFile file) throws IOException {
         if (isStopped())
-            return;
+            return null;
         TorrentFileLocal f = fileManager.getTorrentFile(file.id);
         if (f == null) {
             fileManager.createTorrentFile(location, file);
@@ -300,7 +297,7 @@ public class TorrentClientImpl implements TorrentClient {
         Set<Integer> partsDone = new HashSet<>(f.getParts());
 
         if (partsDone.size() == file.parts())
-            return;
+            return f;
 
         Set<Integer> partsNeeded = new HashSet<>();
         for (int i = 0; i < file.parts(); ++i) {
@@ -312,5 +309,6 @@ public class TorrentClientImpl implements TorrentClient {
         partsNeeded = new ConcurrentSkipListSet<>(partsNeeded);
         FileToLeech fl = new FileToLeech(file.id, partsNeeded, f);
         partsNeeded.forEach(s -> leechQueue.add(fl));
+        return f;
     }
 }
